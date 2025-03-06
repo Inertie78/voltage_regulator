@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <title>Controleur batterie</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Crimson+Pro">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		<link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/superhero/bootstrap.min.css" rel="stylesheet" title="main">
+    <script src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
+		<script src="https://canvasjs.com/assets/script/jquery.canvasjs.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.0/bootstrap-table.min.css">
+    <script src="https://unpkg.com/bootstrap-table@1.14.2/dist/bootstrap-table.min.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <link rel="stylesheet" href="static/menu.css">
+    <link rel="stylesheet" href="static/style.css">
+    <script src="static/script.js"></script>
+  </head>
+  <body >
+    <div>
+      <ul id="menu">
+        <li><a href="/" id="btMenuBatterie">Batterie</a></li>
+        <li><a href="/graphic" id="btMenuBatterie">Graphique</a></li>
+        <li><a href="/settings" id="btMenuSettings">Settings</a></li>
+        <li style="float:right"><a href="/about" id="#btMenuAbout">About</a></li>
+      </ul>
+      
+      <div class="Center_container">
+      
+        <div class="classTitre">
+          <section class="wrapperH1">
+            <div class="top">Controleur de batterie</div>
+            <div class="bottomH1" aria-hidden="true">Controleur de batterie</div>
+          </section>
+        </div>
+        
+        <div class="configuInput" style="margin-bottom: 20px;" >
+          <h4 class="classMois" id="current_date"></h4>
+          <h4 class="classHeure" id="current_time"></h4>
+        </div>
+    
+        <div class="configuInput">
+          <div class="configuInput">
+              <div style="margin-right: 50px;" id="chart_Tension"></div>
+              <div id="chart_Temp"></div>
+          </div>
+        </div>
+
+        {% block content %}{% endblock %}
+
+      </div>
+    </div>
+  </body>
+</html>
