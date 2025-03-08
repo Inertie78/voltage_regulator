@@ -1,0 +1,78 @@
+version : 3.9
+
+
+services : 
+
+  rev_proxy :
+    build : 
+      context : ./Projet/regulateur_tension/nginx
+      dockerfile : dockerfile.rev_proxy
+    volumes : 
+      - ./Projet/regulateur_tension/nginx/templates:/etc/nginx/templates
+      - ./Projet/regulateur_tension/nginx/nginx.conf:/etc/nginx/nginx.conf
+    ports : 
+      - 80:80
+    depends_on : 
+      - db
+      - flask
+      - php_myadmin
+
+    network :
+      - front
+      - back
+
+  db :
+    image : mysql
+    restart : always
+    environnment :
+      - MYSQL_ROOT_PASSWORD : 1234
+      - MYSQL_DATABASE : tension_base
+      - MYSQL_USER : flask && guillaume && christophe
+      - MYSQL_PASSWORD : password   # à mettre depuis un fichier externe
+    volumes :
+      - ./projet/regulateur_tension/mysql:/var/lib/mysql
+    expose :
+      - 3306
+      - 33060
+    network : 
+      - back
+
+  php_myadmin:
+    image : phpmyadmin
+    restart : always
+    depends_on :
+      db
+    environnment :
+      PMA_host : db
+      PMA_PASSWORD : password #repris depuis fichier externe
+    ports :
+      - 9080:80
+    networks :
+      - front
+      - back
+  
+
+  flask :
+    build : 
+      context : ./Projet/regulateur_tension/flask 
+      dockerfile : dockerfile.flask
+    restart: always
+    secrets : password #repris de fichier externe
+    depends_on : 
+      - db
+      - rev_proxy
+      
+    volumes : 
+      - ./index2.html:/var/www/localhost/htdocs/index.html
+    ports :
+      - 8090:80
+    
+    network :
+      - front
+      - back
+
+  volumes :
+    - /Projet/regulateur_tension 
+  networks : 
+    - front
+    - back 

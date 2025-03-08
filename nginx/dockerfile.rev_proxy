@@ -1,0 +1,5 @@
+FROM nginx:latest
+RUN apt --no-cache upgrade && apk add --no-cache bash
+COPY ./Projet/regulateur_tension/nginx/nginx.conf /etc/nginx.conf && ./Projet/regulateur_tension/nginx/defaut.conf /etc/nginx/conf.d/
+CMD ["/usr/sbin/httpd", "-D", "FOREGROUND"] # cette commande permet de garder le programme actif et qu'il ne passe pas en arrière plan une fois qu'elle a démarré.
+
