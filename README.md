@@ -17,7 +17,19 @@
 # Pour la base de données, je te propose mariaDB (https://hub.docker.com/_/mariadb)
 # Pour php_myadmin on pourrait utiliser adminer (https://hub.docker.com/_/adminer)
 
+# Tu en pensed quoi? On poura en discuter mardi
+
 ######################## Pas réussi ########################
 # J'aurais voulu reprendre l'utilisateur dans le dockerfile.flask mais je n'arrive pas.
 
-# Tu en pensed quoi? On poura en discuter mardi
+######################## Raspberrypi ########################
+#### BMP180 pression et température
+# documentation: https://learn.adafruit.com/adafruit-bmp280-barometric-pressure-plus-temperature-sensor-breakout/circuitpython-test
+
+#### se connecter
+# Il faut trouver l'adresse IP de la carte.
+# https://www.advanced-ip-scanner.com/fr/
+
+# logiciel https://www.putty.org/
+
+# vscode https://code.visualstudio.com/docs/remote/ssh
