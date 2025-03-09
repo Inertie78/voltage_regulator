@@ -71,6 +71,20 @@ services :
       - front
       - back
 
+  script :
+    build :
+      context : ./script
+      dockerfile : dockerfile.script
+    restart : allways
+    secrets : password
+    depends_on :
+      - flask
+      - db
+
+    networks :
+      - front
+      - back
+
   volumes :
     - /Projet/regulateur_tension 
   networks : 
