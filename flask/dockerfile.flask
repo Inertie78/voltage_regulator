@@ -1,1 +1,24 @@
-FROM python:latest
+FROM python:alpine
+
+# création d'un utilisateur guichri pour ne pas être root ensuite
+RUN adduser -D guichri
+
+# création d'un dossier /app avec l'utilisateur guichri comme propriétaire
+RUN mkdir /app && chown guichri /app
+
+# copie le code du backend Flask dans l'image
+COPY main.py /app  
+COPY ./static /app
+COPY ./templates /app
+
+# ajout du bit x, pour qu'il soit directement executable
+RUN chmod +x /app/main.py
+
+# bascule sur l'utilisateur guichri
+USER guichri
+
+# installation de Flask et Waitress
+RUN pip install --upgrade pip && pip install flask waitress
+
+# démarrage du serveur en dernière étape
+CMD ["/app/main.py"]

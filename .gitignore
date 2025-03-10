@@ -1,0 +1,4 @@
+# Compiled source #
+###################
+.vscode/
+flask/.flask_venv/

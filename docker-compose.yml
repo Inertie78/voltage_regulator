@@ -22,13 +22,14 @@ services :
       - back
 
   db :
+    env_file: .env
     image : mysql
     restart : always
     environnment :
       - MYSQL_ROOT_PASSWORD : 1234
       - MYSQL_DATABASE : tension_base
-      - MYSQL_USER : flask && guillaume && christophe
-      - MYSQL_PASSWORD : password   # à mettre depuis un fichier externe
+      - MYSQL_USER : &{USER}
+      - MYSQL_PASSWORD : &{MOT_DE_PASSE}
     volumes :
       - ./projet/regulateur_tension/mysql:/var/lib/mysql
     expose :
@@ -38,6 +39,7 @@ services :
       - back
 
   php_myadmin:
+    env_file: .env 
     image : phpmyadmin
     restart : always
     depends_on :
