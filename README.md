@@ -12,7 +12,14 @@
 # Misage jour par Christophe du dockerfile.flask
 # création par Christophe du fichier .env pour l'utilisateur et la clé
 
-
+######################## le 10.03.2025 ########################
+# mise à jour par Guillaume du dockerfile.rev_proxy
+# mise à jour par Guillaume du dockerfile.script
+# mise à jour par Guillaume du docker-compose.yaml
+# mise à jour par Guillaume du requirements.txt (script)
+# mise à jour par Guillaume du nginx.conf
+# docker-compose : mysql -> mariadb
+# modification de dockerfile.flask / CMD -> ajout "python3"
 ######################## porposition ########################
 # Pour la base de données, je te propose mariaDB (https://hub.docker.com/_/mariadb)
 # Pour php_myadmin on pourrait utiliser adminer (https://hub.docker.com/_/adminer)

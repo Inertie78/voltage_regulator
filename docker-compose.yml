@@ -1,52 +1,50 @@
-version : 3.9
-
-
 services : 
 
   rev_proxy :
     build : 
-      context : ./Projet/regulateur_tension/nginx
+      context : ./nginx
       dockerfile : dockerfile.rev_proxy
     volumes : 
-      - ./Projet/regulateur_tension/nginx/templates:/etc/nginx/templates
-      - ./Projet/regulateur_tension/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/templates:/etc/nginx/templates
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
     ports : 
       - 80:80
+    restart : always
     depends_on : 
       - db
       - flask
-      - php_myadmin
+      - adminer
 
-    network :
+    networks :
       - front
       - back
 
   db :
     env_file: .env
-    image : mysql
+    image : mariadb
     restart : always
-    environnment :
-      - MYSQL_ROOT_PASSWORD : 1234
-      - MYSQL_DATABASE : tension_base
-      - MYSQL_USER : &{USER}
-      - MYSQL_PASSWORD : &{MOT_DE_PASSE}
+    environment :
+      - MARIADB_ROOT_PASSWORD=${MOT_DE_PASSE}
+      - MARIADB_DATABASE=tension_base
+      - MARIADB_USER=${USER_APP}
+      - MARIADB_PASSWORD=${MOT_DE_PASSE}
     volumes :
-      - ./projet/regulateur_tension/mysql:/var/lib/mysql
+      - ./mariadb:/var/lib/mysql
     expose :
       - 3306
       - 33060
-    network : 
+    networks : 
       - back
 
-  php_myadmin:
+  adminer:
     env_file: .env 
-    image : phpmyadmin
+    image : adminer
     restart : always
     depends_on :
-      db
-    environnment :
-      PMA_host : db
-      PMA_PASSWORD : password #repris depuis fichier externe
+      - db
+    environment :
+      - PMA_host=db
+      - PMA_PASSWORD=${MOT_DE_PASSE}
     ports :
       - 9080:80
     networks :
@@ -56,20 +54,18 @@ services :
 
   flask :
     build : 
-      context : ./Projet/regulateur_tension/flask 
+      context : flask 
       dockerfile : dockerfile.flask
-    restart: always
-    secrets : password #repris de fichier externe
+    restart : always
     depends_on : 
       - db
-      - rev_proxy
       
     volumes : 
       - ./index2.html:/var/www/localhost/htdocs/index.html
     ports :
       - 8090:80
     
-    network :
+    networks :
       - front
       - back
 
@@ -77,8 +73,7 @@ services :
     build :
       context : ./script
       dockerfile : dockerfile.script
-    restart : allways
-    secrets : password
+    restart : always
     depends_on :
       - flask
       - db
@@ -87,8 +82,8 @@ services :
       - front
       - back
 
-  volumes :
-    - /Projet/regulateur_tension 
-  networks : 
-    - front
-    - back 
+volumes :
+  mysql :
+networks : 
+  front :
+  back :

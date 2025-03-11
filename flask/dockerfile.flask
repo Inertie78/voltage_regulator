@@ -21,4 +21,4 @@ USER guichri
 RUN pip install --upgrade pip && pip install flask waitress
 
 # démarrage du serveur en dernière étape
-CMD ["/app/main.py"]
+CMD ["python3", "/app/main.py"]
