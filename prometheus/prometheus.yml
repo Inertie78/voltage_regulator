@@ -1,0 +1,7 @@
+global:
+    scrape_interval: 10s
+
+scrape_configs:
+  - job_name: "python-app"
+    static_configs:
+      - targets: ["script:8000"] #adresse de l'application exposant les metric

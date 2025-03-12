@@ -3,6 +3,7 @@ WORKDIR /usr/src/app
 COPY requirements.txt ./
 RUN apt update && apt install bash && apt install -y bash && \
 pip install --upgrade pip && \
+pip install prometheus_client && \
 pip install --no-cache-dir -r requirements.txt && \
 apt clean && rm -rf /var/lib/apt/lists/*
 

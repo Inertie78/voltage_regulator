@@ -11,59 +11,58 @@ services :
       - 80:80
     restart : always
     depends_on : 
-      - db
       - flask
-      - adminer
+      - prometheus
+      - grafana
 
-    networks :
+    networks:
       - front
       - back
 
-  db :
-    env_file: .env
-    image : mariadb
-    restart : always
-    environment :
-      - MARIADB_ROOT_PASSWORD=${MOT_DE_PASSE}
-      - MARIADB_DATABASE=tension_base
-      - MARIADB_USER=${USER_APP}
-      - MARIADB_PASSWORD=${MOT_DE_PASSE}
-    volumes :
-      - ./mariadb:/var/lib/mysql
-    expose :
-      - 3306
-      - 33060
-    networks : 
-      - back
+  prometheus:
+    image: prom/prometheus:v2.33.5
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus:/workspace
+    command:
+      - '--config.file=/workspace/prometheus.yml'
 
-  adminer:
-    env_file: .env 
-    image : adminer
-    restart : always
-    depends_on :
-      - db
-    environment :
-      - PMA_host=db
-      - PMA_PASSWORD=${MOT_DE_PASSE}
-    ports :
-      - 9080:80
-    networks :
+    networks:
       - front
       - back
-  
+  grafana:
+    image: grafana/grafana:8.4.3
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: "Admin"
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
 
+    networks:
+      - front
+      - back
+    
   flask :
     build : 
       context : flask 
       dockerfile : dockerfile.flask
     restart : always
     depends_on : 
-      - db
+      - prometheus
       
     volumes : 
-      - ./index2.html:/var/www/localhost/htdocs/index.html
+      - ./flask/main.py:/app/main.py:ro
+      - ./flask/templates:/app/templates:ro     #ro pour read only
+      - ./flask/static:/app/static:ro
     ports :
-      - 8090:80
+      - 8090:5000
     
     networks :
       - front
@@ -76,14 +75,17 @@ services :
     restart : always
     depends_on :
       - flask
-      - db
+      
+
+#    volumes : 
+#      - /sys/class/gpio:/sys/class/gpio
 
     networks :
       - front
       - back
 
 volumes :
-  mysql :
+  prometheus :
 networks : 
   front :
   back :

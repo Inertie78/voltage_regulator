@@ -2,3 +2,4 @@
 ###################
 .vscode/
 flask/.flask_venv/
+.env

@@ -6,10 +6,17 @@
 import random
 #import RPi.GPIO as GPIO
 from time import sleep
+#from prometheus_client import start_http_server, Gauge
+
+
+#start_http_server(8000)   #pour exposer les metric sur prometheus
 
 
 circuit = 1
 etat_circuit = "ouvert"
+
+def log(printValue):
+    print(printValue, flush=True)
 
 while True : 
     
@@ -17,26 +24,26 @@ while True :
 
     sleep(5)
 
-    
-    
-    
     try :
                 
         if measure <= 11.5 and circuit == 1 :
             circuit = 0
             etat_circuit = "fermé"
-            print(f"La tension est de {measure} V. Le circuit était ouvert, il est désormait {etat_circuit} pour charger la batterie.")
+            printValue = f"La tension est de {measure} V. Le circuit était ouvert, il est désormait {etat_circuit} pour charger la batterie."
+            log(printValue)
             sleep(5)
         
 
         if measure >= 14.0 and circuit == 0 :
             circuit = 1
             etat_circuit = "ouvert"
-            print(f"La tension est de {measure} V. Le circuit était fermé, il est désormais {etat_circuit}, la charge est terminée")
+            printValue = f"La tension est de {measure} V. Le circuit était fermé, il est désormais {etat_circuit}, la charge est terminée"
+            log(printValue)
             sleep(5)
 
         if 11.5 <= measure >= 14.0 :
-            print(f"La tension est de {measure} V. Aucun changement nécessaire sur le circuit. Le circuit est {etat_circuit}")
+            printValue =f"La tension est de {measure} V. Aucun changement nécessaire sur le circuit. Le circuit est {etat_circuit}"
+            log(printValue)
             sleep(5)
             pass
 

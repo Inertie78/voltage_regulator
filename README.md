@@ -40,3 +40,7 @@
 # logiciel https://www.putty.org/
 
 # vscode https://code.visualstudio.com/docs/remote/ssh
+
+
+# prometus comme base de donnée
+# grafana pour faire des graphs sur la base de prometus 
