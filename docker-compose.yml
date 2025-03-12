@@ -21,6 +21,7 @@ services :
 
   prometheus:
     image: prom/prometheus:v2.33.5
+    restart: always
     ports:
       - "9090:9090"
     volumes:
@@ -33,6 +34,7 @@ services :
       - back
   grafana:
     image: grafana/grafana:8.4.3
+    restart: always
     ports:
       - "3000:3000"
     volumes:
