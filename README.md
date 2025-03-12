@@ -29,6 +29,16 @@
 ######################## Pas réussi ########################
 # J'aurais voulu reprendre l'utilisateur dans le dockerfile.flask mais je n'arrive pas.
 
+######################## modification pendant le cours du 11.03.2025 ########################
+
+# sur conseil de M. Barazzutti, une db Prometheus serait plus appropriée pour notre projet. 
+# nous supprimons mariadb
+# nous supprimons adminer
+# nous ajoutons un docker prometheus
+# nous ajoutons un docker grafana
+# ces deux services sont une vrai galère à faire fonctionner derrière le reverse proxy nginx, à cause de leur structure. Flask \
+  est plus adapté et cela reste cohérent d'avoir un reverse proxy que pour flask. Prometheus et Grafana sont supprimés nginx.
+
 ######################## Raspberrypi ########################
 #### BMP180 pression et température
 # documentation: https://learn.adafruit.com/adafruit-bmp280-barometric-pressure-plus-temperature-sensor-breakout/circuitpython-test
