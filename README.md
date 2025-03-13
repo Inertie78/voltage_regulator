@@ -39,6 +39,12 @@
 # ces deux services sont une vrai galère à faire fonctionner derrière le reverse proxy nginx, à cause de leur structure. Flask \
   est plus adapté et cela reste cohérent d'avoir un reverse proxy que pour flask. Prometheus et Grafana sont supprimés nginx.
 
+######################## création du nouvelle branche du 12.03.2025 ########################
+# Misage jour par Christophe ajout des noms de conteneur dans le docker-compose
+# Misage jour par Christophe ajout du volume de laison pour le script le fichier main.py dans le docker-compose
+# Test de code python pour communquier avec prometheus
+
+
 ######################## Raspberrypi ########################
 #### BMP180 pression et température
 # documentation: https://learn.adafruit.com/adafruit-bmp280-barometric-pressure-plus-temperature-sensor-breakout/circuitpython-test
