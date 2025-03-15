@@ -11,9 +11,13 @@ app = Flask(__name__)
 def index():
     return render_template('home.html')
 
-@app.route("/graphic")
-def graphic():
-    return render_template('graphic.html')
+@app.route("/grafana")
+def grafana():
+    return render_template('grafana.html')
+
+@app.route("/raspio")
+def raspio():
+    return render_template('raspio.html')
 
 @app.route("/settings")
 def settings():

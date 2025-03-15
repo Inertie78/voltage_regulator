@@ -44,7 +44,7 @@
 # Misage jour par Christophe ajout du volume de laison pour le script le fichier main.py dans le docker-compose
 # Test de code python pour communquier avec prometheus.
 
-######################## création d'un script pour récuperer les températures et autres valuer du pc du 15.03.2025 ########################
+######################## création d'un script pour récuperer les valeurs du pc du 15.03.2025 ########################
 # ce qui fonctionne
   # acquisition des valeurs avec le script python
   # envoie des valeurs sur prometheus

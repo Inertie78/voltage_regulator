@@ -7,25 +7,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Crimson+Pro">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-		<link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/superhero/bootstrap.min.css" rel="stylesheet" title="main">
-    <script src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
-		<script src="https://canvasjs.com/assets/script/jquery.canvasjs.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.0/bootstrap-table.min.css">
-    <script src="https://unpkg.com/bootstrap-table@1.14.2/dist/bootstrap-table.min.js"></script>
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/superhero/bootstrap.min.css" rel="stylesheet" title="main">
+
 
     <link rel="stylesheet" href="static/menu.css">
     <link rel="stylesheet" href="static/style.css">
     <script src="static/script.js"></script>
   </head>
-  <body >
-    <div>
+  <body>
+    <div class="Center_container">
       <ul id="menu">
-        <li><a href="/flask" id="btMenuBatterie">Home</a></li>
-        <li><a href="/flask/graphic" id="btMenuBatterie">Graphique</a></li>
-        <li><a href="/flask/settings" id="btMenuSettings">Settings</a></li>
+        <li><a href="/flask">Home</a></li>
+        <li><a href="/flask/grafana">Grafana</a></li>
+        <li><a href="/flask/raspio">GPIO</a></li>
+        <li><a href="/flask/settings">Settings</a></li>
         <li style="float:right"><a href="/flask/about" id="#btMenuAbout">About</a></li>
       </ul>
       
@@ -41,13 +36,6 @@
         <div class="configuInput" style="margin-bottom: 20px;" >
           <h4 class="classMois" id="current_date"></h4>
           <h4 class="classHeure" id="current_time"></h4>
-        </div>
-    
-        <div class="configuInput">
-          <div class="configuInput">
-              <div style="margin-right: 50px;" id="chart_Tension"></div>
-              <div id="chart_Temp"></div>
-          </div>
         </div>
 
         {% block content %}{% endblock %}
