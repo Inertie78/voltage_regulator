@@ -1,72 +1,44 @@
-#ce script génère aléatoirement des valeurs qui simulent une tension de batterie. 
-#lorsque la tension est inférieure à 11.5 v, le relais ferme le circuit et lance la charge. Lorsque la tension est suppérieure à 14 V, 
-#le relais ouvre le circuit et interrompt la charge de la batterie
+from prometheus_client import start_http_server
+from sensor import Sensor
+from infoPc import InfoPc
+import logging
+import time
+import os
 
 
-import random
-#import RPi.GPIO as GPIO
-from time import sleep
-#from prometheus_client import start_http_server, Gauge
+def main():
+    info_pc = InfoPc()
+    list_sensor = info_pc.get_list_sensor()
+    sensors = []
+    for name in list_sensor:
+        sensor = Sensor(name)
+        sensors.append(sensor)
 
-
-#start_http_server(8000)   #pour exposer les metric sur prometheus
-
-
-circuit = 1
-etat_circuit = "ouvert"
-
-def log(printValue):
-    print(printValue, flush=True)
-
-while True : 
-    
-    measure = round(random.uniform(11.0, 15.0), 2)
-
-    sleep(5)
-
-    try :
-                
-        if measure <= 11.5 and circuit == 1 :
-            circuit = 0
-            etat_circuit = "fermé"
-            printValue = f"La tension est de {measure} V. Le circuit était ouvert, il est désormait {etat_circuit} pour charger la batterie."
-            log(printValue)
-            sleep(5)
+    while True:
+        info_pc.infoPc()
         
+        for sensor in sensors:
+            try:
+                name = sensor.get_name()
+                value = list_sensor[name]
 
-        if measure >= 14.0 and circuit == 0 :
-            circuit = 1
-            etat_circuit = "ouvert"
-            printValue = f"La tension est de {measure} V. Le circuit était fermé, il est désormais {etat_circuit}, la charge est terminée"
-            log(printValue)
-            sleep(5)
+                logging.info(f"{name}: {value}")
+                
+                sensor.set_gauge(value)
+                
+            except Exception as e:
+                logging.error(f"An error occurred when assigning values to the gauges: {e}")
 
-        if 11.5 <= measure >= 14.0 :
-            printValue =f"La tension est de {measure} V. Aucun changement nécessaire sur le circuit. Le circuit est {etat_circuit}"
-            log(printValue)
-            sleep(5)
-            pass
-
-    except :
-
-        continue
-
-    
+        time.sleep(60)
 
 
-#GPIO.setmode(GPIO.BCM)
-#GPIO.setup(18, GPIO.OUT)
+if __name__ == "__main__":
+    format = "%(asctime)s %(levelname)s: %(message)s"
+    level = os.getenv("LOG_LEVEL", "INFO")
+    logging.basicConfig(format=format, level=level)
 
-#try:
-#    while True:
-#        GPIO.output(18, GPIO.HIGH)
-#        time.sleep(1)
-#        GPIO.output(18, GPIO.LOW)
-#        time.sleep(1)
-#except KeyboardInterrupt:
-#    print("Arrêt demandé par l'utilisateur")
-#finally:
-#    GPIO.cleanup()
+    port = int(os.getenv("EXPORTER_PORT", 8000))
+    logging.info(f"Starting web server at port {port}")
+    start_http_server(port)
 
-
-
+    main()

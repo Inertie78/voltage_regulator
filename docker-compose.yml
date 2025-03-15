@@ -89,7 +89,9 @@ services :
     volumes :
       - ./script/main.py:/usr/src/app/main.py:ro #Rajouter le 12.03.2025 par Christophe à contrôler
     #- /sys/class/gpio:/sys/class/gpio
-
+    ports:
+      - "8000:8000"
+    
     networks :
       - front
       - back
