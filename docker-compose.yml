@@ -80,6 +80,7 @@ services :
 
   script :
     container_name: script
+    privileged: true
     build :
       context : ./script
       dockerfile : dockerfile.script

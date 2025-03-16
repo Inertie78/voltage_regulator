@@ -1,9 +1,24 @@
+import RPi.GPIO as GPIO
 from prometheus_client import start_http_server
-from sensor import Sensor
-from infoPc import InfoPc
 import logging
 import time
 import os
+
+from sensor import Sensor
+from infoPc import InfoPc
+
+ledPin = 8
+GPIO.setwarnings(False) # Ignore warning for now
+GPIO.setmode(GPIO.BOARD) # Use physical pin numbering
+
+GPIO.setup(ledPin, GPIO.OUT, initial=GPIO.LOW) # Set pin 8 to be an output pin and set initial value to low (off)
+
+def blinkLed():
+    GPIO.output(ledPin, GPIO.HIGH) # Turn on
+    time.sleep(10) # Sleep for 1 second
+
+    GPIO.output(ledPin, GPIO.LOW) # Turn off
+    time.sleep(10) # Sleep for 1 second
 
 
 def main():
@@ -29,8 +44,8 @@ def main():
             except Exception as e:
                 logging.error(f"An error occurred when assigning values to the gauges: {e}")
 
-        time.sleep(60)
-
+        
+        blinkLed()
 
 if __name__ == "__main__":
     format = "%(asctime)s %(levelname)s: %(message)s"
