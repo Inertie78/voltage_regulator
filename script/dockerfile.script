@@ -6,7 +6,6 @@ RUN groupadd gpio && usermod -G gpio root
 RUN apt-get update && apt-get install -y \
   gcc \
   rpi.gpio \
- #  make \
   && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /usr/src/app
