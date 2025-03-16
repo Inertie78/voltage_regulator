@@ -83,18 +83,12 @@ services :
     privileged: true
     build :
       context : ./script
-      dockerfile : dockerfile.script
+      dockerfile : dockerfile.script 
     restart : always
-    depends_on :
-      - flask
-      
-
     volumes :
-      - ./script/main.py:/usr/src/app/main.py:ro #Rajouter le 12.03.2025 par Christophe à contrôler
-    #- /sys/class/gpio:/sys/class/gpio
+      - ./script/main.py:/usr/src/app/main.py:ro
     ports:
       - "8000:8000"
-    
     networks :
       - front
       - back
