@@ -10,7 +10,8 @@
     </div>
 
     <label class="classSelecteurLabel">Sélectionner la batterie</label>
-    <div>
+
+    <div class="classTitre">
       <select name="batterieSelect" id="batterieSelect" class="classSelecteur">
         <option value="plomb">Plomb</option>
         <option value="nicd">Ni-Cd</option>
@@ -22,28 +23,6 @@
       </select>
     </div>
     
-    <div class="tab-pane fade in active classTable" id="div_mesures">
-      <div class="classTitre">
-        <section class="wrapper">
-          <div class="top">Table</div>
-          <div class="bottom" aria-hidden="true">Table</div>
-        </section>
-      </div>
-      <table  id="tab_mesures"
-          data-toggle="table"
-          data-height="fit-content"
-          data-width ="fit-content"
-          data-pagination="true"
-          data-show-columns="true"
-          data-buttons-align="left">
-        <thead>
-          <tr>
-            <th data-field="e" data-halign="center" data-align="center">Heure</th>
-            <th data-field="t" data-halign="center" data-align="center">Température</th>
-            <th data-field="h" data-halign="center" data-align="center">Tension</th>
-          </tr>
-        </thead>
-      </table>
-    </div>
-</div>
+    <iframe src="http://localhost:9090"></iframe>
+
 {% endblock %}

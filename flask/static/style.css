@@ -14,10 +14,12 @@
   --input-focus-l: 50%;
 }
 
-body {
+html, body {
   background-color: var(--colorBody);
   color: var(--colorWhite);
   font-family:Tahoma;
+  width: 100%;
+  height: 100%;
 }
 
 .classSelecteurLabel{
@@ -37,8 +39,8 @@ body {
 .bottom {
   clip-path: polygon(0% 60%, 100% 50%, 100% 100%, 0% 100%);
   color: transparent;
-  background: -webkit-linear-gradient(177deg, black 53%, var(--text-color) 65%);
-  background: linear-gradient(177deg, black 53%, var(--text-color) 65%);
+  background: -webkit-linear-gradient(177deg, black 40%, var(--text-color) 65%);
+  background: linear-gradient(177deg, black 40%, var(--text-color) 65%);
   background-clip: text;
   -webkit-background-clip: text;
   transform: translateX(-0.02em);
@@ -47,8 +49,8 @@ body {
 .bottomH1 {
   clip-path: polygon(0% 60%, 100% 50%, 100% 100%, 0% 100%);
   color: transparent;
-  background: -webkit-linear-gradient(177deg, black 53%, var(--h1-color) 65%);
-  background: linear-gradient(177deg, black 53%, var(--h1-color) 65%);
+  background: -webkit-linear-gradient(177deg, black 40%, var(--h1-color) 65%);
+  background: linear-gradient(177deg, black 40%, var(--h1-color) 65%);
   background-clip: text;
   -webkit-background-clip: text;
   transform: translateX(-0.02em);
@@ -90,11 +92,11 @@ body {
 .Center_container{
   text-align: center;
   align-content: center;
+  justify-content: center;
   width: 100%;
+  height: 100%;
   padding: 20px;
 }
-
-
 
 select{
   margin-top: 10px;
@@ -181,4 +183,22 @@ div.centered table
   margin: 20px; 
   padding: 30px;
   background-color: var(--colorBody);
+}
+
+.table-container {
+          
+  /* Apply Flexbox*/
+  display: flex;
+  
+/* Horizontally center the Table*/
+  justify-content: center;
+    
+/* Verticalyy center the Table*/
+  align-items: center;
+ 
+}
+
+iframe{
+  width: 100%;
+  height: 100%;
 }
