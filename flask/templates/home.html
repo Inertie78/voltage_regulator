@@ -2,27 +2,27 @@
 
 {% block content %}
 
-    <div class="classTitre">
-        <section class="wrapper" style="margin: 10px;">
-        <div class="top">Home</div>
-        <div class="bottom" aria-hidden="true">Home</div>
-        </section>
-    </div>
+  <div class="classTitre">
+    <section class="wrapper" style="margin: 10px;">
+      <div class="top">Home</div>
+      <div class="bottom" aria-hidden="true">Home</div>
+    </section>
+  </div>
 
-    <label class="classSelecteurLabel">Sélectionner la batterie</label>
+  <label class="classSelecteurLabel">Sélectionner la batterie</label>
 
-    <div class="classTitre">
-      <select name="batterieSelect" id="batterieSelect" class="classSelecteur">
-        <option value="plomb">Plomb</option>
-        <option value="nicd">Ni-Cd</option>
-        <option value="nimh">Ni-MH</option>
-        <option value="lipo">Li-Po</option>
-        <option value="life">Li-Fe</option>
-        <option value="liion">Li-Ion</option>
-        <option value="Lilo">li-Lo</option> 
-      </select>
-    </div>
-    
-    <iframe src="http://localhost:9090"></iframe>
+  <div class="classTitre">
+    <select title="batterieSelect" name="batterieSelect" id="batterieSelect" class="classSelecteur">
+      <option value="plomb">Plomb</option>
+      <option value="nicd">Ni-Cd</option>
+      <option value="nimh">Ni-MH</option>
+      <option value="lipo">Li-Po</option>
+      <option value="life">Li-Fe</option>
+      <option value="liion">Li-Ion</option>
+      <option value="Lilo">li-Lo</option> 
+    </select>
+  </div>
+  
+  <iframe src="http://0.0.0.0:9090"></iframe>
 
 {% endblock %}

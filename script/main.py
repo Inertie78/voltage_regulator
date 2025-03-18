@@ -1,4 +1,5 @@
-import RPi.GPIO as GPIO
+import gpiod
+from gpiod.line import Direction, Value
 from prometheus_client import start_http_server
 import logging
 import time
@@ -7,17 +8,24 @@ import os
 from sensor import Sensor
 from infoPc import InfoPc
 
-ledPin = 8
-GPIO.setwarnings(False) # Ignore warning for now
-GPIO.setmode(GPIO.BOARD) # Use physical pin numbering
 
-GPIO.setup(ledPin, GPIO.OUT, initial=GPIO.LOW) # Set pin 8 to be an output pin and set initial value to low (off)
+LED_PIN = 23
+
+led_line = gpiod.request_lines(
+    "/dev/gpiochip0",
+    consumer="blink-example",
+    config={
+        LED_PIN: gpiod.LineSettings(
+            direction=Direction.OUTPUT, output_value=Value.ACTIVE
+        )
+    },
+)
 
 def blinkLed():
-    GPIO.output(ledPin, GPIO.HIGH) # Turn on
+    led_line.set_value(LED_PIN, Value.ACTIVE) # Turn on
     time.sleep(10) # Sleep for 1 second
 
-    GPIO.output(ledPin, GPIO.LOW) # Turn off
+    led_line.set_value(LED_PIN, Value.INACTIVE) # Turn off
     time.sleep(10) # Sleep for 1 second
 
 
@@ -26,8 +34,12 @@ def main():
     list_sensor = info_pc.get_list_sensor()
     sensors = []
     for name in list_sensor:
-        sensor = Sensor(name)
-        sensors.append(sensor)
+        try:
+            value_test = float(list_sensor[name])
+            sensor = Sensor(name)
+            sensors.append(sensor)
+        except:
+            pass
 
     while True:
         info_pc.infoPc()
@@ -46,11 +58,14 @@ def main():
 
         
         blinkLed()
+    else:
+        led_line.release()
 
 if __name__ == "__main__":
     format = "%(asctime)s %(levelname)s: %(message)s"
     level = os.getenv("LOG_LEVEL", "INFO")
-    logging.basicConfig(format=format, level=level)
+    logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s - %(levelname)s - %(message)s')
 
     port = int(os.getenv("EXPORTER_PORT", 8000))
     logging.info(f"Starting web server at port {port}")
