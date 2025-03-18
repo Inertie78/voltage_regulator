@@ -1,6 +1,4 @@
-<<<<<<< HEAD
 gpiod==2.3.0 --pre
 prometheus_client==0.21.1
 psutil==7.0.0
-=======
->>>>>>> 874a9ae36e0dcb0d5098a5a362ecbca16d3c377b
+
