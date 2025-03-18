@@ -1,4 +1,4 @@
-version: "0.2"
+#version: "0.2"
 name: regulation_tension
 services : 
   rev_proxy :
@@ -43,9 +43,9 @@ services :
     ports:
       - "3000:3000"
     volumes:
-      - ./grafana/provisioning:/etc/grafana/provisioning
-      - ./grafana/data:/var/lib/grafana
-      - ./grafana/grafana.ini:/etc/grafana/grafana.ini
+      - ./grafana/provisioning:/etc/grafana/provisioning:rw
+      - ./grafana/data:/var/lib/grafana:rw
+      - ./grafana/grafana.ini:/etc/grafana/grafana.ini:rw
 
     depends_on:
       - prometheus
@@ -87,6 +87,9 @@ services :
     restart : always
     volumes :
       - ./script/main.py:/usr/src/app/main.py:ro
+      - ./script/infoPc.py:/usr/src/app/infoPc.py:ro
+      - ./script/sensor.py:/usr/src/app/sensor.py:ro
+      - /dev/gpiochip0:/dev/gpiochip0:ro
     ports:
       - "8000:8000"
     networks :

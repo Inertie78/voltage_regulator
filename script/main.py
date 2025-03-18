@@ -1,4 +1,5 @@
-import RPi.GPIO as GPIO
+import gpiod
+from gpiod.line import Direction, Value
 from prometheus_client import start_http_server
 import logging
 import time
@@ -7,18 +8,25 @@ import os
 from sensor import Sensor
 from infoPc import InfoPc
 
-ledPin = 8
-GPIO.setwarnings(False) # Ignore warning for now
-GPIO.setmode(GPIO.BOARD) # Use physical pin numbering
+RELPIN = 23
 
-GPIO.setup(ledPin, GPIO.OUT, initial=GPIO.LOW) # Set pin 8 to be an output pin and set initial value to low (off)
+rel_line = gpiod.request_lines(
+    "/dev/gpiochip0",
+    consumer="blink-example",
+    config={
+        RELPIN: gpiod.LineSettings(
+            direction=Direction.OUTPUT, output_value=Value.ACTIVE
+        )
+    }
+)
+
+
 
 def blinkLed():
-    GPIO.output(ledPin, GPIO.HIGH) # Turn on
-    time.sleep(10) # Sleep for 1 second
-
-    GPIO.output(ledPin, GPIO.LOW) # Turn off
-    time.sleep(10) # Sleep for 1 second
+    rel_line.set_value(RELPIN, Value.ACTIVE)
+    time.sleep(10)
+    rel_line.set_value(RELPIN, Value.INACTIVE)
+    time.sleep(10)
 
 
 def main():
@@ -40,7 +48,7 @@ def main():
                 logging.info(f"{name}: {value}")
                 
                 sensor.set_gauge(value)
-                
+            
             except Exception as e:
                 logging.error(f"An error occurred when assigning values to the gauges: {e}")
 
