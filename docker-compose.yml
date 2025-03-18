@@ -1,4 +1,4 @@
-version: "0.2"
+#version: "0.2"
 name: regulation_tension
 services : 
   rev_proxy :
@@ -38,9 +38,9 @@ services :
     ports:
       - "3000:3000"
     volumes:
-      - ./grafana/provisioning:/etc/grafana/provisioning
-      - ./grafana/data:/var/lib/grafana
-      - ./grafana/grafana.ini:/etc/grafana/grafana.ini
+      - ./grafana/provisioning:/etc/grafana/provisioning:rw
+      - ./grafana/data:/var/lib/grafana:rw
+      - ./grafana/grafana.ini:/etc/grafana/grafana.ini:rw
 
     depends_on:
       - prometheus
@@ -63,7 +63,7 @@ services :
       - ./flask/main.py:/app/main.py:ro
       - ./flask/templates:/app/templates:ro     #ro pour read only
       - ./flask/static:/app/static:ro
-      - /data.json:/app/data.json:ro
+      
 
     ports :
       - 8090:5000
@@ -76,15 +76,15 @@ services :
     privileged: true
     build :
       context : ./script
-      dockerfile : dockerfile.script
+      dockerfile : dockerfile.script 
     restart : always
     depends_on :
       - flask
+
     volumes :
       - ./script/main.py:/usr/src/app/main.py:ro
       - ./script/infoPc.py:/usr/src/app/infoPc.py:ro
       - ./script/sensor.py:/usr/src/app/sensor.py:ro
-      - /data.json:/usr/src/app/data.json
       - /dev/gpiochip0:/dev/gpiochip0:ro
 
       # Pour la lecture des infos sur la raspberry pi
@@ -94,6 +94,9 @@ services :
 
     ports:
       - "8000:8000"   
+    ports:
+      - "8000:8000"
+
     networks :
       - back
 

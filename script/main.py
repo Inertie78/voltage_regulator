@@ -9,24 +9,25 @@ from sensor import Sensor
 from infoPc import InfoPc
 
 
-LED_PIN = 23
+RELPIN = 23
 
-led_line = gpiod.request_lines(
+rel_line = gpiod.request_lines(
     "/dev/gpiochip0",
     consumer="blink-example",
     config={
-        LED_PIN: gpiod.LineSettings(
+        RELPIN: gpiod.LineSettings(
             direction=Direction.OUTPUT, output_value=Value.ACTIVE
         )
-    },
+    }
 )
 
-def blinkLed():
-    led_line.set_value(LED_PIN, Value.ACTIVE) # Turn on
-    time.sleep(10) # Sleep for 1 second
 
-    led_line.set_value(LED_PIN, Value.INACTIVE) # Turn off
-    time.sleep(10) # Sleep for 1 second
+
+def blinkLed():
+    rel_line.set_value(RELPIN, Value.ACTIVE)
+    time.sleep(10)
+    rel_line.set_value(RELPIN, Value.INACTIVE)
+    time.sleep(10)
 
 
 def main():
@@ -52,7 +53,7 @@ def main():
                 logging.info(f"{name}: {value}")
                 
                 sensor.set_gauge(value)
-                
+            
             except Exception as e:
                 logging.error(f"An error occurred when assigning values to the gauges: {e}")
 
