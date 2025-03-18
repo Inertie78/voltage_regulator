@@ -8,6 +8,7 @@ import os
 from sensor import Sensor
 from infoPc import InfoPc
 
+
 RELPIN = 23
 
 rel_line = gpiod.request_lines(
@@ -34,8 +35,12 @@ def main():
     list_sensor = info_pc.get_list_sensor()
     sensors = []
     for name in list_sensor:
-        sensor = Sensor(name)
-        sensors.append(sensor)
+        try:
+            value_test = float(list_sensor[name])
+            sensor = Sensor(name)
+            sensors.append(sensor)
+        except:
+            pass
 
     while True:
         info_pc.infoPc()
@@ -54,11 +59,14 @@ def main():
 
         
         blinkLed()
+    else:
+        led_line.release()
 
 if __name__ == "__main__":
     format = "%(asctime)s %(levelname)s: %(message)s"
     level = os.getenv("LOG_LEVEL", "INFO")
-    logging.basicConfig(format=format, level=level)
+    logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s - %(levelname)s - %(message)s')
 
     port = int(os.getenv("EXPORTER_PORT", 8000))
     logging.info(f"Starting web server at port {port}")
