@@ -6,14 +6,6 @@ RUN adduser -D guichri
 # création d'un dossier /app avec l'utilisateur guichri comme propriétaire
 RUN mkdir /app && chown guichri /app
 
-# copie le code du backend Flask dans l'image
-#COPY main.py /app/main.py 
-#COPY ./static /app/static
-#COPY ./templates /app/templates
-
-# ajout du bit x, pour qu'il soit directement executable
-#RUN chmod +x /app/main.py
-
 # bascule sur l'utilisateur guichri
 USER guichri
 

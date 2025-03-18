@@ -14,9 +14,6 @@ services :
     restart : always
     depends_on : 
       - flask
-      - prometheus
-      - grafana
-
     networks:
       - front
       - back
@@ -31,10 +28,8 @@ services :
       - ./prometheus:/workspace
     command:
       - '--config.file=/workspace/prometheus.yml'
-
     networks:
       - front
-      - back
   
   grafana:
     container_name: grafana
@@ -54,11 +49,9 @@ services :
       GF_AUTH_ANONYMOUS_ENABLED: "true"
       GF_AUTH_ANONYMOUS_ORG_ROLE: "Admin"
       GF_AUTH_DISABLE_LOGIN_FORM: "true"
-
     networks:
       - front
-      - back
-    
+
   flask :
     container_name: flask
     build : 
@@ -67,17 +60,17 @@ services :
     restart : always
     depends_on : 
       - prometheus
-      
     volumes : 
       - ./flask/main.py:/app/main.py:ro
       - ./flask/templates:/app/templates:ro     #ro pour read only
       - ./flask/static:/app/static:ro
+      
+
     ports :
       - 8090:5000
     
     networks :
       - front
-      - back
 
   script :
     container_name: script
@@ -86,19 +79,30 @@ services :
       context : ./script
       dockerfile : dockerfile.script 
     restart : always
+    depends_on :
+      - flask
+
     volumes :
       - ./script/main.py:/usr/src/app/main.py:ro
       - ./script/infoPc.py:/usr/src/app/infoPc.py:ro
       - ./script/sensor.py:/usr/src/app/sensor.py:ro
       - /dev/gpiochip0:/dev/gpiochip0:ro
+
+      # Pour la lecture des infos sur la raspberry pi
+      - /usr/bin/vcgencmd:/usr/bin/vcgencmd:ro
+      - /usr/lib/arm-linux-gnueabihf/libvcos.so.0:/usr/lib/arm-linux-gnueabihf/libvcos.so.0:ro
+      - /usr/lib/arm-linux-gnueabihf/libvchiq_arm.so.0:/usr/lib/arm-linux-gnueabihf/libvchiq_arm.so.0:ro
+
+    ports:
+      - "8000:8000"   
     ports:
       - "8000:8000"
+
     networks :
-      - front
       - back
 
 volumes :
   prometheus :
-networks : 
+networks :
   front :
   back :
