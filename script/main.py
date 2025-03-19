@@ -21,9 +21,8 @@ rel_line = gpiod.request_lines(
     }
 )
 
-
-
 def blinkLed():
+    '''Pour faire clignoter un led'''
     rel_line.set_value(RELPIN, Value.ACTIVE)
     time.sleep(10)
     rel_line.set_value(RELPIN, Value.INACTIVE)
@@ -31,14 +30,21 @@ def blinkLed():
 
 
 def main():
+    '''Fcontion principale du scipt'''
     info_pc = InfoPc()
     list_sensor = info_pc.get_list_sensor()
     sensors = []
     for name in list_sensor:
         try:
-            value_test = float(list_sensor[name])
-            sensor = Sensor(name)
-            sensors.append(sensor)
+            if(name == 'rpi_status'):
+                sensor = Sensor(name, 'info')
+                sensors.append(sensor)
+            elif('state' in name): # pour une future implantation de l'état du relais
+                sensor = Sensor(name, 'enum')
+                sensors.append(sensor)    
+            elif('cpu' in name or 'ram' in name or 'disk' in name):
+                sensor = Sensor(name, 'gauge')
+                sensors.append(sensor)
         except:
             pass
 
@@ -49,14 +55,17 @@ def main():
             try:
                 name = sensor.get_name()
                 value = list_sensor[name]
-
                 logging.info(f"{name}: {value}")
-                
-                sensor.set_gauge(value)
+                sensor_type = sensor.get_type()
+                if(sensor_type == 'info'):
+                    sensor.set_info(value)
+                elif(sensor_type == 'enum'):
+                    sensor.set_enum(value)
+                elif(sensor_type == 'gauge'):
+                    sensor.set_gauge(value)
             
             except Exception as e:
                 logging.error(f"An error occurred when assigning values to the gauges: {e}")
-
         
         blinkLed()
     else:

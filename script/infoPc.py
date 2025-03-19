@@ -6,14 +6,19 @@ import json
 
 class InfoPc:
     def __init__(self):
+        '''Class pour retourner l'état du pc'''
         self.name = ''
-        self.list_sensor = {"sys_stat":'Not value returned', "cpu_temp":float(0.0), "cpu_usage":float(0.0), "cpu_volt":float(0.0), "porcent_ram_ussed":float(0.0), "ram_ussed":float(0.0), "ram_free":float(0.0), "ram_total":float(0.0)}
+        self.list_sensor = {"sys_stat":'Not value returned', "cpu_temp":float(0.0), "cpu_usage":float(0.0), "cpu_volt":float(0.0), 
+                            "porcent_ram_ussed":float(0.0), "ram_ussed":float(0.0), "ram_free":float(0.0), "ram_total":float(0.0),
+                            "porcent_disk_ussed":float(0.0), "disk_ussed":float(0.0), "disk_free":float(0.0), "disk_total":float(0.0)}
 
     def getCPUvoltage(self):
+        '''return dans une list["cpu_volt"] l'etat du cpu de la raspberry pi'''
         res = os.popen('vcgencmd measure_volts').readline()
         self.list_sensor["cpu_volt"] = float(res.replace("volt=","").replace("V\n","")) 
 
     def getSYSstatus(self):
+        '''return dans une list["sys_stat"] l'etat de la raspberry pi'''
         res = os.popen('vcgencmd get_throttled').readline()
         res = int(res.replace("throttled=","").replace("\n",""),0)
         if (res == 0): self.list_sensor["sys_stat"] ='Under-voltage detected'
@@ -26,6 +31,7 @@ class InfoPc:
         elif (res == 19): self.list_sensor["sys_stat"] = 'Soft temperature limit has occurred'
 
     def infoPc(self):
+        '''return dans une List les infos du pc'''
         try:
             self.getCPUvoltage()
             self.getSYSstatus()
@@ -71,6 +77,7 @@ class InfoPc:
             logging.error(f"An error occurred while retrieving sensors value: {e}")
     
     def get_list_sensor(self):
+        '''return la List sur les infos du pc'''
         return self.list_sensor
     
 

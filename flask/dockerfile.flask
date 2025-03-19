@@ -1,5 +1,9 @@
 FROM python:alpine
 
+WORKDIR /usr/src/app
+
+COPY requirements.txt ./
+
 # création d'un utilisateur guichri pour ne pas être root ensuite
 RUN adduser -D guichri
 
@@ -10,7 +14,8 @@ RUN mkdir /app && chown guichri /app
 USER guichri
 
 # installation de Flask et Waitress
-RUN pip install --upgrade pip && pip install flask waitress
+RUN pip install --upgrade pip && \
+pip install --no-cache-dir -r requirements.txt
 
 # démarrage du serveur en dernière étape
 CMD ["python3", "/app/main.py"]
