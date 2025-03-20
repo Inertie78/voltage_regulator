@@ -1,84 +1,52 @@
-import gpiod
-from gpiod.line import Direction, Value
-from prometheus_client import start_http_server
-import logging
-import time
-import os
-
-from sensor import Sensor
-from infoPc import InfoPc
+import board 
+from ina219 import ADCResolution, BusVoltageRange, INA219
 
 
-RELPIN = 23
+i2c_bus = board.I2c()
 
-rel_line = gpiod.request_lines(
-    "/dev/gpiochip0",
-    consumer="blink-example",
-    config={
-        RELPIN: gpiod.LineSettings(
-            direction=Direction.OUTPUT, output_value=Value.ACTIVE
-        )
-    }
-)
+ina1 = INA219(i2c_bus, addr=0x40)
+ina2 = INA219(i2c_bus, addr=0x41)
+ina3 = INA219(i2c_bus, addr=0x42)
+ina4 = INA219(i2c_bus, addr=0x43)
 
-def blinkLed():
-    '''Pour faire clignoter un led'''
-    rel_line.set_value(RELPIN, Value.ACTIVE)
-    time.sleep(10)
-    rel_line.set_value(RELPIN, Value.INACTIVE)
-    time.sleep(10)
+ina1.bus_adc_resolution = ADCResolution.ADCRES_12BIT_32S
+ina1.shunt_adc_resolution = ADCResolution.ADCRES_12BIT_32S
+ina1.bus_voltage_range = BusVoltageRange.RANGE_16V
+
+ina2.bus_adc_resolution = ADCResolution.ADCRES_12BIT_32S
+ina2.shunt_adc_resolution = ADCResolution.ADCRES_12BIT_32S
+ina2.bus_voltage_range = BusVoltageRange.RANGE_16V
+
+ina3.bus_adc_resolution = ADCResolution.ADCRES_12BIT_32S
+ina3.shunt_adc_resolution = ADCResolution.ADCRES_12BIT_32S
+ina3.bus_voltage_range = BusVoltageRange.RANGE_16V
+
+ina4.bus_adc_resolution = ADCResolution.ADCRES_12BIT_32S
+ina4.shunt_adc_resolution = ADCResolution.ADCRES_12BIT_32S
+ina4.bus_voltage_range = BusVoltageRange.RANGE_16V
 
 
-def main():
-    '''Fcontion principale du scipt'''
-    info_pc = InfoPc()
-    list_sensor = info_pc.get_list_sensor()
-    sensors = []
-    for name in list_sensor:
-        try:
-            if(name == 'rpi_status'):
-                sensor = Sensor(name, 'info')
-                sensors.append(sensor)
-            elif('state' in name): # pour une future implantation de l'état du relais
-                sensor = Sensor(name, 'enum')
-                sensors.append(sensor)    
-            elif('cpu' in name or 'ram' in name or 'disk' in name):
-                sensor = Sensor(name, 'gauge')
-                sensors.append(sensor)
-        except:
-            pass
+while True:
+    bus_voltage1 = ina1.bus_voltage        
+    shunt_voltage1 = ina1.shunt_voltage    
+    power1 = ina1.power
+    current1 = ina1.current                
 
-    while True:
-        info_pc.infoPc()
-        
-        for sensor in sensors:
-            try:
-                name = sensor.get_name()
-                value = list_sensor[name]
-                logging.info(f"{name}: {value}")
-                sensor_type = sensor.get_type()
-                if(sensor_type == 'info'):
-                    sensor.set_info(value)
-                elif(sensor_type == 'enum'):
-                    sensor.set_enum(value)
-                elif(sensor_type == 'gauge'):
-                    sensor.set_gauge(value)
-            
-            except Exception as e:
-                logging.error(f"An error occurred when assigning values to the gauges: {e}")
-        
-        blinkLed()
-    else:
-        led_line.release()
+    bus_voltage2 = ina2.bus_voltage        
+    shunt_voltage2 = ina2.shunt_voltage    
+    power2 = ina2.power
+    current2 = ina2.current                
+    
+    bus_voltage3 = ina3.bus_voltage        
+    shunt_voltage3 = ina3.shunt_voltage    
+    power3 = ina3.power
+    current3 = ina3.current                
 
-if __name__ == "__main__":
-    format = "%(asctime)s %(levelname)s: %(message)s"
-    level = os.getenv("LOG_LEVEL", "INFO")
-    logging.basicConfig(level=logging.DEBUG,
-                    format='%(asctime)s - %(levelname)s - %(message)s')
 
-    port = int(os.getenv("EXPORTER_PORT", 8000))
-    logging.info(f"Starting web server at port {port}")
-    start_http_server(port)
 
-    main()
+print("PSU Voltage:{:6.3f}V    Shunt Voltage:{:9.6f}V    Load Voltage:{:6.3f}V    Power:{:9.6f}W    Current:{:9.6f}A".format((bus_voltage1 + shunt_voltage1),(shunt_voltage1),(bus_voltage1),(power1),(current1/1000)))
+print("PSU Voltage:{:6.3f}V    Shunt Voltage:{:9.6f}V    Load Voltage:{:6.3f}V    Power:{:9.6f}W    Current:{:9.6f}A".format((bus_voltage2 + shunt_voltage2),(shunt_voltage2),(bus_voltage2),(power2),(current2/1000)))
+print("PSU Voltage:{:6.3f}V    Shunt Voltage:{:9.6f}V    Load Voltage:{:6.3f}V    Power:{:9.6f}W    Current:{:9.6f}A".format((bus_voltage3 + shunt_voltage3),(shunt_voltage3),(bus_voltage3),(power3),(current3/1000)))
+print("")
+print("")
+time.sleep(1)
