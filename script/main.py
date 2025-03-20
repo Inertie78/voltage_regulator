@@ -1,8 +1,3 @@
-# Source : https://www.waveshare.com/wiki/Current/Power_Monitor_HAT
-
-
-
-import time
 import board 
 from ina219 import ADCResolution, BusVoltageRange, INA219
 

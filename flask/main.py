@@ -2,7 +2,7 @@ import json
 from flask import Flask, render_template, jsonify
 import logging
 import os
-from urllib.request import urlopen
+import requests
 
 app = Flask(__name__)
 
@@ -28,21 +28,11 @@ def about():
 
 @app.route("/updateDataRaspberry")
 def updateDataRaspberry():
-    data = None
-    file_path = os.path.realpath(__file__)
-    try:
-        with open("/data.json", 'r') as file:
-            data = json.load(file)
-
-        logging.info(data)
-
-        data = jsonify(data)
-    except Exception as e:
-        logging.error(f"An error occurred when flask: {e}")
-
-        data = None
-
-    return data
+    data = requests.get('http://0.0.0.0:8000')
+    #data = requests.get('http://0.0.0.0:8000/metrics')
+    print(data)
+    #data = requests.get('http://192.168.50.108:8000/metrics', auth=('user', 'pass'))
+    return True
 
 if __name__ == "__main__":
     from waitress import serve
