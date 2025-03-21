@@ -1,6 +1,6 @@
 gpiod==2.3.0 --pre
-prometheus_client==0.21.1
-psutil==7.0.0
-adafruit-blinka==8.56.0 
-pi-ina219==1.4.1
-
+prometheus_client==0.21.1 --pre
+psutil==7.0.0 --pre
+lgpio==0.2.2.0 --pre
+board==1.0 --pre
+adafruit-circuitpython-ina219==3.4.26 --pre
