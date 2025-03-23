@@ -2,5 +2,6 @@
 ###################
 .vscode/
 flask/.flask_venv/
-.env
-.old
+.venv/
+.old/
+script/__pycache__/

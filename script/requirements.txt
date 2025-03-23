@@ -4,3 +4,4 @@ psutil==7.0.0 --pre
 lgpio==0.2.2.0 --pre
 board==1.0 --pre
 adafruit-circuitpython-ina219==3.4.26 --pre
+requests==2.32.3

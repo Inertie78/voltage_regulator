@@ -1,7 +1,5 @@
 {% extends "index.html" %}
-
 {% block content %}
-
   <div class="classTitre">
     <section class="wrapper" style="margin: 10px;">
       <div class="top">Paramètres batteries</div>
@@ -13,59 +11,67 @@
     <table>
         <tr>
           <th scope="row">
-            <fieldset>
-              <legend>Plomb</legend>
-                <p>Minimum tension: <span id="plombMin"></span></p>
-                <p>Maximum tension: <span id="plombMax"></span></p>
-            </fieldset>
+            <td>
+              <fieldset>
+                <legend>Plomb</legend>
+                  <p>Minimum tension: <span>{{plombMin}} [v]</span></p>
+                  <p>Maximum tension: <span>{{plombMax}} [v]</span></p>
+              </fieldset>
+            </td>
           </th>
           <td>
             <fieldset>
               <legend>Ni-Cd</legend>
-              <p>Minimum tension: <span id="nicdMin"></span></p>
-              <p>Maximum tension: <span id="nicdMax"></span></p>
+              <p>Minimum tension: <span>{{nicdMin}} [v]</span></p>
+              <p>Maximum tension: <span>{{nicdMax}} [v]</span></p>
             </fieldset>
           </td>
         </tr>
         <tr>
           <th scope="row">
-            <fieldset>
-              <legend>Ni-MH</legend>
-              <p>Minimum tension: <span id="nimhMin"></span></p>
-              <p>Maximum tension: <span id="nimhMax"></span></p>
-            </fieldset>
+            <td>
+              <fieldset>
+                <legend>Ni-MH</legend>
+                <p>Minimum tension: <span>{{nimhMin}} [v]</span></p>
+                <p>Maximum tension: <span>{{nimhMax}} [v]</span></p>
+              </fieldset>
+            </td>
           </th>
           <td>
             <fieldset>
               <legend>li-Po</legend>
-              <p>Minimum tension: <span id="lipoMin"></span></p>
-              <p>Maximum tension: <span id="lipoMax"></span></p>
+              <p>Minimum tension: <span>{{lipoMin}} [v]</span></p>
+              <p>Maximum tension: <span>{{lipoMax}} [v]</span></p>
             </fieldset>
           </td>
         </tr>
         <tr>
           <th scope="row">
-            <fieldset>
-              <legend>Li-Fe</legend>
-              <p>Minimum tension: <span id="lifeMin"></span></p>
-              <p>Maximum tension: <span id="lifeMax"></span></p>
-            </fieldset>
+            <td>
+              <fieldset>
+                <legend>Li-Fe</legend>
+                <p>Minimum tension: <span>{{lifeMin}} [v]</span></p>
+                <p>Maximum tension: <span>{{lifeMax}} [v]</span></p>
+              </fieldset>
+            </td>
           </th>
           <td>
             <fieldset>
               <legend>li-Ion</legend>
-              <p>Minimum tension: <span id="liionMin"></span></p>
-              <p>Maximum tension: <span id="liionMax"></span></p>
+              <p>Minimum tension: <span>{{liionMin}} [v]</span></p>
+              <p>Maximum tension: <span>{{liionMax}} [v]</span></p>
             </fieldset>
           </td>
         </tr>
         <tr>
           <th scope="row">
-            <fieldset>
-              <legend>Li-Lo</legend>
-              <p>Minimum tension: <span id="liloMin"></span></p>
-              <p>Maximum tension: <span id="liloMax"></span></p>
-            </fieldset>
+            <td>
+              <fieldset>
+                <legend>Li-Lo</legend>
+                <p>Minimum tension: <span>{{liloMin}} [v]</span></p>
+                <p>Maximum tension: <span>{{liloMax}} [v]</span></p>
+              </fieldset>
+            </td>
           </th>
           <td>
 

@@ -16,7 +16,6 @@ services :
       - flask
     networks:
       - front
-      - back
 
   prometheus:
     container_name: prometheus
@@ -26,6 +25,7 @@ services :
       - "9090:9090"
     volumes:
       - ./prometheus:/workspace
+      - ./prometheus/data:/opt/bitnami/prometheus/data*
     command:
       - '--config.file=/workspace/prometheus.yml'
     networks:
@@ -38,7 +38,7 @@ services :
     ports:
       - "3000:3000"
     volumes:
-      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/provisioning:/etc/grafana/provisioning/*
       - ./grafana/data:/var/lib/grafana/*
       - ./grafana/grafana.ini:/etc/grafana/grafana.ini
     depends_on:
@@ -61,14 +61,15 @@ services :
     volumes : 
       - ./flask/main.py:/app/main.py:ro
       - ./flask/templates:/app/templates:ro     #ro pour read only
-      - ./flask/static:/app/static:ro
-      
+      - ./flask/static:/app/static:ro3
+      - ./flask/batSettings.json:/app/batSettings.json
 
     ports :
       - 8090:5000
     
     networks :
       - front
+      - flask_network
 
   script :
     container_name: script
@@ -84,22 +85,25 @@ services :
       - ./script/main.py:/usr/src/app/main.py:ro
       - ./script/infoPc.py:/usr/src/app/infoPc.py:ro
       - ./script/sensor.py:/usr/src/app/sensor.py:ro
+      - ./script/multimetre.py:/usr/src/app/multimetre.py:ro
+      - ./script/relayState.json:/usr/src/app/relayState.json
       - /dev/gpiochip0:/dev/gpiochip0:ro
-
+      
       # Pour la lecture des infos sur la raspberry pi
       - /usr/bin/vcgencmd:/usr/bin/vcgencmd:ro
       - /usr/lib/arm-linux-gnueabihf/libvcos.so.0:/usr/lib/arm-linux-gnueabihf/libvcos.so.0:ro
       - /usr/lib/arm-linux-gnueabihf/libvchiq_arm.so.0:/usr/lib/arm-linux-gnueabihf/libvchiq_arm.so.0:ro
 
     ports:
-      - "8000:8000"   
-
+      - "8000:8000" 
 
     networks :
-      - back
+      - front
+      - flask_network
 
 volumes :
   prometheus :
 networks :
   front :
-  back :
+  flask_network:
+    driver: bridge 

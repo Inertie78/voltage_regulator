@@ -1,8 +1,11 @@
 {% extends "index.html" %}
-
 {% block content %}
+<div class="classTitre">
+    <section class="wrapper" style="margin: 10px;">
+      <div class="top">Grafana</div>
+      <div class="bottom" aria-hidden="true">Grafana</div>
+    </section>
+  </div>
 
-<iframe src="http://0.0.0.0:3000"></iframe>
-
-
+<iframe src="{{_grafana_ip}}"></iframe>
 {% endblock %}

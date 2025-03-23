@@ -1,0 +1,9 @@
+{
+    "plombMin":"11.5", "plombMax":"12.6", 
+    "nicdMin":"11.5",  "nicdMax":"12.6",
+    "nimhMin":"11.5",  "nimhMax":"12.6",
+    "lipoMin":"11.5",  "lipoMax":"12.6", 
+    "lifeMin":"11.5",  "lifeMax":"12.6", 
+    "liionMin":"11.5", "liionMax":"12.6",
+    "liloMin":"11.5",  "liloMax":"12.6"
+}
