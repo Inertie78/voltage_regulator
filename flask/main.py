@@ -12,8 +12,8 @@ dict_switch_relay = {} #{"rs_01":"off", "rs_02":"off", "rs_03":"off", "rs_04":"o
 
 global dict_settings_batterie
 dict_settings_batterie = None
-with open('/app/batSettings.json', 'r') as file:
-    dict_settings_batterie = json.load(file)
+#with open('/app/batSettings.json', 'r') as file:
+ #   dict_settings_batterie = json.load(file)
 
 # Fonction qui renvoi l'url pour prometheus et grafana
 def get_url(port):
@@ -73,7 +73,7 @@ def relaySwitch():
     except:
         relay_state = None
 
-    logging.info(relay_state)
+    logging.info(f'Change la valeur du switch dans le dictionaire {relay_state}')
 
     return jsonify(result=True)
 
