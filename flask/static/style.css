@@ -197,6 +197,14 @@ div.centered table
   align-items: center;
  
 }
+h4{
+  margin-left: 10px;
+}
+
+.class_box{
+  width: 34px;
+  height: 34px;
+}
 
 iframe{
   width: 100%;

@@ -4,6 +4,8 @@ import os
 import logging
 import json
 
+import platform
+
 class InfoPc:
     def __init__(self):
         '''Class pour retourner l'état du pc'''
@@ -14,21 +16,27 @@ class InfoPc:
 
     def getCPUvoltage(self):
         '''return dans une list["cpu_volt"] l'etat du cpu de la raspberry pi'''
-        res = os.popen('vcgencmd measure_volts').readline()
-        self.dict_sensor["cpu_volt"] = float(res.replace("volt=","").replace("V\n","")) 
+        if(platform.system() == 'Linux'):
+            res = os.popen('vcgencmd measure_volts').readline()
+            self.dict_sensor["cpu_volt"] = float(res.replace("volt=","").replace("V\n",""))
+        else:
+            self.dict_sensor["cpu_volt"] = float("- 0.0")
 
     def getSYSstatus(self):
         '''return dans une list["sys_stat"] l'etat de la raspberry pi'''
-        res = os.popen('vcgencmd get_throttled').readline()
-        res = int(res.replace("throttled=","").replace("\n",""),0)
-        if (res == 0): self.dict_sensor["sys_stat"] ='Under-voltage detected'
-        elif (res == 1): self.dict_sensor["sys_stat"] = 'Arm frequency capped'
-        elif (res == 2): self.dict_sensor["sys_stat"] = 'Currently throttled'
-        elif (res == 3): self.dict_sensor["sys_stat"] = 'Soft temperature limit active'
-        elif (res == 16): self.dict_sensor["sys_stat"] = 'Under-voltage has occurred'
-        elif (res == 17): self.dict_sensor["sys_stat"] = 'Arm frequency capped has occurred'
-        elif (res == 18): self.dict_sensor["sys_stat"] = 'Throttling has occurred'
-        elif (res == 19): self.dict_sensor["sys_stat"] = 'Soft temperature limit has occurred'
+        if(platform.system() == 'Linux'):
+            res = os.popen('vcgencmd get_throttled').readline()
+            res = int(res.replace("throttled=","").replace("\n",""),0)
+            if (res == 0): self.dict_sensor["sys_stat"] ='Under-voltage detected'
+            elif (res == 1): self.dict_sensor["sys_stat"] = 'Arm frequency capped'
+            elif (res == 2): self.dict_sensor["sys_stat"] = 'Currently throttled'
+            elif (res == 3): self.dict_sensor["sys_stat"] = 'Soft temperature limit active'
+            elif (res == 16): self.dict_sensor["sys_stat"] = 'Under-voltage has occurred'
+            elif (res == 17): self.dict_sensor["sys_stat"] = 'Arm frequency capped has occurred'
+            elif (res == 18): self.dict_sensor["sys_stat"] = 'Throttling has occurred'
+            elif (res == 19): self.dict_sensor["sys_stat"] = 'Soft temperature limit has occurred'
+        else:
+            self.dict_sensor["sys_stat"] = "not covered"
 
     def infoPc(self):
         '''return dans une List les infos du pc'''
@@ -86,4 +94,3 @@ if __name__ == "__main__":
     infoPc.infoPc()
     list_info = infoPc.get_dict_sensor() 
     print(list_info)
-    

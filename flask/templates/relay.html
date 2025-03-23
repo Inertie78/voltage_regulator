@@ -1,0 +1,120 @@
+{% extends "index.html" %}
+{% block content %}
+<script src="static/script_relay.js"></script>
+
+<div class="classTitre">
+  <section class="wrapper" style="margin: 10px;">
+    <div class="top">Relay</div>
+    <div class="bottom" aria-hidden="true">Relay</div>
+  </section>
+</div>
+
+<div class="table-container">
+  <table>
+      <tr>
+        <th scope="row">
+          <td>
+            <fieldset>
+              <legend>Relay N°1</legend>
+              <h3 id="etat_rs_01">Etat: close</h3>
+              <div class="configuInput" style="margin-bottom: 20px;" >
+                <h2>Switch</h2>
+                <label class="switch">
+                  <input type="checkbox" id="rs_01" name="rs_01">
+                  <span class="slider"></span>
+                </label>
+                <input type="checkbox" class="class_box" id="au_rs_01" name="au_rs_01" value="Bike" checked>
+                <h4 for="au_rs_01">Auto</h4>
+              </div>
+            </fieldset>
+          </td>
+        </th>
+        <td>
+          <fieldset>
+            <legend>Relay N°2</legend>
+            <h3 id="etat_rs_02">Etat: close</h3>
+            <div class="configuInput" style="margin-bottom: 20px;" >
+              <h2>Switch</h2>
+              <label class="switch">
+                <input type="checkbox" id="rs_02" name="rs_02">
+                <span class="slider"></span>
+              </label>
+              <input type="checkbox" class="class_box" id="au_rs_02" name="au_rs_02" checked>
+              <h4 for="au_rs_02">Auto</h4>
+            </div>
+          </fieldset>
+        </td>
+      </tr>
+      <tr>
+        <th scope="row">
+          <td>
+            <fieldset>
+              <legend>Relay N°3</legend>
+              <h3 id="etat_rs_03">Etat: close</h3>
+              <div class="configuInput" style="margin-bottom: 20px;" >
+                <h2>Switch</h2>
+                <label class="switch">
+                  <input type="checkbox" id="rs_03" name="rs_03">
+                  <span class="slider"></span>
+                </label>
+                <input type="checkbox" class="class_box" id="au_rs_03" name="au_rs_03" checked>
+                <h4 for="au_rs_03">Auto</h4>
+              </div>
+              
+            </fieldset>
+          </td>
+        </th>
+        <td>
+          <fieldset>
+            <legend>Relay N°4</legend>
+            <h3 id="etat_rs_04">Etat: close</h3>
+            <div class="configuInput" style="margin-bottom: 20px;" >
+              <h2>Switch</h2>
+              <label class="switch">
+                <input type="checkbox" id="rs_04" name="rs_04">
+                <span class="slider"></span>
+              </label>
+              <input type="checkbox" class="class_box" id="au_rs_04" name="au_rs_04" checked>
+              <h4 for="au_rs_04">Auto</h4>
+            </div>
+          </fieldset>
+        </td>
+      </tr>
+      <tr>
+        <th scope="row">
+          <td>
+            <fieldset>
+              <legend>Relay N°5</legend>
+              <h3 id="etat_rs_05">Etat: close</h3>
+              <div class="configuInput" style="margin-bottom: 20px;" >
+                <h2>Switch</h2>
+                <label class="switch">
+                  <input type="checkbox" id="rs_05" name="rs_05">
+                  <span class="slider"></span>
+                </label>
+                <input type="checkbox" class="class_box" id="au_rs_05" name="au_rs_05" checked>
+                <h4 for="au_rs_05">Auto</h4>
+              </div>
+            </fieldset>
+          </td>
+        </th>
+        <td>
+          <fieldset>
+            <legend>Relay N°6</legend>
+            <h3 id="etat_rs_06">Etat: close</h3>
+            <div class="configuInput" style="margin-bottom: 20px;" >
+              <h2>Switch</h2>
+              <label class="switch">
+                <input type="checkbox"  id="rs_06" name="rs_06">
+                <span class="slider"></span>
+              </label>
+              <input type="checkbox" class="class_box" id="au_rs_06" name="au_rs_06" checked>
+              <h4 for="au_rs_06">Auto</h4>
+            </div>
+          </fieldset>
+        </td>
+      </tr>
+  </table>
+</div>
+
+{% endblock %}

@@ -11,15 +11,15 @@ from multimetre import Multimetre
 RELPIN = 23
 
 TIME_UPDATE_VALUE = 60
-
-TIME_RELAY_VALUE = 0.5
-
+TIME_GET_RELAY_VALUE = 5
+TIME_SET_RELAY_VALUE = 10
 
 global dict_switch_relay
 dict_switch_relay = None
 with open('relayState.json', 'r') as file:
     dict_switch_relay = json.load(file)
 
+# Initialise les gpio de la rasbperry pi
 rel_line = gpiod.request_lines(
     "/dev/gpiochip0",
     consumer="blink-example",
@@ -30,43 +30,53 @@ rel_line = gpiod.request_lines(
     }
 )
 
+# Faire clignoter un led
 def blinkLed():
     rel_line.set_value(RELPIN, Value.ACTIVE)
     time.sleep(10)
     rel_line.set_value(RELPIN, Value.INACTIVE)
     time.sleep(10)
 
+# Ecrire un message au container flask
 def set_request(url, data):
-    headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
-    r = requests.post(url, json=json.dumps(data), headers=headers)
+    try:
+        headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+        value = requests.post(url, json=json.dumps(data), headers=headers)
+    except Exception as e:
+        logging.error(f"Send message to server. connection on server refused: {e}")
 
+# Recois un message du container flask
 def get_request(url):
-    value = requests.get(url)
-    return value
+    try:
+        value = requests.get(url)
+        return value
+    except Exception as e:
+        logging.error(f"Read message to server. connection on server refused:: {e}")
 
-
+# Function principale
 def main():
     info_pc = InfoPc()
     multimetre = Multimetre()
+    dict_sensor = info_pc.get_dict_sensor()
 
+    sensors = []
+
+    global dict_switch_relay
     
     # test ///////////////////////////////////////////////////
     dict_sensor_01 = {'raspi_info': info_pc.get_dict_sensor()}
     dict_sensor_01.update(multimetre.get_dict_value())
     dict_sensor_01.update({'raspi_gpio':{'state':0}})
 
-    global dict_switch_relay
     # Pour le future return l'etat des switch
     #relay_state = set_request('http://flask:5000/relaySwitch_set', dict_switch_relay)
     #////////////////////////////////////////////////////////
     
-    
-    dict_sensor = info_pc.get_dict_sensor()
-
-    sensors = []
+    bool_set_value = True
 
     last_update_value = 0
     last_relay_value = 0
+    last_set_value = time.time()
 
     for name in dict_sensor:
         try:
@@ -87,18 +97,33 @@ def main():
     while True:
         current_time = time.time()
 
-        if (current_time - last_relay_value > TIME_RELAY_VALUE or last_relay_value == 0):
+        # Envoie le dictionaire au container flask. Une seule fois 5 secondes apés le démarrage. 
+        if (bool_set_value and current_time - last_set_value > TIME_SET_RELAY_VALUE):
+            relay_state = set_request('http://flask:5000/relaySwitch_set', dict_switch_relay)
+            bool_set_value = False
+
+
+        # Envoie une demande au container flask sur l'état des switch toute les 0.5 secondes.
+        if (bool_set_value == False and current_time - last_relay_value > TIME_GET_RELAY_VALUE):
             relay_state = get_request('http://flask:5000/relaySwitch_get')
-            relay_state_json =json.loads(relay_state.text)
-            logging.info(f'Relay status {len(relay_state_json["result"])}')
-            if(len(relay_state_json["result"]) > 0):
-                logging.info(f'Relay status {relay_state.text}')
+            try:
+                relay_state_json =json.loads(relay_state.text)
+                logging.info(f'Relay status {len(relay_state_json["result"])}')
+                if(len(relay_state_json["result"]) > 0):
+                    logging.info(f'Relay status {relay_state.text}')
                 for key, value in relay_state_json.items():
                     dict_switch_relay[key] = value
-            
+
+            except Exception as e:
+                logging.error(f"The conversion of the server response on switch status to json went wrong: {e}")
+
             last_relay_value = current_time
         
+        # Pour le test. Fait clignoté la led toute les 5 secondes.
+        if():
+            blinkLed()
 
+        # Récupère l'état du système, les infos sur la batterie toute les 60 secondes et les envoie à Prometheus (pas encore implanter pour la batterie. juste un print sur la console).
         if (current_time - last_update_value > TIME_UPDATE_VALUE or last_update_value == 0):
             info_pc.infoPc()
             for sensor in sensors:
