@@ -100,7 +100,9 @@ def main():
         # Envoie le dictionaire au container flask. Une seule fois 5 secondes apés le démarrage. 
         if (bool_set_value and current_time - last_set_value > TIME_SET_RELAY_VALUE):
             relay_state = set_request('http://flask:5000/relaySwitch_set', dict_switch_relay)
+
             bool_set_value = False
+            last_set_value = current_time
 
 
         # Envoie une demande au container flask sur l'état des switch toute les 0.5 secondes.
