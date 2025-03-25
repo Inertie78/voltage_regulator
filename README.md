@@ -28,7 +28,9 @@
 ### Url du projet:
 `http://"votre ip"/flask`
 
-###Chéma du projet:
+### Schémas
+
+
 ```mermaid
 graph LR
 A[Raspberry pi] --> B((relay))
@@ -38,3 +40,5 @@ C --> A
 D --> E(capteur tension, courant)
 E --> A
 ```
+
+![This is an alt text.](./schema.jpg "Schéma du régulateur de tension.")
