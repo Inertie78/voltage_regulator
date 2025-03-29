@@ -7,34 +7,32 @@ import json, os, time, logging
 from sensor import Sensor
 from infoPc import InfoPc
 from multimetre import Multimetre
+from relay import Relay
 
-RELPIN = 23
+
+
 
 TIME_UPDATE_VALUE = 60
 TIME_GET_RELAY_VALUE = 5
 TIME_SET_RELAY_VALUE = 10
 
+
+# information état des GPIO sur Flask
 global dict_switch_relay
 dict_switch_relay = None
 with open('relayState.json', 'r') as file:
     dict_switch_relay = json.load(file)
 
 # Initialise les gpio de la rasbperry pi
-rel_line = gpiod.request_lines(
-    "/dev/gpiochip0",
-    consumer="blink-example",
-    config={
-        RELPIN: gpiod.LineSettings(
-            direction=Direction.OUTPUT, output_value=Value.ACTIVE
-        )
-    }
-)
+
+relay = Relay()
+
 
 # Faire clignoter un led
 def blinkLed():
-    rel_line.set_value(RELPIN, Value.ACTIVE)
+    relay.activate(1)       #active le relais sur le PIN 19
     time.sleep(10)
-    rel_line.set_value(RELPIN, Value.INACTIVE)
+    relay.desactivate(1)    #désactive le relais sur le PIN 19
     time.sleep(10)
 
 # Ecrire un message au container flask
@@ -121,9 +119,6 @@ def main():
 
             last_relay_value = current_time
         
-        # Pour le test. Fait clignoté la led toute les 5 secondes.
-        if():
-            blinkLed()
 
         # Récupère l'état du système, les infos sur la batterie toute les 60 secondes et les envoie à Prometheus (pas encore implanter pour la batterie. juste un print sur la console).
         if (current_time - last_update_value > TIME_UPDATE_VALUE or last_update_value == 0):
@@ -171,7 +166,7 @@ def main():
 
             last_update_value = current_time
 
-        #blinkLed()
+        blinkLed()
     else:
         led_line.release()
 

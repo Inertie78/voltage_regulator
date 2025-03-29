@@ -86,6 +86,7 @@ services :
       - ./script/infoPc.py:/usr/src/app/infoPc.py:ro
       - ./script/sensor.py:/usr/src/app/sensor.py:ro
       - ./script/multimetre.py:/usr/src/app/multimetre.py:ro
+      - ./script/relay.py:/usr/src/app/relay.py:ro
       - ./script/relayState.json:/usr/src/app/relayState.json
 
       # pour les gpio sur la raspberry p
