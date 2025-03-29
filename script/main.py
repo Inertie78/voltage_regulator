@@ -30,10 +30,24 @@ relay = Relay()
 
 # Faire clignoter un led
 def blinkLed():
-    relay.activate(1)       #active le relais sur le PIN 19
+    relay.activate(1)
+    time.sleep(1)       #active le relais sur le PIN 19
+    relay.activate(2)
+    time.sleep(1)       #active le relais sur le PIN 19
+    relay.activate(3)
+    time.sleep(1)       #active le relais sur le PIN 19
+    relay.activate(4)
+
     time.sleep(10)
+
     relay.desactivate(1)    #désactive le relais sur le PIN 19
-    time.sleep(10)
+    time.sleep(1)
+    relay.desactivate(2)    #désactive le relais sur le PIN 19
+    time.sleep(1)
+    relay.desactivate(3)    #désactive le relais sur le PIN 19
+    time.sleep(1)
+    relay.desactivate(4)    #désactive le relais sur le PIN 19
+    time.sleep(1)
 
 # Ecrire un message au container flask
 def set_request(url, data):
