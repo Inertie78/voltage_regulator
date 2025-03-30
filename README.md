@@ -42,3 +42,32 @@ E --> A
 ```
 
 ![This is an alt text.](./schema.jpg "Schéma du régulateur de tension.")
+
+### Liste de variable la raspberry pi 
+
+|  Cpu variable |      ram variable     |    disque variable    |
+|---------------|-----------------------|-----------------------|
+|"cpu_temp"     |"porcent_ram_ussed"    |"porcent_disk_ussed"   |
+|"cpu_usage"    |"ram_free"             |"disk_ussed"           |
+|"cpu_volt"     |"ram_ussed"            |"disk_free"            |
+|               |"ram_total"            |"disk_total"           |           
+
+### Liste de variable l'état des relais
+
+|  numéro | Relaie  |automatique|       
+|---------|---------|-----------|
+|   N°1   |"rs_01"  |"au_rs_01" | 
+|   N°2   |"rs_02"  |"au_rs_02" |
+|   N°3   |"rs_03"  |"au_rs_03" |
+|   N°4   |"rs_04"  |"au_rs_04" | 
+
+Automatique = bouton de la page web qui indiaue si le relay est en mode automatique ou manuel. Variable utilisateur,
+
+### Liste de variable l'état de la batterie
+
+|  numéro |     bus voltage      |      shun tvoltage    |     power     |     current     |      
+|---------|----------------------|-----------------------|---------------|-----------------|
+|   N°1   |"bat_bus_voltage_01"  |"bat_shunt_voltage_01" |"bat_power_01" |"bat_current_01" |
+|   N°2   |"bat_bus_voltage_02"  |"bat_shunt_voltage_02" |"bat_power_02" |"bat_current_02" |
+|   N°3   |"bat_bus_voltage_03"  |"bat_shunt_voltage_03" |"bat_power_03" |"bat_current_03" |
+|   N°4   |"bat_bus_voltage_04"  |"bat_shunt_voltage_04" |"bat_power_04" |"bat_current_04" |
