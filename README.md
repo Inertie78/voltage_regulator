@@ -18,7 +18,7 @@
 
 ## Système d'alarme :
 
--   En cas de décharge profonde, un message devrait être envoyé à l'utilisateur par e-amil, ou par le biais d'un popup sur l'interface web, pour lui indiquer que la batterie est défectueuse.
+-   En cas de décharge profonde, un message devrait être envoyé à l'utilisateur par e-mail, ou par le biais d'un popup sur l'interface web, pour lui indiquer que la batterie est défectueuse.
 -   Si la température dépasse les 80 degrés, une commande est envoyé au relais pour couper la charge. Un message devrait être envoyé à l'utilisateur par e-amil, ou par le biais d'un popup sur l'interface web, pour lui indiquer qu'il y a un risque de surchauffe. 
 -   Si la température dépasse les 100 degrés un email est envoyé toutes les minutes.
 
