@@ -9,18 +9,7 @@ import logging
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-dict_raspi = None
-last_dict_raspi = None
-
-# Charge les infos sur les batteries
-global dict_settings_batterie
-file_path = '/app/batSettings.json'
-if not Path(file_path).exists():
-    file_path = 'static/batSettings.json'
-with open(file_path, 'r') as file:
-    dict_settings_batterie = json.load(file)
-
-
+################################################# Fonction #################################################
 # Fonction qui renvoi l'url pour prometheus et grafana
 def get_url(port):
     HOST_IP = request.base_url
@@ -46,7 +35,7 @@ def handle_message(msg):
 @app.route("/")
 def index():
     prometheuse_ip =  get_url("9090")
-    return render_template('home.html', _prometheuse_ip=prometheuse_ip)
+    return render_template('prometheuse.html', _prometheuse_ip=prometheuse_ip)
 
 # Affiche la page web grafana
 @app.route("/grafana")
@@ -61,15 +50,9 @@ def relay():
 
 
 # Affiche la page web des settings des batteries
-@app.route("/settings")
-def settings():
-    return render_template('settings.html', plombMin=dict_settings_batterie["plombMin"], plombMax=dict_settings_batterie["plombMax"],
-                                            nicdMin=dict_settings_batterie["nicdMin"], nicdMax=dict_settings_batterie["nicdMax"],
-                                            nimhMin=dict_settings_batterie["nimhMin"], nimhMax=dict_settings_batterie["nimhMax"],
-                                            lipoMin=dict_settings_batterie["lipoMin"], lipoMax=dict_settings_batterie["lipoMax"],
-                                            lifeMin=dict_settings_batterie["lifeMin"], lifeMax=dict_settings_batterie["lifeMax"],
-                                            liionMin=dict_settings_batterie["liionMin"], liionMax=dict_settings_batterie["liionMax"],
-                                            liloMin=dict_settings_batterie["liloMin"], liloMax=dict_settings_batterie["liloMax"])
+@app.route("/multimeter")
+def multimeter():
+    return render_template('multimeter.html')
 
 # Affiche la page web sur les infos de la raspberry pi
 @app.route("/about")
@@ -110,6 +93,7 @@ def raspberryShutdown():
         logging.error(e)
 
     return jsonify(result=True) 
+
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG,

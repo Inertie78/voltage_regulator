@@ -36,6 +36,9 @@ global dict_relay
 with open(file_path, 'r') as file:
     dict_relay = json.load(file)
 
+global multimetre_list
+multimetre_list = {}
+
 socketio = socketio.Client(logger=True, engineio_logger=True)
 
 # Connect to the server
@@ -74,6 +77,9 @@ def message(data):
     elif (data == 'up_relay'):
         data_string = json.dumps(dict_relay)
         socketio.send(data_string)
+    elif (data == 'up_bat'):
+        data_string = json.dumps(multimetre_list)
+        socketio.send(data_string)
 
 # Faire clignoter une led
 def blinkLed():
@@ -108,12 +114,17 @@ def set_sensors(sensors, dict_sensor):
                     if(sensor_type == 'info'):
                         sensor.set_info(value)
                     elif(sensor_type == 'enum'):
+                        data = ''
+                        if(value == True):
+                            value = 'starting'
+                        else:
+                            value = 'stopped'
+
                         sensor.set_enum(value)
                     elif(sensor_type == 'gauge'):
                         sensor.set_gauge(value)
         except Exception as e:
             logging.error(f"An error occurred when assigning values to the gauges: {e}")
-
 
 # Function principale
 def main():
@@ -129,6 +140,12 @@ def main():
     sensors_multi_02 = createSensors(multimetre_02.get_dict(), 'gauge')
     sensors_multi_03 = createSensors(multimetre_03.get_dict(), 'gauge')
     sensors_multi_04 = createSensors(multimetre_04.get_dict(), 'gauge')
+
+    global multimetre_list
+    multimetre_list = multimetre_01.get_dict()
+    multimetre_list.update(multimetre_02.get_dict())
+    multimetre_list.update(multimetre_03.get_dict())
+    multimetre_list.update(multimetre_04.get_dict())
 
 
     while True:
@@ -154,6 +171,12 @@ def main():
             current2 = multimetre_02.get_power() 
             current3 = multimetre_03.get_power() 
             current4 = multimetre_04.get_power()
+
+            multimetre_list = multimetre_01.get_dict()
+            multimetre_list.update(multimetre_02.get_dict())
+            multimetre_list.update(multimetre_03.get_dict())
+            multimetre_list.update(multimetre_04.get_dict())
+
             last_update_multi = current_time
 
         # Récupère l'état du système, les infos sur la batterie toute les 60 secondes et les envoie à Prometheus (pas encore implanter pour la batterie. juste un print sur la console).
@@ -199,7 +222,7 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
-    port = int(os.getenv("EXPORTER_PORT", 8000))
+    port = 8000
 
     logging.info(f"Starting web server at port {port}")
 

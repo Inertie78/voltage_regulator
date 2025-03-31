@@ -13,7 +13,7 @@ class Sensor:
         elif(type == 'info'):
            self.info = Info(name=self.name, documentation=self.documentation)
         elif(type == 'enum'):
-            self.enum = Enum(name=self.name, documentation=self.documentation, states=[True, False])
+            self.enum = Enum(name=self.name, documentation=self.documentation, states=['starting', 'stopped'])
 
     def get_gauge(self):
         '''return le capteur gauge'''

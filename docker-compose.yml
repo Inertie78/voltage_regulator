@@ -38,8 +38,7 @@ services :
       - /usr/lib/arm-linux-gnueabihf/libvcos.so.0:/usr/lib/arm-linux-gnueabihf/libvcos.so.0:ro
       - /usr/lib/arm-linux-gnueabihf/libvchiq_arm.so.0:/usr/lib/arm-linux-gnueabihf/libvchiq_arm.so.0:ro
     ports:
-      - "8090:8000"
-
+      - "8000:8000"
 
   rev_proxy :
     container_name: rev_proxy
@@ -67,9 +66,6 @@ services :
       - ./prometheus/data:/opt/bitnami/prometheus/data*
     command:
       - '--config.file=/workspace/prometheus.yml'
-    depends_on:
-      - script
-  
 
   grafana:
     container_name: grafana
