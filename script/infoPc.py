@@ -47,13 +47,13 @@ class InfoPc:
             if hasattr(psutil, 'sensors_temperatures'):
                 self.dict_sensor["cpu_temp"] = psutil.sensors_temperatures()['cpu_thermal'][0].current
             else:
-                self.dict_sensor["cpu_temp"] = float(0.0)
+                self.dict_sensor["cpu_temp"] = float(-1.0)
         
             if hasattr(psutil, 'getloadavg'):
                 load1, load5, load15 = psutil.getloadavg()
                 self.dict_sensor["cpu_usage"] = (load15/psutil.cpu_count()) * 100
             else:
-                self.dict_sensor["cpu_usage"] = float(0.0)
+                self.dict_sensor["cpu_usage"] = float(-1.0)
 
             if hasattr(psutil, 'virtual_memory'):
                 self.dict_sensor["porcent_ram_ussed"] =  psutil.virtual_memory().percent
@@ -61,10 +61,10 @@ class InfoPc:
                 self.dict_sensor["ram_free"] =  psutil.virtual_memory().free/1000000000
                 self.dict_sensor["ram_total"] =  psutil.virtual_memory().total/1000000000
             else:
-                self.dict_sensor["porcent_ram_ussed"] = float(0.0)
-                self.dict_sensor["ram_ussed"]  = float(0.0)
-                self.dict_sensor["ram_free"]  = float(0.0)
-                self.dict_sensor["ram_total"]  = float(0.0)
+                self.dict_sensor["porcent_ram_ussed"] = float(-1.0)
+                self.dict_sensor["ram_ussed"]  = float(-1.0)
+                self.dict_sensor["ram_free"]  = float(-1.0)
+                self.dict_sensor["ram_total"]  = float(-1.0)
 
             
             if hasattr(psutil, 'virtual_memory'):
@@ -73,18 +73,15 @@ class InfoPc:
                 self.dict_sensor["disk_free"] =  psutil.disk_usage('/').free/1000000000
                 self.dict_sensor["disk_total"] =  psutil.disk_usage('/').total/1000000000
             else:
-                self.dict_sensor["porcent_disk_ussed"] = float(0.0)
-                self.dict_sensor["disk_ussed"]  = float(0.0)
-                self.dict_sensor["disk_free"]  = float(0.0)
-                self.dict_sensor["disk_total"]  = float(0.0)
-
-            with open("data.json", "w") as fp:
-                json.dump(self.dict_sensor , fp)
+                self.dict_sensor["porcent_disk_ussed"] = float(-1.0)
+                self.dict_sensor["disk_ussed"]  = float(-1.0)
+                self.dict_sensor["disk_free"]  = float(-1.0)
+                self.dict_sensor["disk_total"]  = float(-1.0)
 
         except Exception as e:
             logging.error(f"An error occurred while retrieving sensors value: {e}")
     
-    def get_dict_sensor(self):
+    def get_dict(self):
         '''return la List sur les infos du pc'''
         return self.dict_sensor
     
@@ -92,5 +89,5 @@ class InfoPc:
 if __name__ == "__main__":
     infoPc = InfoPc()
     infoPc.infoPc()
-    list_info = infoPc.get_dict_sensor() 
+    list_info = infoPc.get_dict() 
     print(list_info)

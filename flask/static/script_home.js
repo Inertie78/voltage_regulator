@@ -6,7 +6,13 @@ var year;
 var month;
 var jour;
 
-document.addEventListener("DOMContentLoaded", () => {
+var socket = io('http://localhost:5000');
+
+document.addEventListener("DOMContentLoaded", (event) => {
+  socket.on('connect', function() {
+    socket.send('User has connected!');
+  });
+
   setInterval(myTimer, (1000));
 });
 

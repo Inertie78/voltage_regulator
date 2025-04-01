@@ -1,35 +1,90 @@
-import gpiod
-from gpiod.line import Direction, Value
 from prometheus_client import start_http_server
-import requests
-import json, os, time, logging
+import socketio
+import  os, time, logging
+import json
+from pathlib import Path
 
 from sensor import Sensor
 from infoPc import InfoPc
 from multimetre import Multimetre
-from relay import Relay
+from lineGpio import LineGpio
 
 
+TIME_UPDATE_PROM = 60
+TIME_UPDATE_MULTI = 10
 
+info_pc = InfoPc()
 
-TIME_UPDATE_VALUE = 60
-TIME_GET_RELAY_VALUE = 5
-TIME_SET_RELAY_VALUE = 10
+# Initialise les relaies. Décommenter les lignes au besoin
+relay_01 = LineGpio(name='relay 01', pin=19)
+#relay_02 = LineGpio(name='relay 01', pin=13)
+#relay_03 = LineGpio(name='relay 01', pin=6)
+#relay_04 = LineGpio(name='relay 01', pin=5)
+
+multimetre_01 = Multimetre(0x40, 1) 
+multimetre_02 = Multimetre(0x41, 2)
+multimetre_03 = Multimetre(0x42, 3)
+multimetre_04 = Multimetre(0x43, 4)
 
 
 # information état des GPIO sur Flask
-global dict_switch_relay
-dict_switch_relay = None
-with open('relayState.json', 'r') as file:
-    dict_switch_relay = json.load(file)
+file_path = 'relayState.json'
+if not Path(file_path).exists():
+    file_path = 'script/relayState.json'
 
-# Initialise les gpio de la rasbperry pi
+global dict_relay
+with open(file_path, 'r') as file:
+    dict_relay = json.load(file)
 
-relay = Relay()
+socketio = socketio.Client(logger=True, engineio_logger=True)
 
+# Connect to the server
+try:
+    socketio.connect('http://flask:5000', wait_timeout = 10, transports=['websocket'])
+    logging.info("Socket established")
+except ConnectionError as e:
+    logging.info('Connection error: {e}')
 
-# Faire clignoter un led
+@socketio.event
+def connect():
+    logging.info('Connection established')
+    socketio.send('Client connected')
+
+@socketio.event
+def disconnect():
+    logging.info('Disconnected from server')
+
+# Recois un message du container flask
+@socketio.event
+def message(data):
+    logging.info(f'Message received: {data}')
+    if (data == 'up_PI'):
+        info_pc.infoPc()
+        dict_sensor = info_pc.get_dict()
+        data_string = json.dumps(dict_sensor)
+        socketio.send(data_string)
+    elif ('rs_0' in data):
+        json_object = json.loads(data)
+        if(len(json_object) == 1):
+            for key in json_object.keys():
+                if key in dict_relay:
+                    dict_relay[key] = json_object[key]
+                    with open(file_path, "w") as outfile:
+                        json.dump(dict_relay, outfile)
+    elif (data == 'up_relay'):
+        data_string = json.dumps(dict_relay)
+        socketio.send(data_string)
+    elif (data == 'up_bat'):
+        multimetre_list = multimetre_01.get_dict()
+        multimetre_list.update(multimetre_02.get_dict())
+        multimetre_list.update(multimetre_03.get_dict())
+        multimetre_list.update(multimetre_04.get_dict())
+        data_string = json.dumps(multimetre_list)
+        socketio.send(data_string)
+
+# Faire clignoter une led
 def blinkLed():
+
     relay.activate(1)
     time.sleep(1)       #active le relais sur le PIN 19
     relay.activate(2)
@@ -49,136 +104,115 @@ def blinkLed():
     relay.desactivate(4)    #désactive le relais sur le PIN 19
     time.sleep(1)
 
-# Ecrire un message au container flask
-def set_request(url, data):
-    try:
-        headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
-        value = requests.post(url, json=json.dumps(data), headers=headers)
-    except Exception as e:
-        logging.error(f"Send message to server. connection on server refused: {e}")
-
-# Recois un message du container flask
-def get_request(url):
-    try:
-        value = requests.get(url)
-        return value
-    except Exception as e:
-        logging.error(f"Read message to server. connection on server refused:: {e}")
-
-# Function principale
-def main():
-    info_pc = InfoPc()
-    multimetre = Multimetre()
-    dict_sensor = info_pc.get_dict_sensor()
-
+def createSensors(dict_sensor, type):
     sensors = []
-
-    global dict_switch_relay
-    
-    # test ///////////////////////////////////////////////////
-    dict_sensor_01 = {'raspi_info': info_pc.get_dict_sensor()}
-    dict_sensor_01.update(multimetre.get_dict_value())
-    dict_sensor_01.update({'raspi_gpio':{'state':0}})
-
-    # Pour le future return l'etat des switch
-    #relay_state = set_request('http://flask:5000/relaySwitch_set', dict_switch_relay)
-    #////////////////////////////////////////////////////////
-    
-    bool_set_value = True
-
-    last_update_value = 0
-    last_relay_value = 0
-    last_set_value = time.time()
-
     for name in dict_sensor:
-        try:
-            if(name == 'rpi_status'):
-                sensor = Sensor(name, 'info')
-                sensors.append(sensor)
-            elif('state' in name): # pour une future implantation de l'état du relais
-                sensor = Sensor(name, 'enum')
-                sensors.append(sensor)    
-            elif('cpu' in name or 'ram' in name or 'disk' in name or 
-                 'voltage' in name or 'power' in name or 'current' in name): # pour une future implantation de l'état des batteries
-                sensor = Sensor(name, 'gauge')
-                sensors.append(sensor)
+        try: 
+            sensor = Sensor(name, type)
+            sensors.append(sensor)
         except Exception as e:
             logging.error(f"An error occurred when assigning values to the sensor: {e}")
+            sensors = None
 
+    return sensors
 
-    while True:
-        current_time = time.time()
-
-        # Envoie le dictionaire au container flask. Une seule fois 5 secondes apés le démarrage. 
-        if (bool_set_value and current_time - last_set_value > TIME_SET_RELAY_VALUE):
-            relay_state = set_request('http://flask:5000/relaySwitch_set', dict_switch_relay)
-
-            bool_set_value = False
-            last_set_value = current_time
-
-
-        # Envoie une demande au container flask sur l'état des switch toute les 0.5 secondes.
-        if (bool_set_value == False and current_time - last_relay_value > TIME_GET_RELAY_VALUE):
-            relay_state = get_request('http://flask:5000/relaySwitch_get')
-            try:
-                relay_state_json =json.loads(relay_state.text)
-                logging.info(f'Relay status {len(relay_state_json["result"])}')
-                if(len(relay_state_json["result"]) > 0):
-                    logging.info(f'Relay status {relay_state.text}')
-                for key, value in relay_state_json.items():
-                    dict_switch_relay[key] = value
-
-            except Exception as e:
-                logging.error(f"The conversion of the server response on switch status to json went wrong: {e}")
-
-            last_relay_value = current_time
-        
-
-        # Récupère l'état du système, les infos sur la batterie toute les 60 secondes et les envoie à Prometheus (pas encore implanter pour la batterie. juste un print sur la console).
-        if (current_time - last_update_value > TIME_UPDATE_VALUE or last_update_value == 0):
-            info_pc.infoPc()
-            for sensor in sensors:
-                try:
-                    name = sensor.get_name()
-                    value = dict_sensor[name]
+def set_sensors(sensors, dict_sensor):
+    for sensor in sensors:
+        try:
+            name = sensor.get_name()
+            if(name in dict_sensor):
+                value = dict_sensor[name]
+                if (not type(value) == type('str')):
                     logging.info(f"{name}: {value}")
                     sensor_type = sensor.get_type()
                     if(sensor_type == 'info'):
                         sensor.set_info(value)
                     elif(sensor_type == 'enum'):
+                        data = ''
+                        if(value == True):
+                            value = 'starting'
+                        else:
+                            value = 'stopped'
+
                         sensor.set_enum(value)
                     elif(sensor_type == 'gauge'):
                         sensor.set_gauge(value)
-                
-                except Exception as e:
-                    logging.error(f"An error occurred when assigning values to the gauges: {e}")
+        except Exception as e:
+            logging.error(f"An error occurred when assigning values to the gauges: {e}")
 
-            
-            bus_voltage1, bus_voltage2, bus_voltage3, bus_voltage4 = multimetre.get_bus_voltage()
-            shunt_voltage1, shunt_voltage2, shunt_voltage3, shunt_voltage4 = multimetre.get_shunt_voltage()
-            power1, power2, power3, power4 = multimetre.get_power()
-            current1, current2, current3, current4 = multimetre.get_power()
+# Function principale
+def main():
+    last_update_prom = 0
 
-            dict_ina_value = multimetre.get_dict_value()
-            
+    last_update_multi = 0
+
+    sensors_pc = createSensors(info_pc.get_dict(), 'gauge')
+
+    sensors_relay = createSensors(dict_relay, 'enum')
+
+    sensors_multi_01 = createSensors(multimetre_01.get_dict(), 'gauge')
+    sensors_multi_02 = createSensors(multimetre_02.get_dict(), 'gauge')
+    sensors_multi_03 = createSensors(multimetre_03.get_dict(), 'gauge')
+    sensors_multi_04 = createSensors(multimetre_04.get_dict(), 'gauge')
+
+    while True:
+        current_time = time.time()
+
+        if(current_time - last_update_multi or last_update_multi == 0):
+            bus_voltage1  = multimetre_01.get_bus_voltage()
+            bus_voltage2  = multimetre_02.get_bus_voltage()
+            bus_voltage3 = multimetre_03.get_bus_voltage()
+            bus_voltage4 = multimetre_04.get_bus_voltage()
+
+            shunt_voltage1 = multimetre_01.get_shunt_voltage() 
+            shunt_voltage2 = multimetre_02.get_shunt_voltage()
+            shunt_voltage3 = multimetre_03.get_shunt_voltage() 
+            shunt_voltage4 = multimetre_04.get_shunt_voltage()
+
+            power1 = multimetre_01.get_power()
+            power2 = multimetre_02.get_power()
+            power3 = multimetre_03.get_power() 
+            power4 = multimetre_04.get_power()
+
+            current1 = multimetre_01.get_power()
+            current2 = multimetre_02.get_power() 
+            current3 = multimetre_03.get_power() 
+            current4 = multimetre_04.get_power()
+
+            last_update_multi = current_time
+
+        # Récupère l'état du système, les infos sur la batterie toute les 60 secondes et les envoie à Prometheus (pas encore implanter pour la batterie. juste un print sur la console).
+        if (current_time - last_update_prom > TIME_UPDATE_PROM or last_update_prom == 0):
+            #Mise à jour des info du pc.
+            info_pc.infoPc()
+
+            # Envoie les nouvelles valeurs du pc à prometheus
+            set_sensors(sensors_pc, info_pc.get_dict())
+
+            # Envoie le nouvelle état des relaies et des boutons utilisateur (automatique ou manuel) à prometheus
+            set_sensors(sensors_relay, dict_relay)
+
+            # Envoie les nouvelles état des batteries à prometheus
+            set_sensors(sensors_multi_01, multimetre_01.get_dict())
+            set_sensors(sensors_multi_02, multimetre_02.get_dict())
+            set_sensors(sensors_multi_03, multimetre_03.get_dict())
+            set_sensors(sensors_multi_04, multimetre_04.get_dict())
+
             logging.info("")
             logging.info("")
 
-            logging.info(dict_ina_value)
-            
+            logging.info("PSU Voltage:{:6.3f} [V]    Shunt Voltage:{:9.6f} [V]    Load Voltage:{:6.3f} [V]   Power:{:9.6f} [W]   Current:{:9.6f} [A]"
+                         .format((bus_voltage1 + shunt_voltage1),(shunt_voltage1),(bus_voltage1),(power1),(current1/1000)))
+            logging.info("PSU Voltage:{:6.3f} [V]    Shunt Voltage:{:9.6f} [V]    Load Voltage:{:6.3f} [V]   Power:{:9.6f} [W]   Current:{:9.6f} [A]"
+                         .format((bus_voltage2 + shunt_voltage2),(shunt_voltage2),(bus_voltage2),(power2),(current2/1000)))
+            logging.info("PSU Voltage:{:6.3f} [V]    Shunt Voltage:{:9.6f} [V]    Load Voltage:{:6.3f} [V]   Power:{:9.6f} [W]   Current:{:9.6f} [A]"
+                         .format((bus_voltage3 + shunt_voltage3),(shunt_voltage3),(bus_voltage3),(power3),(current3/1000)))
+            logging.info("PSU Voltage:{:6.3f} [V]    Shunt Voltage:{:9.6f} [V]    Load Voltage:{:6.3f} [V]   Power:{:9.6f} [W]   Current:{:9.6f} [A]"
+                         .format((bus_voltage4 + shunt_voltage4),(shunt_voltage4),(bus_voltage4),(power4),(current4/1000)))
             logging.info("")
             logging.info("")
 
-            logging.info("PSU Voltage:{:6.3f} [V]    Shunt Voltage:{:9.6f} [V]    Load Voltage:{:6.3f} [V]   Power:{:9.6f} [W]   Current:{:9.6f} [A]".format((bus_voltage1 + shunt_voltage1),(shunt_voltage1),(bus_voltage1),(power1),(current1/1000)))
-            logging.info("PSU Voltage:{:6.3f} [V]    Shunt Voltage:{:9.6f} [V]    Load Voltage:{:6.3f} [V]   Power:{:9.6f} [W]   Current:{:9.6f} [A]".format((bus_voltage2 + shunt_voltage2),(shunt_voltage2),(bus_voltage2),(power2),(current2/1000)))
-            logging.info("PSU Voltage:{:6.3f} [V]    Shunt Voltage:{:9.6f} [V]    Load Voltage:{:6.3f} [V]   Power:{:9.6f} [W]   Current:{:9.6f} [A]".format((bus_voltage3 + shunt_voltage3),(shunt_voltage3),(bus_voltage3),(power3),(current3/1000)))
-            logging.info("PSU Voltage:{:6.3f} [V]    Shunt Voltage:{:9.6f} [V]    Load Voltage:{:6.3f} [V]   Power:{:9.6f} [W]   Current:{:9.6f} [A]".format((bus_voltage4 + shunt_voltage4),(shunt_voltage4),(bus_voltage4),(power4),(current4/1000)))
-            logging.info("")
-            logging.info("")
-
-            set_request('http://flask:5000/updateDataRaspberry', dict_sensor)
-
-            last_update_value = current_time
+            last_update_prom = current_time
 
         blinkLed()
     else:
@@ -190,7 +224,7 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
-    port = int(os.getenv("EXPORTER_PORT", 8000))
+    port = 8000
 
     logging.info(f"Starting web server at port {port}")
 

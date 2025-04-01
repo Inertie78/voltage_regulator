@@ -147,8 +147,12 @@ select:focus {
 fieldset{
   padding: 20px;
   border: 2px solid var(--h1-color);
-  width: 400px;
+  width: 500px;
   margin: 20px;
+}
+
+P{
+  margin: 15px;
 }
 
 div.centered 
@@ -197,6 +201,7 @@ div.centered table
   align-items: center;
  
 }
+
 h4{
   margin-left: 10px;
 }

@@ -6,6 +6,7 @@ class Sensor:
         '''Crée un capteur pormetheus. Il a deux argumens le nom, le type de sensor [gauge, info, enum]'''
         self.name = name
         self.type = type
+
         self.documentation = name.replace("_", " ")
         if(type == 'gauge'):
             self.gauge = Gauge(name=self.name, documentation=self.documentation)
@@ -13,7 +14,6 @@ class Sensor:
            self.info = Info(name=self.name, documentation=self.documentation)
         elif(type == 'enum'):
             self.enum = Enum(name=self.name, documentation=self.documentation, states=['starting', 'stopped'])
-        
 
     def get_gauge(self):
         '''return le capteur gauge'''

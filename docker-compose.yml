@@ -1,5 +1,45 @@
 name: regulation_tension
 services : 
+  flask :
+    container_name: server_flask
+    build : 
+      context : ./flask 
+      dockerfile : dockerfile.flask
+    restart : always
+    volumes : 
+      - ./flask/main.py:/app/main.py:ro
+      - ./flask/templates:/app/templates:ro     #ro pour read only
+      - ./flask/static:/app/static:ro3
+      - ./flask/batSettings.json:/app/batSettings.json
+    ports :
+      - 5000:5000
+
+  script :
+    container_name: script
+    privileged: true
+    build :
+      context : ./script
+      dockerfile : dockerfile.script 
+    restart : always
+    volumes :
+      # fchier pour le script flask
+      - ./script/main.py:/usr/src/app/main.py:ro
+      - ./script/infoPc.py:/usr/src/app/infoPc.py:ro
+      - ./script/sensor.py:/usr/src/app/sensor.py:ro
+      - ./script/multimetre.py:/usr/src/app/multimetre.py:ro
+      - ./script/lineGpio.py:/usr/src/app/lineGpio.py:ro
+      - ./script/relayState.json:/usr/src/app/relayState.json
+
+      # pour les gpio sur la raspberry p
+      - /dev/gpiochip0:/dev/gpiochip0:ro
+      
+      # Pour la lecture des infos sur la raspberry pi
+      - /usr/bin/vcgencmd:/usr/bin/vcgencmd:ro
+      - /usr/lib/arm-linux-gnueabihf/libvcos.so.0:/usr/lib/arm-linux-gnueabihf/libvcos.so.0:ro
+      - /usr/lib/arm-linux-gnueabihf/libvchiq_arm.so.0:/usr/lib/arm-linux-gnueabihf/libvchiq_arm.so.0:ro
+    ports:
+      - "8000:8000"
+
   rev_proxy :
     container_name: rev_proxy
     build : 
@@ -13,8 +53,7 @@ services :
     restart : always
     depends_on : 
       - flask
-    networks:
-      - front
+      - script
 
   prometheus:
     container_name: prometheus
@@ -27,9 +66,7 @@ services :
       - ./prometheus/data:/opt/bitnami/prometheus/data*
     command:
       - '--config.file=/workspace/prometheus.yml'
-    networks:
-      - front
-  
+
   grafana:
     container_name: grafana
     image: grafana/grafana:8.4.3
@@ -46,67 +83,6 @@ services :
       GF_AUTH_ANONYMOUS_ENABLED: "true"
       GF_AUTH_ANONYMOUS_ORG_ROLE: "Admin"
       GF_AUTH_DISABLE_LOGIN_FORM: "true"
-    networks:
-      - front
-
-  flask :
-    container_name: flask
-    build : 
-      context : flask 
-      dockerfile : dockerfile.flask
-    restart : always
-    depends_on : 
-      - prometheus
-    volumes : 
-      - ./flask/main.py:/app/main.py:ro
-      - ./flask/templates:/app/templates:ro     #ro pour read only
-      - ./flask/static:/app/static:ro3
-      - ./flask/batSettings.json:/app/batSettings.json
-
-    ports :
-      - 8090:5000
-    
-    networks :
-      - front
-      - flask_network
-
-  script :
-    container_name: script
-    privileged: true
-    build :
-      context : ./script
-      dockerfile : dockerfile.script 
-    restart : always
-    depends_on :
-      - flask
-
-    volumes :
-      # fchier pour le script flask
-      - ./script/main.py:/usr/src/app/main.py:ro
-      - ./script/infoPc.py:/usr/src/app/infoPc.py:ro
-      - ./script/sensor.py:/usr/src/app/sensor.py:ro
-      - ./script/multimetre.py:/usr/src/app/multimetre.py:ro
-      - ./script/relay.py:/usr/src/app/relay.py:ro
-      - ./script/relayState.json:/usr/src/app/relayState.json
-
-      # pour les gpio sur la raspberry p
-      - /dev/gpiochip0:/dev/gpiochip0:ro
-      
-      # Pour la lecture des infos sur la raspberry pi
-      - /usr/bin/vcgencmd:/usr/bin/vcgencmd:ro
-      - /usr/lib/arm-linux-gnueabihf/libvcos.so.0:/usr/lib/arm-linux-gnueabihf/libvcos.so.0:ro
-      - /usr/lib/arm-linux-gnueabihf/libvchiq_arm.so.0:/usr/lib/arm-linux-gnueabihf/libvchiq_arm.so.0:ro
-
-    ports:
-      - "8000:8000" 
-
-    networks :
-      - front
-      - flask_network
 
 volumes :
   prometheus :
-networks :
-  front :
-  flask_network:
-    driver: bridge 
