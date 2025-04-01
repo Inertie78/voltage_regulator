@@ -36,9 +36,6 @@ global dict_relay
 with open(file_path, 'r') as file:
     dict_relay = json.load(file)
 
-global multimetre_list
-multimetre_list = {}
-
 socketio = socketio.Client(logger=True, engineio_logger=True)
 
 # Connect to the server
@@ -78,6 +75,10 @@ def message(data):
         data_string = json.dumps(dict_relay)
         socketio.send(data_string)
     elif (data == 'up_bat'):
+        multimetre_list = multimetre_01.get_dict()
+        multimetre_list.update(multimetre_02.get_dict())
+        multimetre_list.update(multimetre_03.get_dict())
+        multimetre_list.update(multimetre_04.get_dict())
         data_string = json.dumps(multimetre_list)
         socketio.send(data_string)
 
@@ -141,13 +142,6 @@ def main():
     sensors_multi_03 = createSensors(multimetre_03.get_dict(), 'gauge')
     sensors_multi_04 = createSensors(multimetre_04.get_dict(), 'gauge')
 
-    global multimetre_list
-    multimetre_list = multimetre_01.get_dict()
-    multimetre_list.update(multimetre_02.get_dict())
-    multimetre_list.update(multimetre_03.get_dict())
-    multimetre_list.update(multimetre_04.get_dict())
-
-
     while True:
         current_time = time.time()
 
@@ -171,11 +165,6 @@ def main():
             current2 = multimetre_02.get_power() 
             current3 = multimetre_03.get_power() 
             current4 = multimetre_04.get_power()
-
-            multimetre_list = multimetre_01.get_dict()
-            multimetre_list.update(multimetre_02.get_dict())
-            multimetre_list.update(multimetre_03.get_dict())
-            multimetre_list.update(multimetre_04.get_dict())
 
             last_update_multi = current_time
 
