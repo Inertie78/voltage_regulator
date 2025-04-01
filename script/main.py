@@ -84,12 +84,25 @@ def message(data):
 
 # Faire clignoter une led
 def blinkLed():
-    #active le relais sur le PIN 19
-    relay_01.activate() 
+
+    relay.activate(1)
+    time.sleep(1)       #active le relais sur le PIN 19
+    relay.activate(2)
+    time.sleep(1)       #active le relais sur le PIN 19
+    relay.activate(3)
+    time.sleep(1)       #active le relais sur le PIN 19
+    relay.activate(4)
+
     time.sleep(10)
-    #désactive le relais sur le PIN 19
-    relay_01.desactivate() 
-    time.sleep(10)
+
+    relay.desactivate(1)    #désactive le relais sur le PIN 19
+    time.sleep(1)
+    relay.desactivate(2)    #désactive le relais sur le PIN 19
+    time.sleep(1)
+    relay.desactivate(3)    #désactive le relais sur le PIN 19
+    time.sleep(1)
+    relay.desactivate(4)    #désactive le relais sur le PIN 19
+    time.sleep(1)
 
 def createSensors(dict_sensor, type):
     sensors = []
