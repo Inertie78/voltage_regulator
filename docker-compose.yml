@@ -10,7 +10,6 @@ services :
       - ./flask/main.py:/app/main.py:ro
       - ./flask/templates:/app/templates:ro     #ro pour read only
       - ./flask/static:/app/static:ro3
-      - ./flask/batSettings.json:/app/batSettings.json
     ports :
       - 5000:5000
 
@@ -28,6 +27,8 @@ services :
       - ./script/sensor.py:/usr/src/app/sensor.py:ro
       - ./script/multimetre.py:/usr/src/app/multimetre.py:ro
       - ./script/lineGpio.py:/usr/src/app/lineGpio.py:ro
+      - ./script/prometheus.py:/usr/src/app/prometheus.py:ro
+      - ./script/relay.py:/usr/src/app/relay.py:ro
       - ./script/relayState.json:/usr/src/app/relayState.json
 
       # pour les gpio sur la raspberry p

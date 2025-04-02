@@ -2,7 +2,6 @@ import os
 import json
 from flask import Flask, render_template, request, jsonify
 from flask_socketio import SocketIO, send
-from pathlib import Path
 
 import logging
 
@@ -26,7 +25,6 @@ def get_url(port):
 ################################################# route soketio #################################################
 @socketio.on('message')
 def handle_message(msg):
-    type(msg)
     logging.info('Message: ' + msg)
     send(msg, broadcast=True)
 
@@ -34,8 +32,9 @@ def handle_message(msg):
 # Affiche la page web home
 @app.route("/")
 def index():
+    socketio_ip =  get_url("5000")
     prometheuse_ip =  get_url("9090")
-    return render_template('prometheuse.html', _prometheuse_ip=prometheuse_ip)
+    return render_template('prometheus.html', _prometheuse_ip=prometheuse_ip, _socketio_ip=socketio_ip)
 
 # Affiche la page web grafana
 @app.route("/grafana")
