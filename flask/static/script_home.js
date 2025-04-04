@@ -7,7 +7,7 @@ var month;
 var jour;
 
 
-var socket = io('http://192.168.1.202:5000');
+var socket = io(adress);
 
 document.addEventListener("DOMContentLoaded", (event) => {
   socket.on('connect', function() {

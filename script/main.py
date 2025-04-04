@@ -51,6 +51,10 @@ global dict_relay
 with open(file_path, 'r') as file:
     dict_relay = json.load(file)
 
+dict_relay['au_ob'] = True
+dict_relay['au_pr'] = False
+dict_relay['au_co'] = False
+
 socketio = socketio.Client(logger=True, engineio_logger=True)
 
 # Connect to the server
@@ -78,14 +82,14 @@ def message(data):
         dict_sensor = info_pc.get_dict()
         data_string = json.dumps(dict_sensor)
         socketio.send(data_string)
-    elif ('rs_0' in data):
+    elif ('rs_0' in data or 'au_' in data ):
         json_object = json.loads(data)
-        if(len(json_object) == 1):
+        if(len(json_object) >= 1):
             for key in json_object.keys():
                 if key in dict_relay:
                     dict_relay[key] = json_object[key]
-                    with open(file_path, "w") as outfile:
-                        json.dump(dict_relay, outfile)
+            with open(file_path, "w") as outfile:
+                json.dump(dict_relay, outfile)
     elif (data == 'up_relay'):
         data_string = json.dumps(dict_relay)
         socketio.send(data_string)
@@ -96,7 +100,6 @@ def message(data):
         multimetre_list.update(multimetre_04.get_dict())
         data_string = json.dumps(multimetre_list)
         socketio.send(data_string)
-
 
 # Function principale
 def main(prometheus):

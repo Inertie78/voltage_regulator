@@ -19,6 +19,7 @@ def get_url(port):
 
     trav = HOST_IP.split('/')
     logging.info(f"The host IP address is: {trav[0]}")
+    trav[2] = trav[2].replace(':5000', '')
     return f"http://{trav[2]}:{port}"
 
 

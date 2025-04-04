@@ -22,25 +22,49 @@ document.addEventListener('DOMContentLoaded', (event) => {
   function handleInputChange(event) {
     const name = event.target.name;
     const checked = event.target.checked;
-
-    const etat_text = document.querySelectorAll('h3');
-    for (let i = 0; i < etat_text.length; i++) {
-      let mainString = etat_text[i].id
-      if (mainString.includes(name)) {
-        if(checked === true){
-          etat_text[i].textContent = 'Etat open'
-        }else{
-          etat_text[i].textContent = 'Etat close'
-        }
-      }  
-    }
     let etat_switch = {};
+
+    if(name.includes("au_")){
+      if(name === 'au_ob'){
+        $("#au_pr").prop('checked', false);
+        $("#au_co").prop('checked', false);
+        etat_switch[name] = checked;
+        Object.assign(etat_switch, { "au_pr": false });
+        Object.assign(etat_switch, { "au_co": false });
+      }else if(name === 'au_pr'){
+        $("#au_co").prop('checked', false);
+        $("#au_ob").prop('checked', false);
+        etat_switch[name] = checked;
+        Object.assign(etat_switch, { "au_co": false });
+        Object.assign(etat_switch, { "au_ob": false });
+      }else if(name === 'au_co'){
+        $("#au_pr").prop('checked', false);
+        $("#au_ob").prop('checked', false);
+        etat_switch[name] = checked;
+        Object.assign(etat_switch, { "au_pr": false });
+        Object.assign(etat_switch, { "au_ob": false });
+      }
+      
+    }else{
+      const etat_text = document.querySelectorAll('h3');
+      for (let i = 0; i < etat_text.length; i++) {
+        let mainString = etat_text[i].id
+        if (mainString.includes(name)) {
+          if(checked === true){
+            etat_text[i].textContent = 'Etat open'
+          }else{
+            etat_text[i].textContent = 'Etat close'
+          }
+        }  
+      }
+      etat_switch[name] = checked;
+    }
+
+    
     etat_switch[name] = checked;
     const jsonString = JSON.stringify(etat_switch);
     socket.send(jsonString);
   }
-
-
 
   // Add event listener to each input element
   inputs.forEach(input => {
@@ -48,4 +72,10 @@ document.addEventListener('DOMContentLoaded', (event) => {
   });
 });
 
-//document.getElementById("relaySwitch").checked = true;
+function activateCheckbox(clickedCheckbox) {
+  const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+  checkboxes.forEach(checkbox => {
+      checkbox.checked = false;
+  });
+  clickedCheckbox.checked = true;
+}
