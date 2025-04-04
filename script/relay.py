@@ -4,7 +4,7 @@ class Relay:
           pass
     
     # Faire clignoter une led
-    def relayAction(relay_n, auto, activate):
+    def relayAction(self, relay_n, auto, activate):
         if(auto):
             if(activate):
                 relay_n.activate() #active le relais

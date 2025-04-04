@@ -15,7 +15,7 @@ level = os.getenv("LOG_LEVEL", "INFO")
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
-TIME_UPDATE_PROM = 60
+TIME_UPDATE_PROM = 10
 TIME_UPDATE_MULTI = 0.1
 LIMIT_COUNT = 100
 
@@ -33,6 +33,15 @@ multimetre_02 = Multimetre(0x41, 2)
 multimetre_03 = Multimetre(0x42, 3)
 multimetre_04 = Multimetre(0x43, 4)
 
+change_etat_relay_1 = Relay()
+change_etat_relay_2 = Relay()
+change_etat_relay_3 = Relay()
+change_etat_relay_4 = Relay()
+
+a = Observer():
+
+a.run
+
 # information état des GPIO sur Flask
 file_path = 'relayState.json'
 if not Path(file_path).exists():
@@ -46,7 +55,7 @@ socketio = socketio.Client(logger=True, engineio_logger=True)
 
 # Connect to the server
 try:
-    socketio.connect('http://flask:5000', wait_timeout = 10, transports=['websocket'])
+    socketio.connect('http://192.168.1.202:5000', wait_timeout = 10, transports=['websocket'])
     logging.info("Socket established")
 except ConnectionError as e:
     logging.info('Connection error: {e}')
@@ -91,6 +100,10 @@ def message(data):
 
 # Function principale
 def main(prometheus):
+
+    
+
+
     last_update_prom = 0
 
     last_update_multi = 0
@@ -158,7 +171,17 @@ def main(prometheus):
     while True:
         current_time = time.time()
 
+        
+        change_etat_relay_1.relayAction(relay_01, dict_relay["au_rs_01"], dict_relay["rs_01"])
+
+        change_etat_relay_2.relayAction(relay_02, dict_relay["au_rs_02"], dict_relay["rs_02"])
+        change_etat_relay_3.relayAction(relay_03, dict_relay["au_rs_03"], dict_relay["rs_03"])
+        change_etat_relay_4.relayAction(relay_04, dict_relay["au_rs_04"], dict_relay["rs_04"])
+
         if(current_time - last_update_multi or last_update_multi == 0):
+
+            
+
 
             if(count < LIMIT_COUNT):
                 psu_voltage1 += multimetre_01.get_psu_voltage()
@@ -247,6 +270,9 @@ def main(prometheus):
 
             logging.info("")
             logging.info("")
+
+
+    
 
             last_update_prom = current_time
 
