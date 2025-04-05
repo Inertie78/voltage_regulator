@@ -14,6 +14,8 @@
   --input-focus-l: 50%;
 }
 
+@media (-ms-high-contrast: white-on-black) {}
+
 html, body {
   background-color: var(--colorBody);
   color: var(--colorWhite);

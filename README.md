@@ -1,26 +1,115 @@
 # Projet contrôleur de charge d'une batterie
 ## Guillaume et Christophe
 
--	Le projet a pour but de contrôler la charge d'une batterie.
--	Le programme a pour mission d'effectuer des relevés de tension et de définir l'état de charge de la batterie surveillée. 
--   Différentes actions seront entreprises selon le développement du script.
--   Les valeurs sont transmises à un serveur Prometheus
--   une application Grafana permet de consulter la base Prometheus et d'afficher des graphes.
--   Le tout est monitoré et contrôlé par une application web, basée sur le Framework Flask, lequel est exposé à l'extérieur via un reverse proxy Nginx.
+# Concept du projet 
 
+## Introduction
 
-## fonctionnalités envisagées 
+Dans le cadre d'une application réelle, des batteries sont utilisées comme alimentation de secours pour des appareils connectés en permanence au réseau 230 V. 
+Toutes les batteries utilisées se sont révélées hors d'usage après une durée de vie d'environ 15 mois. 
+Notre projet à pour objectif de permettre la récolte de mesures sur l'activité de la batterie, de l'alimentation 230 V et du chargeur. 
 
--   Si la batterie est pleine, nous coupons la charge avec un relais connecté au Raspberry.
--	Si la batterie est en dessous d'une certaine tension, le relais lancera la charge.
--   Les valeurs de tensions, de températures seront récoltées périodiquement et stockées pour analyse.
--   Un server SMTP sera déployé pour permettre l'envoi d'e-mail.
+## Hardware
 
-## Système d'alarme :
+Un Raspberry Pi 5 - 15 Gb de RAM été choisi comme contrôleur. Plusieurs accessoires ont été ajoutés :
+- Module avec 4 relais 230 V
+- Module I2C avec 4 entrées permettant la mesure de tension de 0 à 26 V
+- Module I2C permettant la mesure de température
 
--   En cas de décharge profonde, un message devrait être envoyé à l'utilisateur par e-mail, ou par le biais d'un popup sur l'interface web, pour lui indiquer que la batterie est défectueuse.
--   Si la température dépasse les 80 degrés, une commande est envoyé au relais pour couper la charge. Un message devrait être envoyé à l'utilisateur par e-amil, ou par le biais d'un popup sur l'interface web, pour lui indiquer qu'il y a un risque de surchauffe. 
--   Si la température dépasse les 100 degrés un email est envoyé toutes les minutes.
+## Installation
+
+- L'alimentation électrique principale est connectée au relais no 1, ce qui permet de couper à distance le raccordement électrique de toute l'installation, ainsi de forcer le fonctionnement sur l'alimentation de secours.
+
+- Le circuit de charge est connectée au relais no 2, ce qui permet d'interrompre la charge de la batterie.
+
+- La batterie est raccordée à l'entrée numéro 1 du moniteur de tension, afin que des mesures de tensions puissent être effectuées de façon récurentes.
+
+- Le circuit de charge est raccordé en série sur l'entrée numéro 2 du moniteur de tension, afin de pouvoir récupérer la tension, la puissance ainsi que le courant envoyé par le chargeur sur la batterie
+- Le circuit d'alimentation des équipements est raccordé sur l'entrée numéro 3 du moniteur de tension, afin de pouvoir récupérer la tension, la puissance ainsi que le courant utilisés par les consommateurs. 
+
+## Software (succinct)
+
+Tout l'environnement a été déployé sur la base de dockers. 
+
+Une instance **Nginx** fonctionne comme reverse proxy et route le trafic sur un **framework Flask**.
+
+Ce framework est le tiers 1/3 du système, soit le coeur d'affichage et de contrôle pour l'utilisateur. Il permet d'envoyer des ordres au script, de questionner la DB et d'afficher des graphiques.
+
+Un **script Python** a été élaboré pour interragir avec les équipements hardware et contient la logique des processus et se positionne donc dans le tiers 2/3. Les modes de fonctionnement et variantes seront appliqués, selon des ordres provenant de l'utilisateur, via le framework Flask. 
+
+Un **serveur Promotheus** a été déployé pour recevoir toutes les mesures horodatées.
+
+Finalement une instance **Grafana** est utilisée pour permettre la conception de tableaux de bords et de graphiques, lesquels permettront de visualiser, via le framework Flask, les différentes mesures, selon les modes utilisés. 
+
+Ces deux dernières instances constituent le tiers 3/3, soit la partie de stockage des valeurs.
+
+## Modes de fonctionnement 
+
+*note :* *relais ouvert = circuit coupé*  // 
+*relais fermé = circuit connecté*
+
+Rpi5 = Raspberry Pi 5 et accessoires
+
+### **Observateur** (fonctionnement par défaut)
+
+Le système se limite à effectuer des mesures lors du fonctionnement normal des objets. 
+
+Le Rpi5 : 
+- ferme le relais 1 et le relais 2
+- récolte chaque 30 secondes 10 mesures de tension, de courant, de puissance et de température 
+- une moyenne de ces valeurs est faite (pour limiter le risque d'erreur de mesure) et la transmet au serveur Prometheus
+
+### **Protection contre la surcharge**
+
+Le système mesure la tension de la batterie et lorsqu'elle atteint la tension de x V, ouvre le relais pour interrompre la charge.
+
+Le Rpi5 :
+- ferme le relais 1 et le relais 2
+- récolte chaque 30 secondes 10 mesures de tension, de courant, de puissance et de température. 
+- effectue une moyenne de ces valeurs et la transmet au serveur Prometheus
+
+Lorsque la valeur moyenne des mesures dépasse x V 
+
+- ouvre le relais 2 pour interrompre le circuit de charge.
+- récolte chaque 30 secondes 10 mesures de tension, de courant, de puissance et de température. 
+- effectue une moyenne de ces valeurs et la transmet au serveur Prometheus
+
+Lorsque la valeur moyenne des mesures est en dessous de x V 
+
+- ferme le relais 2 pour relancer la charge et reprend le processus de départ.
+
+### **Cycle de consommation**
+
+Hors périodes critiques pour les équipements, le système coupe l'alimentation électrique principale forçant les équipements à se servir de l'alimentation de secours. La batterie est donc forcée d'effectuer un cycle partiel. Une fois déchargée à la tension voulue, le système reconnecte l'alimentation 230 V et recharge la batterie. Une fois la batterie atteignant la tension souhaitée, la charge sera interrompue par le relais.
+
+Le Rpi5 :
+- ouvre le relais 1 et le relais 2
+- récolte chaque 30 secondes 10 mesures de tension, de courant, de puissance et de température. 
+- effectue une moyenne de ces valeurs et la transmet au serveur Prometheus
+
+Lorsque la valeur moyenne des mesures est en dessous de  x V 
+
+- ferme le relais 1 et le relais 2 pour lancer la charge.
+- récolte chaque 30 secondes 10 mesures de tension, de courant, de puissance et de température. 
+- effectue une moyenne de ces valeurs et la transmet au serveur Prometheus
+
+Lorsque la valeur moyenne des mesures dépasse x V 
+
+- ouvre le relais 2 pour stopper la charge 
+- récolte chaque 30 secondes 10 mesures de tension, de courant, de puissance et de température. 
+- effectue une moyenne de ces valeurs et la transmet au serveur Prometheus
+
+Si la tension de la batterie descend en dessous de x V
+
+- ferme le relais 2 pour reprendre la charge
+
+## Alarming et monitoring
+
+### Dispositif de sécurité
+
+Si la température dépasse une certaine valeur, un message d'alerte est transmis à l'utilisateur. Soit par le biais d'un popup dans le framework Flask, soit par e-mail si un serveur SMTP est disponible.
+
+Si la température dépasse une valeur limite, le système ouvre le relais 2 pour stopper la charge. Le message d'erreur sont également transmis. 
 
 ### Lancer le projet :
 `docker compose build && docker compose up -d`
@@ -54,14 +143,13 @@ E --> A
 
 ### Liste de variable l'état des relais
 
-|  numéro | Relaie  |automatique|       
-|---------|---------|-----------|
-|   N°1   |"rs_01"  |"au_rs_01" | 
-|   N°2   |"rs_02"  |"au_rs_02" |
-|   N°3   |"rs_03"  |"au_rs_03" |
-|   N°4   |"rs_04"  |"au_rs_04" | 
+|  numéro | Relaie  |      
+|---------|---------|
+|   N°1   | "rs_01" |
+|   N°2   | "rs_02" |
+|   N°3   | "rs_03" |
+|   N°4   | "rs_04" |
 
-Automatique = bouton de la page web qui indiaue si le relay est en mode automatique ou manuel. Variable utilisateur,
 
 ### Liste de variable l'état de la batterie
 
@@ -71,3 +159,11 @@ Automatique = bouton de la page web qui indiaue si le relay est en mode automati
 |   N°2   |"bat_bus_voltage_02"  |"bat_shunt_voltage_02" |"bat_power_02" |"bat_current_02" |
 |   N°3   |"bat_bus_voltage_03"  |"bat_shunt_voltage_03" |"bat_power_03" |"bat_current_03" |
 |   N°4   |"bat_bus_voltage_04"  |"bat_shunt_voltage_04" |"bat_power_04" |"bat_current_04" |
+
+
+### Mode de fonctionnement du système
+|   mode     |varaible |      
+|------------|---------|
+| bservateur | "au_ob" |
+| Protection | "au_pr" |
+|consommation| "au_co" |
