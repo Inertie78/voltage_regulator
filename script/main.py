@@ -9,6 +9,7 @@ from multimetre import Multimetre
 from lineGpio import LineGpio
 from prometheus import Prometheus
 from relay import Relay
+from observer import Observer
 
 format = "%(asctime)s %(levelname)s: %(message)s"
 level = os.getenv("LOG_LEVEL", "INFO")
@@ -38,9 +39,12 @@ change_etat_relay_2 = Relay()
 change_etat_relay_3 = Relay()
 change_etat_relay_4 = Relay()
 
-a = Observer():
+# Initialise le mode de fonctionnement 
 
-a.run
+mode_observer = Observer(change_etat_relay_1, change_etat_relay_2, relay_01, relay_02)
+
+
+
 
 # information état des GPIO sur Flask
 file_path = 'relayState.json'
@@ -172,11 +176,14 @@ def main(prometheus):
         current_time = time.time()
 
         
-        change_etat_relay_1.relayAction(relay_01, dict_relay["au_rs_01"], dict_relay["rs_01"])
+        mode_observer.run()
 
-        change_etat_relay_2.relayAction(relay_02, dict_relay["au_rs_02"], dict_relay["rs_02"])
-        change_etat_relay_3.relayAction(relay_03, dict_relay["au_rs_03"], dict_relay["rs_03"])
-        change_etat_relay_4.relayAction(relay_04, dict_relay["au_rs_04"], dict_relay["rs_04"])
+        
+#        change_etat_relay_1.relayAction(relay_01, dict_relay["au_rs_01"], dict_relay["rs_01"])
+#
+#        change_etat_relay_2.relayAction(relay_02, dict_relay["au_rs_02"], dict_relay["rs_02"])
+ #       change_etat_relay_3.relayAction(relay_03, dict_relay["au_rs_03"], dict_relay["rs_03"])
+ #       change_etat_relay_4.relayAction(relay_04, dict_relay["au_rs_04"], dict_relay["rs_04"])
 
         if(current_time - last_update_multi or last_update_multi == 0):
 
