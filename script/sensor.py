@@ -1,9 +1,20 @@
 from prometheus_client import Gauge, Enum
+import logging, os
+
+format = "%(asctime)s %(levelname)s: %(message)s"
+level = os.getenv("LOG_LEVEL", "INFO")
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s - %(levelname)s - %(message)s')
+
 
 class Sensor:
     def __init__(self, name, type, index):
         '''Crée un capteur pormetheus. Il a deux argumens le nom, le type de sensor [gauge, info, enum]'''
-        self.name = name + f'_0{index}'
+        if (index > 0):
+            self.name = name + f'_0{index}'
+        else:
+            self.name = name
+
         self.type = type
         self.documentation = name.replace("_", " ")
         try:

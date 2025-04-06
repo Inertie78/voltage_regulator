@@ -25,7 +25,7 @@ class Main():
 
         self.info_pc = InfoPc()
         # Crée un sensor prometheus pour les inforamtions du pc
-        self.sensors_pc = prometheus.createSensors(self.info_pc.get_dict(), 'gauge', 1)
+        self.sensors_pc = prometheus.createSensors(self.info_pc.get_dict(), 'gauge', 0)
 
         # Initialise les relaies. Décommenter les lignes au besoin
         self.relay_01 = LineGpio(name='relay 01', pin=19)
@@ -53,9 +53,9 @@ class Main():
 
         # Crée des sensors prometheus pour les valeurs du multimètre
         self.sensors_multi_01 = self.prometheus.createSensors(self.multi_dict_01, 'gauge', 1)
-        self.sensors_multi_02 = self.prometheus.createSensors(self.multi_dict_02, 'gauge', 2)
-        self.sensors_multi_03 = self.prometheus.createSensors(self.multi_dict_03, 'gauge', 3)
-        self.sensors_multi_04 = self.prometheus.createSensors(self.multi_dict_04, 'gauge', 4)
+        self.sensors_multi_02 = self.prometheus.createSensors(self.multi_dict_02, 'gauge', 1)
+        self.sensors_multi_03 = self.prometheus.createSensors(self.multi_dict_03, 'gauge', 1)
+        self.sensors_multi_04 = self.prometheus.createSensors(self.multi_dict_04, 'gauge', 1)
 
         # information état des GPIO sur Flask
         self.file_path = 'relayState.json'
@@ -71,14 +71,14 @@ class Main():
         self.dict_relay['au_co'] = False
 
         # Crée un sensor prometheus pour les relaies
-        self.sensors_relay = prometheus.createSensors(self.dict_relay, 'enum', 1)
+        self.sensors_relay = prometheus.createSensors(self.dict_relay, 'enum', 0)
 
         # Inisialize une communication client
         self.socketio = socketio.Client(logger=True, engineio_logger=True)
 
         # Connection au server falsk
         try:
-            self.socketio.connect('http://flask:5000', wait_timeout = 10, transports=['websocket'])
+            self.socketio.connect('http://192.168.50.108:5000', wait_timeout = 10, transports=['websocket'])
             logging.info("Socket established")
             self.call_backs()
         except ConnectionError as e:
@@ -165,16 +165,16 @@ class Main():
                 self.info_pc.infoPc()
 
                 # Envoie les nouvelles valeurs du pc à prometheus
-                self.prometheus.set_sensors(self.sensors_pc, self.info_pc.get_dict())
+                self.prometheus.set_sensors(self.sensors_pc, self.info_pc.get_dict(), 0)
 
                 # Envoie le nouvelle état des relaies et des boutons utilisateur (automatique ou manuel) à prometheus
-                self.prometheus.set_sensors(self.sensors_relay, self.dict_relay)
+                self.prometheus.set_sensors(self.sensors_relay, self.dict_relay, 0)
 
                 # Envoie les nouvelles état des batteries à prometheus
-                self.prometheus.set_sensors(self.sensors_multi_01, self.multi_dict_01)
-                self.prometheus.set_sensors(self.sensors_multi_02, self.multi_dict_02)
-                self.prometheus.set_sensors(self.sensors_multi_03, self.multi_dict_03)
-                self.prometheus.set_sensors(self.sensors_multi_04, self.multi_dict_04)
+                self.prometheus.set_sensors(self.sensors_multi_01, self.multi_dict_01, 1)
+                self.prometheus.set_sensors(self.sensors_multi_02, self.multi_dict_02, 2)
+                self.prometheus.set_sensors(self.sensors_multi_03, self.multi_dict_03, 3)
+                self.prometheus.set_sensors(self.sensors_multi_04, self.multi_dict_04, 4)
 
                 logging.info("")
                 logging.info("")

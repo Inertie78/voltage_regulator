@@ -20,19 +20,21 @@ class  Prometheus:
 
         return sensors
 
-    def set_sensors(self, sensors, dict_sensor):
+    def set_sensors(self, sensors, dict_sensor, index):
         if(not sensors == None):
             for sensor in sensors:
                 try:
-                    name = sensor.get_name()
+                    if(index > 0):
+                        name = sensor.get_name()
+                        name = name[:len(name)-3]
+                    else:
+                        name = sensor.get_name()
                     if(name in dict_sensor):
                         value = dict_sensor[name]
                         if (not type(value) == type('str')):
                             logging.info(f"{name}: {value}")
                             sensor_type = sensor.get_type()
-                            if(sensor_type == 'info'):
-                                sensor.set_info(value)
-                            elif(sensor_type == 'enum'):
+                            if(sensor_type == 'enum'):
                                 data = ''
                                 if(value == True):
                                     value = 'starting'
