@@ -2,71 +2,76 @@ import board
 import busio
 from adafruit_ina219 import ADCResolution, BusVoltageRange, INA219
 
+# Pour l'apprentissage classe retourné par une IA (sauf la partie pour supprimmer la première varibale et rejouter une variable a la fin de la liste)
+# Crée une dictionnaire avec clé et une liste sur laquelle nous pouvons rajouter des variable et supprime la première variable de la liste si elle dépasse une certaine limite.
+class MetaIterable(type):
+    def __new__(cls, name, bases, dct):
+        dct['add_to_list'] = lambda self, key, value: self.data.setdefault(key, []).append(value) if not key in self.data.keys() else \
+            self.data.setdefault(key, []).append(value) if len(self.data[key]) < self.limit else (self.data[key].pop(0), self.data.setdefault(key, []).append(value))
+        return super().__new__(cls, name, bases, dct)
+        return super().__new__(cls, name, bases, dct)
+
+# Pour l'apprentissage méthode retourné par une IA
+# Methode qui additionne les valeurs d'une liste
+def add_sum_method(cls):
+    def sum_elements(self, key):
+        return sum(self.data.get(key, []))
+    cls.sum_elements = sum_elements
+    return cls
+
+# Pour l'apprentissage classe retourné par une IA (sauf la partie limit de la fonction)
+# Classe pour itérer sur la class MetaIterable
+@add_sum_method
+class IterableDict(metaclass=MetaIterable):
+    def __init__(self, limit):
+        self.data = {}
+        self.limit = limit
+
+    # methode pour iterer sur le dictionaire
+    def __iter__(self):
+        for key, values in self.data.items():
+            yield key, values
+
 class Multimetre() :
-
-    def __init__(self, addr, number) :
-        '''
-            Classe qui permet d'interragir avec le multimètre avec comme paramètre l'adresse du contrôler. 
-            Protocole de communication I2C.
-        '''
-        self.number = number
-        
+    '''Classe qui va permettre d'interragir avec le multimètre'''
+    def __init__(self, addr, limit=50) :
+        self.limit = limit
+        # Crée une liste pour pouvoir crée des sensors pour prometheus
+        self.ina_dict = {'psu_voltage':-1, 'bus_voltage':-1, 'shunt_voltage':-1, 'current':-1, 'power':-1}
         try:
-
             i2c_bus = busio.I2C(board.SCL, board.SDA)
-            self.ina = INA219(i2c_bus, addr)
 
+            self.ina = INA219(i2c_bus, addr)
             self.ina.bus_adc_resolution = ADCResolution.ADCRES_12BIT_32S
             self.ina.shunt_adc_resolution = ADCResolution.ADCRES_12BIT_32S
-            self.ina.bus_voltage_range = BusVoltageRange.RANGE_16V    
+            self.ina.bus_voltage_range = BusVoltageRange.RANGE_16V 
 
         except:
-            self.ina = None      
+            self.ina = None
 
-    def get_psu_voltage(self):
+        # Création de l'objet
+        self.iterable_dict = IterableDict(self.limit)
+
+    def add_value(self):
         if (not self.ina == None):
-            return (self.ina.bus_voltage + self.ina.shunt_voltage)
+            self.iterable_dict.add_to_list('psu_voltage', (self.ina.bus_voltage + self.ina.shunt_voltage))
+            self.iterable_dict.add_to_list('bus_voltage', self.ina.bus_voltage)
+            self.iterable_dict.add_to_list('shunt_voltage', self.ina.shunt_voltage)
+            self.iterable_dict.add_to_list('current', self.ina.current)
+            self.iterable_dict.add_to_list('power', self.ina.power)
         else:
-            return -1
-         
-    def get_bus_voltage(self):
-        '''retounre la tension du bus (entre V- et GND) en Volts'''
-        if (not self.ina == None):
-            return self.ina.bus_voltage
-        else:
-            return -1
-    
-    def get_shunt_voltage(self):
-        '''retounre la tension de dérivation (entre V+ et V-) en Volts (so +-.327V'''
-        if (not self.ina == None):
-            return self.ina.shunt_voltage
-        else:
-            return -1
-    
-    def get_power(self):
-        '''retounre la puissance traversant la charge en Watt.'''
-        if (not self.ina == None):
-            return self.ina.power
-        else:
-            return -1
-    
-    def get_current(self):
-        '''retounre le courant à travers la résistance de dérivation en milliampères.'''
-        if (not self.ina == None):
-            return (self.ina.current/1000)
-        else:
-            return -1
-    
+            self.iterable_dict.add_to_list('psu_voltage', -1)
+            self.iterable_dict.add_to_list('bus_voltage', -1)
+            self.iterable_dict.add_to_list('shunt_voltage', -1)
+            self.iterable_dict.add_to_list('current', -1)
+            self.iterable_dict.add_to_list('power', -1)
+
     def get_dict(self):
-        '''retounre un dictionaire des valeurs si-dessu'''
-        if (not self.ina == None):
-            psu_voltage = f"{(self.get_psu_voltage()):6.3f}"
-            bus_voltage = f"{self.get_bus_voltage():6.3f}"
-            shunt_voltage = f"{self.get_shunt_voltage():6.3f}"
-            current = f"{(self.get_current()):6.3f}"
-            power = f"{self.get_power():6.3f}"
-            return {f'bat_psu_voltage_0{self.number}': psu_voltage, f'bat_bus_voltage_0{self.number}': bus_voltage, 
-                    f'bat_shunt_voltage_0{self.number}': shunt_voltage, f'bat_power_0{self.number}': power, f'bat_current_0{self.number}': current}
-        else:
-            return {f'bat_psu_voltage_0{self.number}': -1, f'bat_bus_voltage_0{self.number}': -1, 
-                    f'bat_shunt_voltage_0{self.number}': -1, f'bat_power_0{self.number}': -1, f'bat_current_0{self.number}': -1}
+        # Itération sur les éléments
+        for key, values in self.iterable_dict:
+            if(key == 'current'):
+                self.ina_dict[key] = self.iterable_dict.sum_elements(key)/(len(self.iterable_dict.data[key]) * 1000)
+            else:
+                self.ina_dict[key] = self.iterable_dict.sum_elements(key)/len(self.iterable_dict.data[key])
+    
+        return self.ina_dict

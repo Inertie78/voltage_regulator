@@ -12,7 +12,7 @@ class LineGpio :
             un numéro de pin (variable:format [pin:int])
         '''
         self.pin = pin
-        self.relay = gpiod.request_lines(
+        self.gpio_line = gpiod.request_lines(
             LineGpio.CHIP,
             consumer=name,
             config={
@@ -24,12 +24,15 @@ class LineGpio :
 
     def activate(self) :
        '''Active le pin'''
-       self.relay.set_value(self.pin, Value.ACTIVE)
+       self.gpio_line.set_value(self.pin, Value.ACTIVE)
 
     def desactivate(self) :
         '''Desctive le pin'''
-        self.relay.set_value(self.pin, Value.INACTIVE)
+        self.gpio_line.set_value(self.pin, Value.INACTIVE)
 
     def etat(self):
         '''Retourne l'état du pin'''
-        return self.relay.get_value(self.pin)
+        return self.gpio_line.get_value(self.pin)
+    
+    def release(self):
+        self.gpio_line.release()

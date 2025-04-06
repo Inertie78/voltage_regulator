@@ -19,6 +19,7 @@ def get_url(port):
 
     trav = HOST_IP.split('/')
     logging.info(f"The host IP address is: {trav[0]}")
+    trav[2] = trav[2].replace(':5000', '')
     return f"http://{trav[2]}:{port}"
 
 
@@ -45,39 +46,28 @@ def grafana():
 # Affiche la page web des relaies
 @app.route("/relay")
 def relay():
-    return render_template('relay.html')
+    socketio_ip =  get_url("5000")
+    return render_template('relay.html', _socketio_ip=socketio_ip)
 
 
 # Affiche la page web des settings des batteries
 @app.route("/multimeter")
 def multimeter():
-    return render_template('multimeter.html')
+    socketio_ip =  get_url("5000")
+    return render_template('multimeter.html', _socketio_ip=socketio_ip)
 
 # Affiche la page web sur les infos de la raspberry pi
 @app.route("/about")
 def about():
-    return render_template('about.html')
+    socketio_ip =  get_url("5000")
+    return render_template('about.html', _socketio_ip=socketio_ip)
 
-# Met à jour le dictionaire en fonction des choix du l'utilisateur sur la page web
-@app.route("/relaySwitch")
-def relaySwitch():
-    try:
-        relay_state = json.loads(request.args.get('result'))
-        for key, value in relay_state.items():
-            global dict_switch_relay 
-            dict_switch_relay[key] = value
-    except:
-        relay_state = None
-
-    logging.info(f'Change la valeur du switch dans le dictionaire {relay_state}')
-
-    return jsonify(result=True)
 
 # Reboot la raspberry pi
 @app.route("/raspberryReboot")
 def raspberryReboot():
     try:
-       os.system('sudo reboot') 
+       os.system('sudo reboot')
     except Exception as e:
         logging.error(e)
 
