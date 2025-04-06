@@ -4,12 +4,9 @@ import json
 from pathlib import Path
 
 from infoPc import InfoPc
-from multimetre import Multimetre
-
-from lineGpio import LineGpio
 from prometheus import Prometheus
-from relay import Relay
-from observer import Observer
+from modes import Modes
+from multimetre import Multimetre
 
 format = "%(asctime)s %(levelname)s: %(message)s"
 level = os.getenv("LOG_LEVEL", "INFO")
@@ -18,276 +15,198 @@ logging.basicConfig(level=logging.DEBUG,
 
 TIME_UPDATE_PROM = 10
 TIME_UPDATE_MULTI = 0.1
-LIMIT_COUNT = 100
+LIMIT_COUNT = 10
 
-info_pc = InfoPc()
+class Main():
+    def __init__(self, prometheus):
 
-# Initialise les relaies. Décommenter les lignes au besoin
-relay_01 = LineGpio(name='relay 01', pin=19)
-relay_02 = LineGpio(name='relay 02', pin=13)
-relay_03 = LineGpio(name='relay 03', pin=6)
-relay_04 = LineGpio(name='relay 04', pin=5)
+        self.prometheus = prometheus
 
-# Initialise les relaimultimètres. Décommenter les lignes au besoin
-multimetre_01 = Multimetre(0x40, 1) 
-multimetre_02 = Multimetre(0x41, 2)
-multimetre_03 = Multimetre(0x42, 3)
-multimetre_04 = Multimetre(0x43, 4)
-
-change_etat_relay_1 = Relay()
-change_etat_relay_2 = Relay()
-change_etat_relay_3 = Relay()
-change_etat_relay_4 = Relay()
-
-# Initialise le mode de fonctionnement 
-
-mode_observer = Observer(change_etat_relay_1, change_etat_relay_2, relay_01, relay_02)
-
-
-
-
-# information état des GPIO sur Flask
-file_path = 'relayState.json'
-if not Path(file_path).exists():
-    file_path = 'script/relayState.json'
-
-global dict_relay
-with open(file_path, 'r') as file:
-    dict_relay = json.load(file)
-
-socketio = socketio.Client(logger=True, engineio_logger=True)
-
-# Connect to the server
-try:
-    socketio.connect('http://192.168.1.202:5000', wait_timeout = 10, transports=['websocket'])
-    logging.info("Socket established")
-except ConnectionError as e:
-    logging.info('Connection error: {e}')
-
-@socketio.event
-def connect():
-    logging.info('Connection established')
-    socketio.send('Client connected')
-
-@socketio.event
-def disconnect():
-    logging.info('Disconnected from server')
-
-# Recois un message du container flask
-@socketio.event
-def message(data):
-    logging.info(f'Message received: {data}')
-    if (data == 'up_PI'):
-        info_pc.infoPc()
-        dict_sensor = info_pc.get_dict()
-        data_string = json.dumps(dict_sensor)
-        socketio.send(data_string)
-    elif ('rs_0' in data):
-        json_object = json.loads(data)
-        if(len(json_object) == 1):
-            for key in json_object.keys():
-                if key in dict_relay:
-                    dict_relay[key] = json_object[key]
-                    with open(file_path, "w") as outfile:
-                        json.dump(dict_relay, outfile)
-    elif (data == 'up_relay'):
-        data_string = json.dumps(dict_relay)
-        socketio.send(data_string)
-    elif (data == 'up_bat'):
-        multimetre_list = multimetre_01.get_dict()
-        multimetre_list.update(multimetre_02.get_dict())
-        multimetre_list.update(multimetre_03.get_dict())
-        multimetre_list.update(multimetre_04.get_dict())
-        data_string = json.dumps(multimetre_list)
-        socketio.send(data_string)
-
-
-# Function principale
-def main(prometheus):
-
-    
-
-
-    last_update_prom = 0
-
-    last_update_multi = 0
-
-    sensors_pc = prometheus.createSensors(info_pc.get_dict(), 'gauge')
-
-    sensors_relay = prometheus.createSensors(dict_relay, 'enum')
-
-    sensors_multi_01 = prometheus.createSensors(multimetre_01.get_dict(), 'gauge')
-    sensors_multi_02 = prometheus.createSensors(multimetre_02.get_dict(), 'gauge')
-    sensors_multi_03 = prometheus.createSensors(multimetre_03.get_dict(), 'gauge')
-    sensors_multi_04 = prometheus.createSensors(multimetre_04.get_dict(), 'gauge')
-
-    count = 1
-    psu_voltage10 = multimetre_01.get_psu_voltage()
-    psu_voltage20 = multimetre_02.get_psu_voltage()
-    psu_voltage30 = multimetre_03.get_psu_voltage()
-    psu_voltage40 = multimetre_04.get_psu_voltage()
-
-    bus_voltage10 = multimetre_01.get_bus_voltage()
-    bus_voltage20  = multimetre_02.get_bus_voltage()
-    bus_voltage30 = multimetre_03.get_bus_voltage()
-    bus_voltage40 = multimetre_04.get_bus_voltage()
-
-    shunt_voltage10 = multimetre_01.get_shunt_voltage() 
-    shunt_voltage20 = multimetre_02.get_shunt_voltage()
-    shunt_voltage30 = multimetre_03.get_shunt_voltage() 
-    shunt_voltage40 = multimetre_04.get_shunt_voltage()
-
-    current10 = multimetre_01.get_current()
-    current20 = multimetre_02.get_current()
-    current30 = multimetre_03.get_current()
-    current40 = multimetre_04.get_current()
-
-    power10 = multimetre_01.get_power()
-    power20 = multimetre_02.get_power()
-    power30 = multimetre_03.get_power() 
-    power40 = multimetre_04.get_power()
-
-    psu_voltage1 = 0
-    psu_voltage2 = 0
-    psu_voltage3 = 0
-    psu_voltage4 = 0
-
-    bus_voltage1  = 0
-    bus_voltage2 = 0
-    bus_voltage3 = 0
-    bus_voltage4 = 0
-
-    shunt_voltage1 = 0 
-    shunt_voltage2 = 0
-    shunt_voltage3 = 0 
-    shunt_voltage4 = 0
-
-    current1 = 0
-    current2 = 0
-    current3 = 0
-    current4 = 0
-
-    power1 = 0
-    power2 = 0
-    power3 = 0
-    power4 = 0
-
-    while True:
-        current_time = time.time()
+        self.info_pc = InfoPc()
+        # Crée un sensor prometheus pour les inforamtions du pc
+        self.sensors_pc = prometheus.createSensors(self.info_pc.get_dict(), 'gauge', 0)
 
         
-        mode_observer.run()
+        # Initialise les relaimultimètres. Décommenter les lignes au besoin
+        self.multimetre_01 = Multimetre(0x40, LIMIT_COUNT) 
+        self.multimetre_02 = Multimetre(0x41, LIMIT_COUNT)
+        self.multimetre_03 = Multimetre(0x42, LIMIT_COUNT)
+        self.multimetre_04 = Multimetre(0x43, LIMIT_COUNT)
 
-        
-#        change_etat_relay_1.relayAction(relay_01, dict_relay["au_rs_01"], dict_relay["rs_01"])
-#
-#        change_etat_relay_2.relayAction(relay_02, dict_relay["au_rs_02"], dict_relay["rs_02"])
- #       change_etat_relay_3.relayAction(relay_03, dict_relay["au_rs_03"], dict_relay["rs_03"])
- #       change_etat_relay_4.relayAction(relay_04, dict_relay["au_rs_04"], dict_relay["rs_04"])
 
-        if(current_time - last_update_multi or last_update_multi == 0):
+       # Crée des dictionaires pour les valeurs du multimètres
+        self.multi_dict_01 = self.multimetre_01.get_dict()
+        self.multi_dict_02 = self.multimetre_02.get_dict()
+        self.multi_dict_03 = self.multimetre_03.get_dict()
+        self.multi_dict_04 = self.multimetre_04.get_dict()
+
+        # Crée des sensors prometheus pour les valeurs du multimètre
+        self.sensors_multi_01 = self.prometheus.createSensors(self.multi_dict_01, 'gauge', 1)
+        self.sensors_multi_02 = self.prometheus.createSensors(self.multi_dict_02, 'gauge', 2)
+        self.sensors_multi_03 = self.prometheus.createSensors(self.multi_dict_03, 'gauge', 3)
+        self.sensors_multi_04 = self.prometheus.createSensors(self.multi_dict_04, 'gauge', 4)
+
+        # information état des GPIO sur Flask
+        self.file_path = 'relayState.json'
+        if not Path(self.file_path).exists():
+            self.file_path = 'script/relayState.json'
+
+        with open(self.file_path, 'r') as file:
+            self.dict_relay = json.load(file)
+
+        # Pour minitialisé le programme en mode observation
+        self.dict_relay['au_ob'] = True
+        self.dict_relay['au_pr'] = False
+        self.dict_relay['au_co'] = False
+
+        # Crée un sensor prometheus pour les relaies
+        self.sensors_relay = prometheus.createSensors(self.dict_relay, 'enum', 0)
+
+        # Inisialize une communication client
+        self.socketio = socketio.Client(logger=True, engineio_logger=True)
+
+        self.mode = Modes()
+
+        # Connection au server falsk
+        try:
+            self.socketio.connect('http://192.168.1.202:5000', wait_timeout = 10, transports=['websocket'])
+            logging.info("Socket established")
+            self.call_backs()
+        except ConnectionError as e:
+            logging.info('Connection error: {e}')
+
+    # Retour du server flask et envoie des message au server flask
+    def call_backs(self):
+        @self.socketio.event
+        def connect():
+            logging.info('Connection established')
+            self.socketio.send('Client connected')
+
+        @self.socketio.event
+        def disconnect():
+            logging.info('Disconnected from server')
+
+        # Recois un message du container flask
+        @self.socketio.event
+        def message(data):
+            logging.info(f'Message received: {data}')
+            if (data == 'up_PI'):
+                self.info_pc.infoPc()
+                dict_sensor = self.info_pc.get_dict()
+                data_string = json.dumps(dict_sensor)
+                self.socketio.send(data_string)
+            elif ('rs_0' in data or 'au_' in data ):
+                json_object = json.loads(data)
+                if(len(json_object) >= 1):
+                    for key in json_object.keys():
+                        if key in self.dict_relay:
+                            self.dict_relay[key] = json_object[key]
+                    with open(self.file_path, "w") as outfile:
+                        json.dump(self.dict_relay, outfile)
+            elif (data == 'up_relay'):
+                data_string = json.dumps(self.dict_relay)
+                self.socketio.send(data_string)
+            elif (data == 'up_bat'):
+                multimetre_list = {}
+                for key in self.multi_dict_01.keys():
+                    multimetre_list[f'bat_{key}_01'] = self.multi_dict_01[key]
+                    multimetre_list[f'bat_{key}_02'] = self.multi_dict_02[key]
+                    multimetre_list[f'bat_{key}_03'] = self.multi_dict_03[key]
+                    multimetre_list[f'bat_{key}_04'] = self.multi_dict_04[key]
+                data_string = json.dumps(multimetre_list)
+                self.socketio.send(data_string)
+
+    # Function principale
+    def run(self):
+
+        last_update_prom = 0
+
+        last_update_multi = 0
+
+        count = 0
+
+        while True:
+            current_time = time.time()
 
             
 
+            if(current_time - last_update_multi > TIME_UPDATE_MULTI or last_update_multi == 0):
 
-            if(count < LIMIT_COUNT):
-                psu_voltage1 += multimetre_01.get_psu_voltage()
-                psu_voltage2 += multimetre_02.get_psu_voltage()
-                psu_voltage3 += multimetre_03.get_psu_voltage()
-                psu_voltage4 += multimetre_04.get_psu_voltage()
-            
-                bus_voltage1 += multimetre_01.get_bus_voltage()
-                bus_voltage2 += multimetre_02.get_bus_voltage()
-                bus_voltage3 += multimetre_03.get_bus_voltage()
-                bus_voltage4 += multimetre_04.get_bus_voltage()
+                if(count < LIMIT_COUNT):
+                    self.multimetre_01.add_value()
+                    self.multimetre_02.add_value()
+                    self.multimetre_03.add_value()
+                    self.multimetre_04.add_value()
 
-                shunt_voltage1 += multimetre_01.get_shunt_voltage() 
-                shunt_voltage2 += multimetre_02.get_shunt_voltage()
-                shunt_voltage3 += multimetre_03.get_shunt_voltage() 
-                shunt_voltage4 += multimetre_04.get_shunt_voltage()
+                    count += 1
+                else:
+                    self.multi_dict_01 = self.multimetre_01.get_dict()
+                    self.multi_dict_02 = self.multimetre_02.get_dict()
+                    self.multi_dict_03 = self.multimetre_03.get_dict()
+                    self.multi_dict_04 = self.multimetre_04.get_dict()
 
-                current1 += multimetre_01.get_current()
-                current2 += multimetre_02.get_current()
-                current3 += multimetre_03.get_current()
-                current4 += multimetre_04.get_current()
-
-                power1 += multimetre_01.get_power()
-                power2 += multimetre_02.get_power()
-                power3 += multimetre_03.get_power() 
-                power4 += multimetre_04.get_power()
-
-                count += 1
-            else:
-                psu_voltage10 = psu_voltage1 / (LIMIT_COUNT)
-                psu_voltage20 = psu_voltage2 / (LIMIT_COUNT)
-                psu_voltage30 = psu_voltage3 / (LIMIT_COUNT)
-                psu_voltage40 = psu_voltage4 / (LIMIT_COUNT)
-            
-                bus_voltage10  = bus_voltage1 / (LIMIT_COUNT)
-                bus_voltage20  = bus_voltage2 / (LIMIT_COUNT)
-                bus_voltage20 = bus_voltage2 / (LIMIT_COUNT )
-                bus_voltage40 = bus_voltage4 / (LIMIT_COUNT )
-
-                shunt_voltage10 = shunt_voltage1 / (LIMIT_COUNT)
-                shunt_voltage20 = shunt_voltage2 / (LIMIT_COUNT)
-                shunt_voltage30 = shunt_voltage3 / (LIMIT_COUNT)
-                shunt_voltage40 = shunt_voltage4 / (LIMIT_COUNT)
-
-                current10 = current1 / (LIMIT_COUNT)
-                current20 = current2 / (LIMIT_COUNT)
-                current30 = current3 / (LIMIT_COUNT)
-                current40 = current4 / (LIMIT_COUNT)
-
-                power10 = power1 / (LIMIT_COUNT)
-                power20 = power2 / (LIMIT_COUNT)
-                power30 = power3 / (LIMIT_COUNT)
-                power40 = power4 / (LIMIT_COUNT)
+                last_update_multi = current_time
 
 
-            last_update_multi = current_time
+            if self.dict_relay["au_ob"] :
+                
+                
+                self.mode.run_observer(self.multi_dict_02, self.multi_dict_03, self.dict_relay)
 
-        # Récupère l'état du système, les infos sur la batterie toute les 60 secondes et les envoie à Prometheus (pas encore implanter pour la batterie. juste un print sur la console).
-        if (current_time - last_update_prom > TIME_UPDATE_PROM or last_update_prom == 0):
-            #Mise à jour des info du pc.
-            info_pc.infoPc()
+                self.dict_relay = self.mode.get_dict_relay()
 
-            # Envoie les nouvelles valeurs du pc à prometheus
-            prometheus.set_sensors(sensors_pc, info_pc.get_dict())
+            if self.dict_relay["au_pr"] :
+                
+                self.mode.run_manuel(self.dict_relay)
 
-            # Envoie le nouvelle état des relaies et des boutons utilisateur (automatique ou manuel) à prometheus
-            prometheus.set_sensors(sensors_relay, dict_relay)
+                self.dict_relay = self.mode.get_dict_relay()
 
-            # Envoie les nouvelles état des batteries à prometheus
-            prometheus.set_sensors(sensors_multi_01, multimetre_01.get_dict())
-            prometheus.set_sensors(sensors_multi_02, multimetre_02.get_dict())
-            prometheus.set_sensors(sensors_multi_03, multimetre_03.get_dict())
-            prometheus.set_sensors(sensors_multi_04, multimetre_04.get_dict())
+            # Récupère l'état du système, les infos sur la batterie toute les 60 secondes et les envoie à Prometheus (pas encore implanter pour la batterie. juste un print sur la console).
+            if (current_time - last_update_prom > TIME_UPDATE_PROM or last_update_prom == 0):
+                #Mise à jour des info du pc.
+                self.info_pc.infoPc()
 
-            logging.info("")
-            logging.info("")
+                # Envoie les nouvelles valeurs du pc à prometheus
+                self.prometheus.set_sensors(self.sensors_pc, self.info_pc.get_dict(), 0)
 
-            logging.info("PSU Voltage:{:6.3f} [V]    Shunt Voltage:{:9.6f} [V]    Load Voltage:{:6.3f} [V]   Power:{:9.6f} [W]   Current:{:9.6f} [A]"
-                         .format((psu_voltage10),(shunt_voltage10),(bus_voltage10),(power10),(current10)))
-            logging.info("PSU Voltage:{:6.3f} [V]    Shunt Voltage:{:9.6f} [V]    Load Voltage:{:6.3f} [V]   Power:{:9.6f} [W]   Current:{:9.6f} [A]"
-                         .format((psu_voltage20),(shunt_voltage20),(bus_voltage20),(power20),(current20)))
-            logging.info("PSU Voltage:{:6.3f} [V]    Shunt Voltage:{:9.6f} [V]    Load Voltage:{:6.3f} [V]   Power:{:9.6f} [W]   Current:{:9.6f} [A]"
-                         .format((psu_voltage30),(shunt_voltage30),(bus_voltage30),(power30),(current30)))
-            logging.info("PSU Voltage:{:6.3f} [V]    Shunt Voltage:{:9.6f} [V]    Load Voltage:{:6.3f} [V]   Power:{:9.6f} [W]   Current:{:9.6f} [A]"
-                         .format((psu_voltage40),(shunt_voltage40),(bus_voltage40),(power40),(current40)))
+                # Envoie le nouvelle état des relaies et des boutons utilisateur (automatique ou manuel) à prometheus
+                self.prometheus.set_sensors(self.sensors_relay, self.dict_relay, 0)
 
-            logging.info("")
-            logging.info("")
+                # Envoie les nouvelles état des batteries à prometheus
+                self.prometheus.set_sensors(self.sensors_multi_01, self.multi_dict_01, 1)
+                self.prometheus.set_sensors(self.sensors_multi_02, self.multi_dict_02, 2)
+                self.prometheus.set_sensors(self.sensors_multi_03, self.multi_dict_03, 3)
+                self.prometheus.set_sensors(self.sensors_multi_04, self.multi_dict_04, 4)
+
+                logging.info("")
+                logging.info("")
+
+                logging.info("PSU Voltage:{:6.3f} [V]    Shunt Voltage:{:9.6f} [V]    Load Voltage:{:6.3f} [V]   Power:{:9.6f} [W]   Current:{:9.6f} [A]"
+                            .format((self.multi_dict_01['psu_voltage']),(self.multi_dict_01['shunt_voltage']),(self.multi_dict_01['bus_voltage']),(self.multi_dict_01['power']),(self.multi_dict_01['current'])))
+                logging.info("PSU Voltage:{:6.3f} [V]    Shunt Voltage:{:9.6f} [V]    Load Voltage:{:6.3f} [V]   Power:{:9.6f} [W]   Current:{:9.6f} [A]"
+                            .format((self.multi_dict_02['psu_voltage']),(self.multi_dict_02['shunt_voltage']),(self.multi_dict_02['bus_voltage']),(self.multi_dict_02['power']),(self.multi_dict_02['current'])))
+                logging.info("PSU Voltage:{:6.3f} [V]    Shunt Voltage:{:9.6f} [V]    Load Voltage:{:6.3f} [V]   Power:{:9.6f} [W]   Current:{:9.6f} [A]"
+                            .format((self.multi_dict_03['psu_voltage']),(self.multi_dict_03['shunt_voltage']),(self.multi_dict_03['bus_voltage']),(self.multi_dict_03['power']),(self.multi_dict_03['current'])))
+                logging.info("PSU Voltage:{:6.3f} [V]    Shunt Voltage:{:9.6f} [V]    Load Voltage:{:6.3f} [V]   Power:{:9.6f} [W]   Current:{:9.6f} [A]"
+                            .format((self.multi_dict_04['psu_voltage']),(self.multi_dict_04['shunt_voltage']),(self.multi_dict_04['bus_voltage']),(self.multi_dict_04['power']),(self.multi_dict_04['current'])))
 
 
-    
 
-            last_update_prom = current_time
+                logging.info("")
+                logging.info("")
 
-    else:
-        led_line.release()
+                last_update_prom = current_time
+
+
+        else:
+            self.relay_01.release()
+            self.relay_02.release()
+            self.relay_03.release()
+            self.relay_04.release()
 
 if __name__ == "__main__":
     prometheus = Prometheus()
     prometheus.startServer()
 
-    main(prometheus)
+    main = Main(prometheus)
+    main.run()
