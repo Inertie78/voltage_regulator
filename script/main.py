@@ -53,9 +53,9 @@ class Main():
 
         # Crée des sensors prometheus pour les valeurs du multimètre
         self.sensors_multi_01 = self.prometheus.createSensors(self.multi_dict_01, 'gauge', 1)
-        self.sensors_multi_02 = self.prometheus.createSensors(self.multi_dict_02, 'gauge', 1)
-        self.sensors_multi_03 = self.prometheus.createSensors(self.multi_dict_03, 'gauge', 1)
-        self.sensors_multi_04 = self.prometheus.createSensors(self.multi_dict_04, 'gauge', 1)
+        self.sensors_multi_02 = self.prometheus.createSensors(self.multi_dict_02, 'gauge', 2)
+        self.sensors_multi_03 = self.prometheus.createSensors(self.multi_dict_03, 'gauge', 3)
+        self.sensors_multi_04 = self.prometheus.createSensors(self.multi_dict_04, 'gauge', 4)
 
         # information état des GPIO sur Flask
         self.file_path = 'relayState.json'
