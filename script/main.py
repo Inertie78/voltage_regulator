@@ -66,7 +66,7 @@ class Main():
         try:
             # Inisialize une communication client
             self.socketio = socketio.Client(logger=True, engineio_logger=True)
-            self.socketio.connect('http://192.168.50.108:5000', wait_timeout = 10, transports=['websocket'])
+            self.socketio.connect('http://flask:5000', wait_timeout = 10, transports=['websocket'])
             logging.info("Socket established")
             self.call_backs()
         except ConnectionError as e:
