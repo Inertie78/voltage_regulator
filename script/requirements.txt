@@ -15,4 +15,4 @@ websocket-client==1.8.0 --pre
 python-socketio==5.12.1 --pre
 
 #seulement pour la raspberry pi 4
-RPi.GPIO==0.7.1 --pre
+#RPi.GPIO==0.7.1 --pre
