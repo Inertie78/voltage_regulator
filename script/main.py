@@ -46,30 +46,27 @@ class Main():
         self.sensors_multi_03 = self.prometheus.createSensors(self.multi_dict_03, 'gauge', 3)
         self.sensors_multi_04 = self.prometheus.createSensors(self.multi_dict_04, 'gauge', 4)
 
-        # information état des GPIO sur Flask
-        self.file_path = 'relayState.json'
-        if not Path(self.file_path).exists():
-            self.file_path = 'script/relayState.json'
-
-        with open(self.file_path, 'r') as file:
-            self.dict_relay = json.load(file)
-
         # Pour minitialisé le programme en mode observation
+        self.dict_relay = {}
         self.dict_relay['au_ob'] = True
         self.dict_relay['au_pr'] = False
         self.dict_relay['au_co'] = False
+        self.dict_relay['au_ma'] = False
+        self.dict_relay['rs_01'] = False
+        self.dict_relay['rs_02'] = False
+        self.dict_relay['rs_03'] = False
+        self.dict_relay['rs_04'] = False
 
         # Crée un sensor prometheus pour les relaies
         self.sensors_relay = prometheus.createSensors(self.dict_relay, 'enum', 0)
-
-        # Inisialize une communication client
-        self.socketio = socketio.Client(logger=True, engineio_logger=True)
 
         self.mode = Modes()
 
         # Connection au server falsk
         try:
-            self.socketio.connect('http://192.168.1.202:5000', wait_timeout = 10, transports=['websocket'])
+            # Inisialize une communication client
+            self.socketio = socketio.Client(logger=True, engineio_logger=True)
+            self.socketio.connect('http://192.168.50.108:5000', wait_timeout = 10, transports=['websocket'])
             logging.info("Socket established")
             self.call_backs()
         except ConnectionError as e:
@@ -89,11 +86,11 @@ class Main():
         # Recois un message du container flask
         @self.socketio.event
         def message(data):
-            logging.info(f'Message received: {data}')
             if (data == 'up_PI'):
                 self.info_pc.infoPc()
                 dict_sensor = self.info_pc.get_dict()
                 data_string = json.dumps(dict_sensor)
+                logging.info(f'Info pc ==> {dict_sensor}')
                 self.socketio.send(data_string)
             elif ('rs_0' in data or 'au_' in data ):
                 json_object = json.loads(data)
@@ -101,8 +98,7 @@ class Main():
                     for key in json_object.keys():
                         if key in self.dict_relay:
                             self.dict_relay[key] = json_object[key]
-                    with open(self.file_path, "w") as outfile:
-                        json.dump(self.dict_relay, outfile)
+                            logging.info(f'Dict ==> {key}:{self.dict_relay[key]}')
             elif (data == 'up_relay'):
                 data_string = json.dumps(self.dict_relay)
                 self.socketio.send(data_string)
@@ -114,6 +110,7 @@ class Main():
                     multimetre_list[f'bat_{key}_03'] = self.multi_dict_03[key]
                     multimetre_list[f'bat_{key}_04'] = self.multi_dict_04[key]
                 data_string = json.dumps(multimetre_list)
+                logging.info(f'Multimetre ==> {multimetre_list}')
                 self.socketio.send(data_string)
 
     # Function principale

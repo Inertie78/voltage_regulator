@@ -37,7 +37,7 @@ class Multimetre() :
     def __init__(self, addr, limit=50) :
         self.limit = limit
         # Crée une liste pour pouvoir crée des sensors pour prometheus
-        self.ina_dict = {'psu_voltage':-1, 'bus_voltage':-1, 'shunt_voltage':-1, 'current':-1, 'power':-1}
+        self.ina_dict = {'psu_voltage':0.0, 'bus_voltage':0.0, 'shunt_voltage':0.0, 'current':0.0, 'power':0.0}
         try:
             i2c_bus = busio.I2C(board.SCL, board.SDA)
 
@@ -60,11 +60,11 @@ class Multimetre() :
             self.iterable_dict.add_to_list('current', self.ina.current)
             self.iterable_dict.add_to_list('power', self.ina.power)
         else:
-            self.iterable_dict.add_to_list('psu_voltage', -1)
-            self.iterable_dict.add_to_list('bus_voltage', -1)
-            self.iterable_dict.add_to_list('shunt_voltage', -1)
-            self.iterable_dict.add_to_list('current', -1)
-            self.iterable_dict.add_to_list('power', -1)
+            self.iterable_dict.add_to_list('psu_voltage', -1.0)
+            self.iterable_dict.add_to_list('bus_voltage', -1.0)
+            self.iterable_dict.add_to_list('shunt_voltage', -1.0)
+            self.iterable_dict.add_to_list('current', -1.0)
+            self.iterable_dict.add_to_list('power', -1.0)
 
     def get_dict(self):
         # Itération sur les éléments

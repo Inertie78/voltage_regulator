@@ -9,7 +9,9 @@ document.addEventListener('DOMContentLoaded', (event) => {
           const etat_text = document.querySelectorAll('h3');
           for (let i = 0; i < etat_switch.length; i++) {
             etat_switch[i].checked = myObj[etat_switch[i].name]
+            textEtatChexbox(etat_switch[i].name, etat_switch[i].checked);
           }
+          
         }
       }
     }
@@ -28,54 +30,87 @@ document.addEventListener('DOMContentLoaded', (event) => {
       if(name === 'au_ob'){
         $("#au_pr").prop('checked', false);
         $("#au_co").prop('checked', false);
+        $("#au_ma").prop('checked', false);
         etat_switch[name] = checked;
         Object.assign(etat_switch, { "au_pr": false });
         Object.assign(etat_switch, { "au_co": false });
+        Object.assign(etat_switch, { "au_ma": false });
+        Object.assign(etat_switch, { "au_ma": false });
       }else if(name === 'au_pr'){
         $("#au_co").prop('checked', false);
         $("#au_ob").prop('checked', false);
+        $("#au_ma").prop('checked', false);
         etat_switch[name] = checked;
         Object.assign(etat_switch, { "au_co": false });
         Object.assign(etat_switch, { "au_ob": false });
+        Object.assign(etat_switch, { "au_ma": false });
       }else if(name === 'au_co'){
         $("#au_pr").prop('checked', false);
         $("#au_ob").prop('checked', false);
+        $("#au_ma").prop('checked', false);
         etat_switch[name] = checked;
         Object.assign(etat_switch, { "au_pr": false });
         Object.assign(etat_switch, { "au_ob": false });
+        Object.assign(etat_switch, { "au_ma": false });
+      }else if(name === 'au_ma'){
+        $("#au_pr").prop('checked', false);
+        $("#au_ob").prop('checked', false);
+        $("#au_co").prop('checked', false);
+        etat_switch[name] = checked;
+        Object.assign(etat_switch, { "au_pr": false });
+        Object.assign(etat_switch, { "au_ob": false });
+        Object.assign(etat_switch, { "au_co": false });
+
+        $("#rs_01").prop('checked', false);
+        $("#rs_02").prop('checked', false);
+        $("#rs_03").prop('checked', false);
+        $("#rs_04").prop('checked', false);
+
+        Object.assign(etat_switch, { "rs_01": false });
+        Object.assign(etat_switch, { "rs_02": false });
+        Object.assign(etat_switch, { "rs_03": false });
+        Object.assign(etat_switch, { "rs_04": false });
       }
       
     }else{
-      const etat_text = document.querySelectorAll('h3');
-      for (let i = 0; i < etat_text.length; i++) {
-        let mainString = etat_text[i].id
-        if (mainString.includes(name)) {
-          if(checked === true){
-            etat_text[i].textContent = 'Etat open'
-          }else{
-            etat_text[i].textContent = 'Etat close'
-          }
-        }  
-      }
       etat_switch[name] = checked;
     }
 
-    
-    etat_switch[name] = checked;
+    textEtatChexbox(name, checked);
+
     const jsonString = JSON.stringify(etat_switch);
     socket.send(jsonString);
   }
+
+  
 
   // Add event listener to each input element
   inputs.forEach(input => {
       input.addEventListener('input', handleInputChange);
   });
+
+  function textEtatChexbox(name, checked) {
+    const etat_text = document.querySelectorAll('h3');
+    for (let i = 0; i < etat_text.length; i++) {
+      let mainString = etat_text[i].id
+      if (mainString.includes(name)) {
+        if(checked === true){
+          etat_text[i].textContent = 'Etat close'
+        }else{
+          etat_text[i].textContent = 'Etat open'
+        }
+      }  
+    }
+
+  }
+
+  function activateCheckbox(clickedCheckbox) {
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    clickedCheckbox.checked = true;
+  }
+  
 });
 
-function activateCheckbox(clickedCheckbox) {
-  const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-  checkboxes.forEach(checkbox => {
-      checkbox.checked = false;
-  });
-  clickedCheckbox.checked = true;
-}

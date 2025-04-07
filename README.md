@@ -166,4 +166,5 @@ E --> A
 |------------|---------|
 | bservateur | "au_ob" |
 | Protection | "au_pr" |
-|consommation| "au_co" |
+|Consommation| "au_co" |
+|   Manuel   | "au_ma" |
