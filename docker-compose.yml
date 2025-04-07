@@ -30,6 +30,7 @@ services :
       - ./script/prometheus.py:/usr/src/app/prometheus.py:ro
       - ./script/relay.py:/usr/src/app/relay.py:ro
       - ./script/relayState.json:/usr/src/app/relayState.json
+      - ./script/modes.py:/usr/src/app/modes.py:ro
 
       # pour les gpio sur la raspberry p
       - /dev/gpiochip0:/dev/gpiochip0:ro

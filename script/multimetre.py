@@ -2,7 +2,7 @@ import board
 import busio
 from adafruit_ina219 import ADCResolution, BusVoltageRange, INA219
 
-# Pour l'apprentissage classe retourné par une IA (sauf la partie pour supprimmer la première varibale et rejouter une variable a la fin de la liste)
+# Pour l'apprentissage classe retourné par une IA (sauf la partie pour supprimmer la première variable et rejouter une variable a la fin de la liste)
 # Crée une dictionnaire avec clé et une liste sur laquelle nous pouvons rajouter des variable et supprime la première variable de la liste si elle dépasse une certaine limite.
 class MetaIterable(type):
     def __new__(cls, name, bases, dct):

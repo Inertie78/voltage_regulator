@@ -54,7 +54,7 @@ class Main():
         with open(self.file_path, 'r') as file:
             self.dict_relay = json.load(file)
 
-        # Pour minitialisé le programme en mode observation
+        # Pour initialiser le programme en mode observation
         self.dict_relay['au_ob'] = True
         self.dict_relay['au_pr'] = False
         self.dict_relay['au_co'] = False
