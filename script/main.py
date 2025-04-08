@@ -22,9 +22,7 @@ LIMIT_COUNT = 10
 #MAX_BUFFER_TENSION = 13.8      #-18mV/°C
 #MIN_CYCLE_TENSION = 14.4       #-30mV/°C
 #MAX_CYCLE_TENSION = 14.9       #-30mV/°C
-FULL_CHARGE_TENSION = 12.8
-CYCLE_CHARGE_TENSION = 12.4
-MIN_CHARGE_TENSION = 11.9     
+   
 
 class Main():
     def __init__(self, prometheus):
@@ -78,7 +76,7 @@ class Main():
         try:
             # Inisialize une communication client
             self.socketio = socketio.Client(logger=True, engineio_logger=True)
-            self.socketio.connect('http://192.168.1.202:5000', wait_timeout = 10, transports=['websocket'])
+            self.socketio.connect('http://flask:5000', wait_timeout = 10, transports=['websocket'])
             logging.info("Socket established")
             self.call_backs()
         except ConnectionError as e:
@@ -161,33 +159,36 @@ class Main():
             # Sélection du mode de fonctionnement 
 
             if self.dict_relay["au_ob"] :
+                self.mode.run_observer(self.dict_relay)
+
+                self.dict_relay = self.mode.get_dict_relay()
+
+            elif self.dict_relay["au_pr"] :
+                
+                message = self.mode.run_protect(self.multi_dict_01, self.multi_dict_02, self.multi_dict_03,\
+                                      self.dict_relay)
+                
+                logging.info(f'Modes ==> {message}')
                 
                 
-                self.mode.run_observer(self.multi_dict_02, self.multi_dict_03, self.dict_relay)
 
                 self.dict_relay = self.mode.get_dict_relay()
 
 
-            if self.dict_relay["au_pr"] :
+            elif self.dict_relay["au_co"] :
                 
                 
-                self.mode.run_protect(self.multi_dict_01, self.multi_dict_02, self.multi_dict_03,\
-                                      self.dict_relay, FULL_CHARGE_TENSION, CYCLE_CHARGE_TENSION, MIN_CHARGE_TENSION)
-
-                self.dict_relay = self.mode.get_dict_relay()
-
-
-            if self.dict_relay["au_co"] :
+                message = self.mode.run_conso(self.multi_dict_01, self.multi_dict_02, self.multi_dict_03,\
+                                      self.dict_relay)
                 
-                
-                self.mode.run_conso(self.multi_dict_01, self.multi_dict_02, self.multi_dict_03,\
-                                      self.dict_relay, FULL_CHARGE_TENSION, CYCLE_CHARGE_TENSION, MIN_CHARGE_TENSION)
+                logging.info(f'Modes ==> {message}')
 
                 self.dict_relay = self.mode.get_dict_relay()   
 
-            if self.dict_relay["au_ma"] :
+            elif self.dict_relay["au_ma"] :
                 
                 self.mode.run_manuel(self.dict_relay)
+
 
                 self.dict_relay = self.mode.get_dict_relay()
 

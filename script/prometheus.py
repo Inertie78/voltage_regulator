@@ -32,7 +32,6 @@ class  Prometheus:
                     if(name in dict_sensor):
                         value = dict_sensor[name]
                         if (not type(value) == type('str')):
-                            logging.info(f"{name}: {value}")
                             sensor_type = sensor.get_type()
                             if(sensor_type == 'enum'):
                                 data = ''
