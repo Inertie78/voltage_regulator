@@ -29,6 +29,7 @@ services :
       - ./script/lineGpio.py:/usr/src/app/lineGpio.py:ro
       - ./script/prometheus.py:/usr/src/app/prometheus.py:ro
       - ./script/relay.py:/usr/src/app/relay.py:ro
+      - ./script/modes.py:/usr/src/app/modes.py:ro
       - ./script/relayState.json:/usr/src/app/relayState.json
       - ./script/modes.py:/usr/src/app/modes.py:ro
 

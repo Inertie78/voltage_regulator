@@ -166,4 +166,9 @@ E --> A
 |------------|---------|
 | bservateur | "au_ob" |
 | Protection | "au_pr" |
-|consommation| "au_co" |
+|Consommation| "au_co" |
+|   Manuel   | "au_ma" |
+
+### Valeurs attendues 
+
+![This is an alt text.](./cara_charge.jpg "Valeurs attendues selon la fiche technique de la batterie.")
