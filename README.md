@@ -6,12 +6,13 @@
 ## Introduction
 
 Dans le cadre d'une application réelle, des batteries sont utilisées comme alimentation de secours pour des appareils connectés en permanence au réseau 230 V. 
-Toutes les batteries utilisées se sont révélées hors d'usage après une durée de vie d'environ 15 mois. 
-Notre projet à pour objectif de permettre la récolte de mesures sur l'activité de la batterie, de l'alimentation 230 V et du chargeur. 
+Toutes les batteries utilisées se sont révélées hors d'usage après une durée de vie d'environ 15 mois, alors que leur durée de vie annoncée est de 5-8 ans. 
+Notre projet à pour objectif de permettre la récolte de mesures sur l'activité de la batterie, de l'alimentation 230 V et du chargeur ainsi que de pouvoir effectuer des simulations de fonctionnement.
+
 
 ## Hardware
 
-Un Raspberry Pi 5 - 15 Gb de RAM été choisi comme contrôleur. Plusieurs accessoires ont été ajoutés :
+Un Raspberry Pi 5 - 16 Gb de RAM été choisi comme contrôleur. Plusieurs accessoires ont été ajoutés :
 - Module avec 4 relais 230 V
 - Module I2C avec 4 entrées permettant la mesure de tension de 0 à 26 V
 - Module I2C permettant la mesure de température
@@ -45,8 +46,9 @@ Ces deux dernières instances constituent le tiers 3/3, soit la partie de stocka
 
 ## Modes de fonctionnement 
 
-*note :* *relais ouvert = circuit coupé*  // 
-*relais fermé = circuit connecté*
+*note : \
+relais ouvert = circuit électrique coupé* \
+*relais fermé = circuit électrique connecté*
 
 Rpi5 = Raspberry Pi 5 et accessoires
 
@@ -56,54 +58,55 @@ Le système se limite à effectuer des mesures lors du fonctionnement normal des
 
 Le Rpi5 : 
 - ferme le relais 1 et le relais 2
-- récolte chaque 30 secondes 10 mesures de tension, de courant, de puissance et de température 
+- récolte 10 mesures de tension, de courant, de puissance 
 - une moyenne de ces valeurs est faite (pour limiter le risque d'erreur de mesure) et la transmet au serveur Prometheus
 
 ### **Protection contre la surcharge**
 
-Le système mesure la tension de la batterie et lorsqu'elle atteint la tension de x V, ouvre le relais pour interrompre la charge.
+Le système mesure la tension de la batterie et lorsqu'elle atteint la tension de 12.9 V, ouvre le relais pour interrompre la charge.
 
 Le Rpi5 :
 - ferme le relais 1 et le relais 2
-- récolte chaque 30 secondes 10 mesures de tension, de courant, de puissance et de température. 
+- récolte 10 mesures de tension, de courant, de puissance. 
 - effectue une moyenne de ces valeurs et la transmet au serveur Prometheus
 
-Lorsque la valeur moyenne des mesures dépasse x V 
+Lorsque la valeur moyenne des mesures dépasse 12.9 V 
 
 - ouvre le relais 2 pour interrompre le circuit de charge.
-- récolte chaque 30 secondes 10 mesures de tension, de courant, de puissance et de température. 
+- récolte 10 mesures de tension, de courant, de puissance et de température. 
 - effectue une moyenne de ces valeurs et la transmet au serveur Prometheus
 
-Lorsque la valeur moyenne des mesures est en dessous de x V 
+Lorsque la valeur moyenne des mesures est en dessous de 12.7 V 
 
 - ferme le relais 2 pour relancer la charge et reprend le processus de départ.
 
 ### **Cycle de consommation**
 
-Hors périodes critiques pour les équipements, le système coupe l'alimentation électrique principale forçant les équipements à se servir de l'alimentation de secours. La batterie est donc forcée d'effectuer un cycle partiel. Une fois déchargée à la tension voulue, le système reconnecte l'alimentation 230 V et recharge la batterie. Une fois la batterie atteignant la tension souhaitée, la charge sera interrompue par le relais.
+Le système coupe l'alimentation électrique principale forçant les équipements à se servir de l'alimentation de secours. La batterie est donc forcée d'effectuer un cycle partiel. Une fois déchargée à la tension voulue, le système reconnecte l'alimentation 230 V et recharge la batterie. Une fois la batterie atteignant la tension souhaitée, la charge sera interrompue par le relais.
 
 Le Rpi5 :
 - ouvre le relais 1 et le relais 2
-- récolte chaque 30 secondes 10 mesures de tension, de courant, de puissance et de température. 
+- récolte 10 mesures de tension, de courant, de puissance. 
 - effectue une moyenne de ces valeurs et la transmet au serveur Prometheus
 
-Lorsque la valeur moyenne des mesures est en dessous de  x V 
+Lorsque la valeur moyenne des mesures est en dessous de  12.4 V 
 
 - ferme le relais 1 et le relais 2 pour lancer la charge.
-- récolte chaque 30 secondes 10 mesures de tension, de courant, de puissance et de température. 
+- récolte 10 mesures de tension, de courant, de puissance. 
 - effectue une moyenne de ces valeurs et la transmet au serveur Prometheus
 
-Lorsque la valeur moyenne des mesures dépasse x V 
+Lorsque la valeur moyenne des mesures dépasse 12.9 V 
 
 - ouvre le relais 2 pour stopper la charge 
-- récolte chaque 30 secondes 10 mesures de tension, de courant, de puissance et de température. 
+- récolte 10 mesures de tension, de courant, de puissance. 
 - effectue une moyenne de ces valeurs et la transmet au serveur Prometheus
 
-Si la tension de la batterie descend en dessous de x V
+Si la tension de la batterie descend en dessous de 12.4 V
 
 - ferme le relais 2 pour reprendre la charge
 
-## Alarming et monitoring
+## Alarming et monitoring  
+*Ce poste n'a pas encore été implémenté*
 
 ### Dispositif de sécurité
 
