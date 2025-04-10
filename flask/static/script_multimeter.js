@@ -1,6 +1,5 @@
 var myObj = null
 document.addEventListener("DOMContentLoaded", () => {
-
   google.charts.load('current', { 'packages': ['gauge'] });
   google.charts.setOnLoadCallback(drawChart);
 
@@ -98,16 +97,5 @@ function drawChart() {
         }
       }
     });
-
-      
-      
-
-      
-      
-      
-
-      
-
-
   }, (1000));
 }
