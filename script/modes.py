@@ -44,7 +44,7 @@ class Modes():
         self.dict_relay = dict_relay
 
         # vérifie dans le dict_relay si le relais 1 et 2 sont fermés, sinon il passe ses lignes
-        if self.dict_relay['rs_01'] or self.dict_relay['rs_02']:
+        if self.dict_relay['rs_01'] or self.dict_relay['rs_02'] or self.dict_relay['rs_03'] or self.dict_relay['rs_04']:
             self.change_etat_relay_1.relayAction(self.relay_01, False)
             self.change_etat_relay_2.relayAction(self.relay_02, False)
             self.change_etat_relay_3.relayAction(self.relay_03, False)
@@ -53,6 +53,8 @@ class Modes():
             #corrige le dict relay avec le nouvel état des relais
             self.dict_relay["rs_01"] = False
             self.dict_relay["rs_02"] = False
+            self.dict_relay["rs_03"] = False
+            self.dict_relay["rs_04"] = False
             self.counter_protect = 0
             self.counter_conso = 0
 

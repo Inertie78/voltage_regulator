@@ -19,15 +19,15 @@ function drawChart() {
   ]);
 FULL_CHARGE_TENSION = 12.8
 CYCLE_CHARGE_TENSION = 12.4
-MIN_CHARGE_TENSION = 11.9
+MIN_CHARGE_TENSION = 7.0
   var optionsTension = {
     width: 150, height: 150,
-    min: 11, max: 14,
-    redFrom: 11.5, redTo: 11.9,
+    min: 7, max: 14,
+    redFrom: 11.4, redTo: 11.9,
     yellowFrom: 11.9, yellowTo: 12.4,
     greenFrom: 12.4, greenTo: 12.8,
-    majorTicks: ['11', '12', '13', '14'],
-    minorTicks: 10
+    majorTicks: ['7', '8', '9', '10', '11', '12', '13', '14'],
+    minorTicks: 5
   };
 
   var formatTension = new google.visualization.NumberFormat({
