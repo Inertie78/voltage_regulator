@@ -49,28 +49,28 @@ MIN_CHARGE_TENSION = 11.9
         if(msg.includes("bat_")){
           formatTension.format(dataTension, 1);
           myObj = JSON.parse(msg);
-          var voltage = Number(myObj.bat_shunt_voltage_01).toFixed(3)
+          var voltage = Number(myObj.bat_psu_voltage_01).toFixed(3)
           $("#shunt_voltage_01").text( voltage + " V");
           dataTension.setValue(0, 1, voltage);
           chartTension_01.draw(dataTension, optionsTension);
           $("#current_01").text( Number(myObj.bat_current_01).toFixed(3) + " A");
           $("#power_01").text( Number(myObj.bat_power_01).toFixed(3) + " W");
           
-          voltage = Number(myObj.bat_shunt_voltage_02).toFixed(3)
+          voltage = Number(myObj.bat_psu_voltage_02).toFixed(3)
           $("#shunt_voltage_02").text( voltage + " V");
           dataTension.setValue(0, 1, voltage);
           chartTension_02.draw(dataTension, optionsTension);
           $("#current_02").text( Number(myObj.bat_current_02).toFixed(3) + " A");
           $("#power_02").text( Number(myObj.bat_power_02).toFixed(3) + " W");
 
-          voltage = Number(myObj.bat_shunt_voltage_03).toFixed(3)
+          voltage = Number(myObj.bat_psu_voltage_03).toFixed(3)
           $("#shunt_voltage_03").text( voltage + " V");
           dataTension.setValue(0, 1, voltage);
           chartTension_03.draw(dataTension, optionsTension);
           $("#current_03").text( Number(myObj.bat_current_03).toFixed(3) + " A");
           $("#power_03").text( Number(myObj.bat_power_03).toFixed(3) + " W");
           
-          voltage = Number(myObj.bat_shunt_voltage_04).toFixed(3)
+          voltage = Number(myObj.bat_psu_voltage_04).toFixed(3)
           $("#shunt_voltage_04").text( voltage + " V");
           dataTension.setValue(0, 1, voltage);
           chartTension_04.draw(dataTension, optionsTension);
