@@ -53,12 +53,19 @@ class Multimetre() :
         self.iterable_dict = IterableDict(self.limit)
 
     def add_value(self):
+
+
+        self.ina_nul = self.ina.bus_voltage
+
         if (not self.ina == None):
-            self.iterable_dict.add_to_list('psu_voltage', (self.ina.bus_voltage + self.ina.shunt_voltage))
-            self.iterable_dict.add_to_list('bus_voltage', self.ina.bus_voltage)
-            self.iterable_dict.add_to_list('shunt_voltage', self.ina.shunt_voltage)
-            self.iterable_dict.add_to_list('current', self.ina.current)
-            self.iterable_dict.add_to_list('power', self.ina.power)
+            if self.ina_nul <= 1.0 :
+                self.iterable_dict.add_to_list('psu_voltage', abs((0.0)))
+            else:
+                self.iterable_dict.add_to_list('psu_voltage', abs((self.ina.bus_voltage + self.ina.shunt_voltage)))
+                self.iterable_dict.add_to_list('bus_voltage', abs(self.ina.bus_voltage))
+                self.iterable_dict.add_to_list('shunt_voltage', abs(self.ina.shunt_voltage))
+                self.iterable_dict.add_to_list('current', abs(self.ina.current))
+                self.iterable_dict.add_to_list('power', abs(self.ina.power))
         else:
             self.iterable_dict.add_to_list('psu_voltage', -1.0)
             self.iterable_dict.add_to_list('bus_voltage', -1.0)
