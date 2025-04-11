@@ -43,7 +43,7 @@ class Modes():
         
         self.dict_relay = dict_relay
 
-        # vérifie dans le dict_relay si le relais 1 et 2 sont fermés, sinon il passe ses lignes
+        # vérifie dans le dict_relay si le relais sont fermés, sinon il passe ses lignes
         if self.dict_relay['rs_01'] or self.dict_relay['rs_02'] or self.dict_relay['rs_03'] or self.dict_relay['rs_04']:
             self.change_etat_relay_1.relayAction(self.relay_01, False)
             self.change_etat_relay_2.relayAction(self.relay_02, False)
@@ -107,12 +107,11 @@ class Modes():
                         
                         
                 else :
-                    self.change_etat_relay_2.relayAction(self.relay_02, True)
                     self.dict_relay["rs_02"] = True
                     message_protect = "Batterie chargée"
 
 
-            # si on est déjà dans le mode charge, on vérifie que les consommateurs ont assez d'énergie
+            # si on est déjà dans le mode Protect, on vérifie que les consommateurs ont assez d'énergie
             # on ne remet la charge que si la tension a baissé en 0.2V
              
             else :
@@ -125,10 +124,27 @@ class Modes():
                     self.run_observer(self.dict_relay)
                     message_protect = "Erreur alimentation perdue."
 
-                if  self.multi_dict_01['psu_voltage'] < Modes.FULL_CHARGE_TENSION - 0.2 :
-                    self.change_etat_relay_2.relayAction(self.relay_02, False)
-                    self.dict_relay["rs_02"] = False
-                    message_protect = "Batterie à nouveau en charge."
+                if self.dict_relay['rs_02'] : 
+                
+                    if self.multi_dict_01['psu_voltage'] >= Modes.FULL_CHARGE_TENSION - 0.2 :
+                        self.change_etat_relay_2.relayAction(self.relay_02, True)
+                        self.dict_relay["rs_02"] = True
+                        message_protect = "Batterie pleine"
+                    else :
+                        self.change_etat_relay_2.relayAction(self.relay_02, False)
+                        self.dict_relay["rs_02"] = False
+                        message_protect = "Batterie en charge"
+                else : 
+
+                    if self.multi_dict_01['psu_voltage'] <= Modes.FULL_CHARGE_TENSION :
+                        self.change_etat_relay_2.relayAction(self.relay_02, False)
+                        self.dict_relay["rs_02"] = False
+                        message_protect = "Batterie en charge"
+                    else :
+                        self.change_etat_relay_2.relayAction(self.relay_02, True)
+                        self.dict_relay["rs_02"] = True
+                        message_protect = "Batterie pleine" 
+
 
         return message_protect
                 
@@ -159,6 +175,9 @@ class Modes():
             self.run_observer(self.dict_relay)
             message_conso = ("La batterie n'a pas assez de tension, Mode Observateur activé.")              
         else :
+            self.change_etat_relay_2.relayAction(self.relay_02, False)
+            self.dict_relay['rs_02'] = False
+
            
             # si on démarre la première fois le mode conso, on coupe l'alimentation électrique par le R1.
 
@@ -173,15 +192,16 @@ class Modes():
 
             if self.counter_conso >= 2 :     
 
-                if self.dict_relay['rs_01'] == True :
+                if self.dict_relay['rs_01'] :
 
                     if self.multi_dict_01['psu_voltage'] <= Modes.CYCLE_CHARGE_TENSION :
                         self.change_etat_relay_1.relayAction(self.relay_01, False)
                         self.dict_relay["rs_01"] == False
-
-                elif self.dict_relay['rs_01'] == False :
                     
-                    if self.multi_dict_01['psu_voltage'] >= self.full_charge_tension :
+
+                else :
+                    
+                    if self.multi_dict_01['psu_voltage'] >= Modes.FULL_CHARGE_TENSION :
                         self.change_etat_relay_1.relayAction(self.relay_01, True)
                         self.dict_relay["rs_01"] == True
 
