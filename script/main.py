@@ -76,7 +76,7 @@ class Main():
         try:
             # Inisialize une communication client
             self.socketio = socketio.Client(logger=True, engineio_logger=True)
-            self.socketio.connect('http://192.168.1.202:5000', wait_timeout = 10, transports=['websocket'])
+            self.socketio.connect('http://flask:5000', wait_timeout = 10, transports=['websocket'])
             logging.info("Socket established")
             self.call_backs()
         except ConnectionError as e:
@@ -93,7 +93,7 @@ class Main():
         def disconnect():
             logging.info('Disconnected from server')
 
-        # Recois un message du container flask
+        # Recois un message du server flask
         @self.socketio.event
         def message(data):
             if (data == 'up_PI'):
@@ -136,7 +136,8 @@ class Main():
             current_time = time.time()
 
             
-
+            # add les valeurs à la class multimètre toute les x secondes (TIME_UPDATE_MULTI) et un nombres limite de valeurs (LIMIT_COUNT).
+            # Quand la limit des valeurs et atteinte nous faisons la moyenne de la listes.
             if(current_time - last_update_multi > TIME_UPDATE_MULTI or last_update_multi == 0):
 
                 if(count < LIMIT_COUNT):
@@ -192,7 +193,7 @@ class Main():
 
                 self.dict_relay = self.mode.get_dict_relay()
 
-            # Récupère l'état du système, les infos sur la batterie toute les 60 secondes et les envoie à Prometheus (pas encore implanter pour la batterie. juste un print sur la console).
+            # Récupère l'état du système, les infos sur la batterie toute les 60 secondes et les envoie à Prometheus.
             if (current_time - last_update_prom > TIME_UPDATE_PROM or last_update_prom == 0):
                 #Mise à jour des info du pc.
                 self.info_pc.infoPc()
@@ -221,13 +222,10 @@ class Main():
                 logging.info("PSU Voltage:{:6.3f} [V]    Shunt Voltage:{:9.6f} [V]    Load Voltage:{:6.3f} [V]   Power:{:9.6f} [W]   Current:{:9.6f} [A]"
                             .format((self.multi_dict_04['psu_voltage']),(self.multi_dict_04['shunt_voltage']),(self.multi_dict_04['bus_voltage']),(self.multi_dict_04['power']),(self.multi_dict_04['current'])))
 
-
-
                 logging.info("")
                 logging.info("")
 
                 last_update_prom = current_time
-
 
         else:
             self.relay_01.release()

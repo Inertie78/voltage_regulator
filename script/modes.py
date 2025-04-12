@@ -219,10 +219,4 @@ class Modes():
         self.counter_conso = 0
 
     def get_dict_relay(self) :
-        return self.dict_relay
-            
-            
-
-         
-    
-        
+        return self.dict_relay    

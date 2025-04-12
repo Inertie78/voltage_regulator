@@ -27,11 +27,11 @@
   <body>
     <div class="Center_container">
       <ul id="menu">
-        <li><a href="/flask">Prometheuse</a></li>
-        <li><a href="/flask/grafana">Grafana</a></li>
-        <li><a href="/flask/relay">GPIO</a></li>
-        <li><a href="/flask/multimeter">Multimeter</a></li>
-        <li style="float:right"><a href="/flask/about" id="#btMenuAbout">About</a></li>
+        <li class="menuclass {{_menuDict['prom']}}"><a href="/flask">Prometheus</a></li>
+        <li class="menuclass {{_menuDict['graf']}}"><a href="/flask/grafana">Grafana</a></li>
+        <li class="menuclass {{_menuDict['rela']}}"><a href="/flask/relay">Relais</a></li>
+        <li class="menuclass {{_menuDict['multi']}}"><a href="/flask/multimeter">Multimètre</a></li>
+        <li class="menuclass {{_menuDict['abou']}}" style="float:right"><a href="/flask/about" id="#btMenuAbout">About</a></li>
       </ul>
       
       <div class="Center_container">

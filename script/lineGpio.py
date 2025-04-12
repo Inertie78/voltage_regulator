@@ -8,8 +8,8 @@ class LineGpio :
     
     def __init__(self, name, pin):
         '''
-            Crée une classe pour le contrôle des gpio. Elle prend comme argument un nom (variable:format [name:str]) et 
-            un numéro de pin (variable:format [pin:int])
+            Crée une classe pour le contrôle des gpio. Elle prend comme argument un nom ==> str et 
+            un numéro de pin ==> int)
         '''
         self.pin = pin
         self.gpio_line = gpiod.request_lines(
@@ -35,4 +35,5 @@ class LineGpio :
         return self.gpio_line.get_value(self.pin)
     
     def release(self):
+        '''Tu le processus de la gpio'''
         self.gpio_line.release()

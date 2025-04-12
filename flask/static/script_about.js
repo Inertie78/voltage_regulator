@@ -1,5 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // Envoi à socket un message pour faire une mise à jour des valeurs 
   socket.send("up_PI");
+  // Reçois les valeurs du socket
   socket.on('message', function(msg) {
     if (msg != null) {
       if(msg.includes("cpu_")){

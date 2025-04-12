@@ -8,6 +8,9 @@ import logging
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
+global menuDict
+menuDict = {'prom':'', 'graf':'', 'rela':'', 'multi':'', 'multi':'','abou':''}
+
 ################################################# Fonction #################################################
 # Fonction qui renvoi l'url pour prometheus et grafana
 def get_url(port):
@@ -22,6 +25,14 @@ def get_url(port):
     trav[2] = trav[2].replace(':5000', '')
     return f"http://{trav[2]}:{port}"
 
+# Pour rendre le menu dynamique
+def changeMenu(name):
+    global menuDict
+    for key in menuDict:
+        menuDict[key] = ''
+    
+    menuDict[name] = 'active'
+
 
 ################################################# route soketio #################################################
 @socketio.on('message')
@@ -33,34 +44,58 @@ def handle_message(msg):
 # Affiche la page web home
 @app.route("/")
 def index():
-    socketio_ip =  get_url("5000")
+    # Retourne une variable pour l'url de prometheus à la page htm pour l'afficher
     prometheuse_ip =  get_url("9090")
-    return render_template('prometheus.html', _prometheuse_ip=prometheuse_ip, _socketio_ip=socketio_ip)
+
+    #Pour changer ajouter le mode active du menu sur prometheus et enlèver sur les autres items du menu.
+    changeMenu('prom')
+
+    return render_template('prometheus.html', _prometheuse_ip=prometheuse_ip, _menuDict=menuDict)
 
 # Affiche la page web grafana
 @app.route("/grafana")
 def grafana():
+    # Retourne une variable pour l'url ip de grafana à la page htm pour l'afficher
     grafana_ip = get_url("3000")
-    return render_template('grafana.html', _grafana_ip=grafana_ip)
+
+    #Pour changer ajouter le mode active du menu sur grafana et enlèver sur les autres items du menu.
+    changeMenu('graf')
+
+    return render_template('grafana.html', _grafana_ip=grafana_ip, _menuDict=menuDict)
 
 # Affiche la page web des relaies
 @app.route("/relay")
 def relay():
+    # Retourne une variable pour l'url du soket à la page htm pour le retour des informations
     socketio_ip =  get_url("5000")
-    return render_template('relay.html', _socketio_ip=socketio_ip)
+
+    #Pour changer ajouter le mode active du menu sur GPIO et enlèver sur les autres items du menu.
+    changeMenu('rela')
+
+    return render_template('relay.html', _socketio_ip=socketio_ip, _menuDict=menuDict)
 
 
 # Affiche la page web des settings des batteries
 @app.route("/multimeter")
 def multimeter():
+    # Retourne une variable pour l'url du soket à la page htm pour le retour des informations
     socketio_ip =  get_url("5000")
-    return render_template('multimeter.html', _socketio_ip=socketio_ip)
+
+    #Pour changer ajouter le mode active du menu sur multimètre et enlèver sur les autres items du menu.
+    changeMenu('multi')
+
+    return render_template('multimeter.html', _socketio_ip=socketio_ip, _menuDict=menuDict)
 
 # Affiche la page web sur les infos de la raspberry pi
 @app.route("/about")
 def about():
+    # Retourne une variable pour l'url du soket à la page htm pour le retour des informations
     socketio_ip =  get_url("5000")
-    return render_template('about.html', _socketio_ip=socketio_ip)
+
+     #Pour changer ajouter le mode active du menu sur multimètre et enlèver sur les autres items du menu.
+    changeMenu('abou')
+
+    return render_template('about.html', _socketio_ip=socketio_ip, _menuDict=menuDict)
 
 
 # Reboot la raspberry pi
