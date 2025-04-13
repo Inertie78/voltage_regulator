@@ -280,9 +280,9 @@ E --> A
                                                 afin de forcer la batterie à effectuer des cycles.
         - manuel.py(Hérite de data.py) ==> Mode qui permet à l'utilisateur d'interagir avec les relais.
         - observer.py(Hérite de data.py) ==> Mode de fonctionnement normal de l'installation.
-        - protect.py(Hérite de data.py) ==> Mode de fonctionnement qui va mesurer la tension de la batterie et une fois que la batterie 
-                                            a atteint la tension de charge maximale, le système va couper la charge, jusqu'à ce que la tension 
-                                            passe en dessous de 0.2v de la tension maximale
+        - protect.py(Hérite de data.py) ==> Mode de fonctionnement qui va mesurer la tension de la batterie et une fois 
+                                            que la batterie a atteint la tension de charge maximale, le système va couper 
+                                            la charge, jusqu'à ce que la tension passe en dessous de 0.2v de la tension maximale
 
     - dossier dataBase :
         - prometheus.py ==> 

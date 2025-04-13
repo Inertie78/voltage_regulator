@@ -8,12 +8,12 @@ logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
 class Transmitting(Data):
-    def __init__(self):
+    def __init__(self, url):
         # Connection au server falsk
         try:
             # Inisialize une communication client
             self.socketio = socketio.Client(logger=True, engineio_logger=True)
-            self.socketio.connect('http://flask:5000', wait_timeout = 10, transports=['websocket'])
+            self.socketio.connect(url, wait_timeout = 10, transports=['websocket'])
             logging.info("Socket established")
             self.call_backs()
         except ConnectionError as e:

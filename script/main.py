@@ -5,6 +5,7 @@ import json
 from data import Data
 from transmitting import Transmitting
 
+from modes.action import Action
 from modes.observer import Observer
 from modes.protect import Protect
 from modes.consomation import Consomation
@@ -26,12 +27,13 @@ logging.basicConfig(level=logging.DEBUG,
 class Main(Data):
     def __init__(self):
 
+        self.action = Action()
         self.mode_observer = Observer()
         self.mode_protect = Protect()
         self.mode_consomation = Consomation()
         self.mode_manuel = Manuel()
 
-        self.transmitting = Transmitting()
+        self.transmitting = Transmitting('http://192.168.50.108:5000')
 
         super().initData()
         
@@ -44,9 +46,6 @@ class Main(Data):
         last_update_multi = 0
 
         count = 0
-        
-        count_modes = 0
-
         bool_modes = False
 
         while True:
@@ -63,20 +62,15 @@ class Main(Data):
                     Data.multimetre_04.add_value()
 
                     count += 1
-                else:
+                    bool_modes = False
+                elif (count == Data.LIMIT_COUNT  or last_update_multi == 0):
                     Data.multi_dict_01 = Data.multimetre_01.get_dict()
                     Data.multi_dict_02 = Data.multimetre_02.get_dict()
                     Data.multi_dict_03 = Data.multimetre_03.get_dict()
                     Data.multi_dict_04 = Data.multimetre_04.get_dict()
 
                     count = 0
-
-                    count_modes += 1
-
-                    if (count_modes == 12):
-                        bool_modes = True
-                    else:
-                        bool_modes = False
+                    bool_modes = True
 
                 last_update_multi = current_time
 

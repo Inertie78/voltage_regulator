@@ -25,7 +25,6 @@ services :
       - ./script/main.py:/usr/src/app/main.py:ro
       - ./script/data.py:/usr/src/app/data.py:ro
       - ./script/transmitting.py:/usr/src/app/transmitting.py:ro
-      - ./script/relayState.json:/usr/src/app/relayState.json
 
       # Pour script pour la raspberry pi
       - ./script/raspberry/__init__.py:/usr/src/app/raspberry/__init__.py:ro
