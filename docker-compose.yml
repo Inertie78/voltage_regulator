@@ -21,18 +21,31 @@ services :
       dockerfile : dockerfile.script 
     restart : always
     volumes :
-      # fchier pour le script flask
+      # fchier pour le scrip principal
       - ./script/main.py:/usr/src/app/main.py:ro
-      - ./script/infoPc.py:/usr/src/app/infoPc.py:ro
-      - ./script/sensor.py:/usr/src/app/sensor.py:ro
-      - ./script/multimetre.py:/usr/src/app/multimetre.py:ro
-      - ./script/lineGpio.py:/usr/src/app/lineGpio.py:ro
-      - ./script/prometheus.py:/usr/src/app/prometheus.py:ro
-      - ./script/relay.py:/usr/src/app/relay.py:ro
-      - ./script/modes.py:/usr/src/app/modes.py:ro
+      - ./script/data.py:/usr/src/app/data.py:ro
+      - ./script/transmitting.py:/usr/src/app/transmitting.py:ro
       - ./script/relayState.json:/usr/src/app/relayState.json
-      - ./script/modes.py:/usr/src/app/modes.py:ro
 
+      # Pour script pour la raspberry pi
+      - ./script/raspberry/__init__.py:/usr/src/app/raspberry/__init__.py:ro
+      - ./script/raspberry/infoPc.py:/usr/src/app/raspberry/infoPc.py:ro
+      - ./script/raspberry/multimetre.py:/usr/src/app/raspberry/multimetre.py:ro
+      - ./script/raspberry/lineGpio.py:/usr/src/app/raspberry/lineGpio.py:ro
+      - ./script/raspberry/relay.py:/usr/src/app/raspberry/relay.py:ro
+      
+      # Pour script pour la dataBase prometheus
+      - ./script/dataBase/__init__.py:/usr/src/app/dataBase/__init__.py:ro
+      - ./script/dataBase/sensor.py:/usr/src/app/dataBase/sensor.py:ro
+      - ./script/dataBase/prometheus.py:/usr/src/app/dataBase/prometheus.py:ro
+
+      # Pour script pour les modes de fonctionnement
+      - ./script/modes/__init__.py:/usr/src/app/modes/__init__.py:ro
+      - ./script/modes/consomation.py:/usr/src/app/modes/consomation.py:ro
+      - ./script/modes/manuel.py:/usr/src/app/modes/manuel.py:ro
+      - ./script/modes/observer.py:/usr/src/app/modes/observer.py:ro
+      - ./script/modes/protect.py:/usr/src/app/modes/protect.py:ro
+      
       # pour les gpio sur la raspberry p
       - /dev/gpiochip0:/dev/gpiochip0:ro
       
@@ -77,7 +90,7 @@ services :
       - "3000:3000"
     volumes:
       - ./grafana/provisioning:/etc/grafana/provisioning/*
-      - ./grafana/data:/var/lib/grafana/*
+      #- ./grafana/data:/var/lib/grafana/*
       - ./grafana/grafana.ini:/etc/grafana/grafana.ini
     depends_on:
       - prometheus

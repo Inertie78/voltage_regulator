@@ -118,10 +118,10 @@ function drawChart() {
           myObj = JSON.parse(msg);
 
           // Met à jour la gauge N°1
-          voltage = Number(myObj.bat_psu_voltage_01).toFixed(3);
+          voltage = Number(myObj.bat_psu_voltage_01).toFixed(value_precision);
           voltage_gauge = voltage;
-          current = Number(myObj.bat_current_01).toFixed(3);
-          power = Number(myObj.bat_power_01).toFixed(3);
+          current = Number(myObj.bat_current_01).toFixed(value_precision);
+          power = Number(myObj.bat_power_01).toFixed(value_precision);
           checkValue();
 
           gauge_01.set(voltage_gauge);
@@ -142,7 +142,7 @@ function drawChart() {
           $("#power_02").text( power + " W");
 
           // Met à jour la gauge N°3
-          voltage = Number(myObj.bat_psu_voltage_03).toFixed(3);
+          voltage = Number(myObj.bat_psu_voltage_03).toFixed(value_precision);
           voltage_gauge = voltage;
           current = Number(myObj.bat_current_03).toFixed(value_precision);
           power = Number(myObj.bat_power_03).toFixed(value_precision);

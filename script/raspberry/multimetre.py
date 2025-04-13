@@ -48,6 +48,9 @@ class Multimetre() :
 
         except:
             self.ina = None
+            # Pour faire varier les valeurs sans le multimètre connecté
+            self.number = 11.0
+
 
         # Création de l'objet
         self.iterable_dict = IterableDict(self.limit)
@@ -61,11 +64,13 @@ class Multimetre() :
             self.iterable_dict.add_to_list('current', abs(self.ina.current))
             self.iterable_dict.add_to_list('power', abs(self.ina.power))
         else:
-            self.iterable_dict.add_to_list('psu_voltage', -1.0)
-            self.iterable_dict.add_to_list('bus_voltage', -1.0)
-            self.iterable_dict.add_to_list('shunt_voltage', -1.0)
-            self.iterable_dict.add_to_list('current', -1.0)
-            self.iterable_dict.add_to_list('power', -1.0)
+            # Pour faire varier les valeurs sans le multimètre connecté
+            self.number += 0.1 
+            self.iterable_dict.add_to_list('psu_voltage', self.number)
+            self.iterable_dict.add_to_list('bus_voltage', self.number)
+            self.iterable_dict.add_to_list('shunt_voltage', self.number)
+            self.iterable_dict.add_to_list('current', self.number)
+            self.iterable_dict.add_to_list('power', self.number)
 
     def get_dict(self):
         '''Itération sur les éléments du dictionnaire pour faire la moyenne des éléments et retouner les moyennes dans nouveau dictionnaire'''
@@ -74,5 +79,9 @@ class Multimetre() :
                 self.ina_dict[key] = self.iterable_dict.sum_elements(key)/(len(self.iterable_dict.data[key]) * 1000)
             else:
                 self.ina_dict[key] = self.iterable_dict.sum_elements(key)/len(self.iterable_dict.data[key])
+
+        # Pour faire varier les valeurs sans le multimètre connecté
+        if(self.ina == None and self.ina_dict['psu_voltage'] > 13):
+            self.number -= 2
     
         return self.ina_dict
