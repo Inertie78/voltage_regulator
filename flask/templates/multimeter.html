@@ -1,6 +1,6 @@
 {% extends "index.html" %}
 {% block content %}
-  <script src="static/loader.js"></script>
+  <script src="static/gauge.js"></script>
   <script src="static/script_multimeter.js"></script>
   
   <div class="classTitre">
@@ -18,14 +18,12 @@
               <fieldset>
                 <legend>N° 1</legend>
                   <div class="configuInput">
-                    <div class="configuInput">
-                      <div class="configuInput">
-                          <div id="chart_Tension_01"></div>
-                          <div id="chart_Temp"></div>
-                      </div>
-                    </div>   
                     <div>
-                      <p>Voltage: <span id="shunt_voltage_01"/></p>
+                      <canvas id="chart_Tension_01"></canvas>
+                      <p>Voltage: <span id="psu_voltage_01"/></p>
+                    </div>
+                    <div>
+
                       <p>Current: <span id="current_01"/></p>
                       <p>Power:   <span id="power_01"/></p>
                     </div>
@@ -37,14 +35,11 @@
             <fieldset>
               <legend>N° 2</legend>
                 <div class="configuInput">
-                  <div class="configuInput">
-                    <div class="configuInput">
-                        <div id="chart_Tension_02"></div>
-                        <div id="chart_Temp"></div>
-                    </div>
+                  <div>
+                    <canvas id="chart_Tension_02"></canvas>
+                    <p>Voltage: <span id="psu_voltage_02"/></p>
                   </div>
                   <div>
-                    <p>Voltage: <span id="shunt_voltage_02"/></p>
                     <p>Current: <span id="current_02"/></p>
                     <p>Power:   <span id="power_02"/></p>
                   </div>
@@ -58,14 +53,11 @@
               <fieldset>
                 <legend>N° 3</legend>
                   <div class="configuInput">
-                    <div class="configuInput">
-                      <div class="configuInput">
-                          <div id="chart_Tension_03"></div>
-                          <div id="chart_Temp"></div>
-                      </div>
-                    </div> 
                     <div>
-                      <p>Voltage: <span id="shunt_voltage_03"/></p>
+                      <canvas id="chart_Tension_03"></canvas>
+                      <p>Voltage: <span id="psu_voltage_03"/></p>
+                    </div>
+                    <div>
                       <p>Current: <span id="current_03"/></p>
                       <p>Power:   <span id="power_03"/></p>
                     </div>
@@ -77,14 +69,11 @@
             <fieldset>
               <legend>N° 4</legend>
                 <div Class="configuInput">
-                  <div class="configuInput">
-                    <div class="configuInput">
-                        <div id="chart_Tension_04"></div>
-                        <div id="chart_Temp"></div>
-                    </div>
-                  </div> 
                   <div>
-                    <p>Voltage: <span id="shunt_voltage_04"/></p>
+                    <canvas id="chart_Tension_04"></canvas>
+                    <p>Voltage: <span id="psu_voltage_04"/></p>
+                  </div>
+                  <div>
                     <p>Current: <span id="current_04"/></p>
                     <p>Power:   <span id="power_04"/></p>
                   </div>

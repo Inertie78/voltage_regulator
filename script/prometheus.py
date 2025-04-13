@@ -2,13 +2,18 @@ from prometheus_client import start_http_server
 from sensor import Sensor
 import logging, os
 
+# Pour les logs pour le debbugage
 format = "%(asctime)s %(levelname)s: %(message)s"
 level = os.getenv("LOG_LEVEL", "INFO")
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
 class  Prometheus:
+    '''Classe por Créer  les capteurs pour la base de donnée prometheus'''
     def createSensors(self, dict_sensor, type, index):
+        '''Créer de nouveaux capteurs en function d'un dictonaire d'un type de capteur et d'un index. 
+            Variale dict_sensor==> dictionary, type ==> str ['gauge' or 'enum' ....], index ==> int
+        '''
         sensors = []
         for name in dict_sensor:
             try: 
@@ -21,6 +26,11 @@ class  Prometheus:
         return sensors
 
     def set_sensors(self, sensors, dict_sensor, index):
+        '''Change les valeurs des capteurs. En function d'une liste de capteur, d'un dictionnaire des valeurs et d'un index.
+           Variale sensors ==> list de senors, dict_sensor ==> diconnaire, index ==> int
+           Récupère le nom du capteur dans list (sensors) et récupère la valeur dans le dictionnaire avec comme key (le nom du capteur)  pour en suite 
+           le donner au capteur
+        '''
         if(not sensors == None):
             for sensor in sensors:
                 try:
@@ -49,6 +59,7 @@ class  Prometheus:
             raise Exception("Aucun capteur pour prometheus n'a été crée.")
 
     def startServer(self):
+        '''Start le server prometheus'''
         port = 8000
         logging.info(f"Le server prometheus est lancé sur le port:  {port}")
         start_http_server(port)

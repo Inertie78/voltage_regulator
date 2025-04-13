@@ -1,3 +1,7 @@
+// Varible pour la boucle de mise à jour
+var update_time = 1000; // 1 seconde
+
+// Au chargement de la page
 document.addEventListener('DOMContentLoaded', (event) => {
   
 
@@ -78,11 +82,12 @@ function handleInputChange(event) {
   }
 
   textEtatChexbox(name, checked);
-
+  // Envoie les valeurs au socket
   const jsonString = JSON.stringify(etat_switch);
   socket.send(jsonString);
 }
 
+// Function qui change le text de l'état du relais entre ouvert ou fermé
 function textEtatChexbox(name, checked) {
   const etat_text = document.querySelectorAll('h3');
   for (let i = 0; i < etat_text.length; i++) {
@@ -98,9 +103,13 @@ function textEtatChexbox(name, checked) {
 
 }
 
+
+// Function pour mettre à jour les varibles de la page toute les seconde
 function updatePage() {
   setInterval(function () {
+    // Envoi à socket un message pour faire une mise à jour des valeurs 
     socket.send("up_relay");
+    // Reçois les valeurs du socket
     socket.on('message', function(msg) {
       if (msg != null) {
         if(msg.includes("rs_0")){
@@ -117,6 +126,6 @@ function updatePage() {
         }
       }
     });
-  }, (1000));
+  }, (update_time));
 }
 

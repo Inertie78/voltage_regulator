@@ -1,101 +1,183 @@
-var myObj = null
-document.addEventListener("DOMContentLoaded", () => {
-  google.charts.load('current', { 'packages': ['gauge'] });
-  google.charts.setOnLoadCallback(drawChart);
+// Varible pour la boucle de mise à jour
+var update_time = 1000; // 1 seconde
 
+var myObj = null
+
+var voltage = 0.0;
+var voltage_gauge = 11.0;
+var current = 0.0;
+var power = 0.0;
+
+var value_precision = 2;
+
+var min_gauge = 11;
+var max_gauge  = 14;
+var anim_gauge = 32;
+
+document.addEventListener("DOMContentLoaded", () => {
+  drawChart();
 });
 
+
+// Pour les gauge et la mise à jour des variables du multimètre
 function drawChart() {
 
-  var chartTension_01 = new google.visualization.Gauge(document.getElementById("chart_Tension_01"));
-  var chartTension_02 = new google.visualization.Gauge(document.getElementById("chart_Tension_02"));
-  var chartTension_03 = new google.visualization.Gauge(document.getElementById("chart_Tension_03"));
-  var chartTension_04 = new google.visualization.Gauge(document.getElementById("chart_Tension_04"));
+  // Variable pour les options des gauges 
+  var opts = {
+    // color configs
+    colorStart: "#6fadcf",
+    colorStop: void 0,
+    gradientType: 0,
+    strokeColor: "#e0e0e0",
+    generateGradient: true,
+    percentColors: [[0.0, "#a9d70b" ], [0.50, "#f9c802"], [1.0, "#ff0000"]],
+    // customize pointer
+    pointer: {
+      length: 0.6,
+      strokeWidth: 0.035,
+      iconScale: 1.0,
+      color: '#ffffff'
+    },
+    // static labels
+    staticLabels: {
+      font: "10px sans-serif",
+      labels: [11, 12, 13, 14],
+      fractionDigits: 0,
+      color: '#ffffff'
 
-  var dataTension_01 = google.visualization.arrayToDataTable([
-    ['Label', 'Value'],
-    ['Tens', 0]
-  ]);
-
-  var dataTension_02 = google.visualization.arrayToDataTable([
-    ['Label', 'Value'],
-    ['Tens', 0]
-  ]);
-
-  var dataTension_03 = google.visualization.arrayToDataTable([
-    ['Label', 'Value'],
-    ['Tens', 0]
-  ]);
-
-  var dataTension_04 = google.visualization.arrayToDataTable([
-    ['Label', 'Value'],
-    ['Tens', 0]
-  ]);
-
-  var optionsTension = {
-    width: 150, height: 150,
-    min: 11, max: 15,
-    redFrom: 11.4, redTo: 11.9,
-    yellowFrom: 11.9, yellowTo: 12.4,
-    greenFrom: 12.4, greenTo: 15.0,
-    majorTicks: ['11', '12', '13', '14', '15'],
-    minorTicks: 5
+    },
+    // static zones
+    staticZones: [
+      {strokeStyle: "#FF0000", min: 11, max: 11.9},
+      {strokeStyle: "#FFDD00", min: 11.9, max: 12.4},
+      {strokeStyle: "#30B32D", min: 12.4, max: 12.8},
+      {strokeStyle: "#FF0000", min: 12.8, max: 14}
+    ],
+    // render ticks
+    renderTicks: {
+      divisions: 6,
+      divWidth: 1.1,
+      divLength: 0.3,
+      divColor: "#333333",
+      subDivisions: 5,
+      subLength: 0.2,
+      subWidth: 0.6,
+      subColor: "#666666"
+    },
+    // the span of the gauge arc
+    angle: 0.15,
+    // line thickness
+    lineWidth: 0.44,
+    // radius scale
+    radiusScale: 1.0,
+    // font size
+    fontSize: 30,
+    // if false, max value increases automatically if value > maxValue
+    limitMax: false,
+    // if true, the min value of the gauge will be fixed
+    limitMin: false,
+    // High resolution support
+    highDpiSupport: true
   };
 
-  var formatTension = new google.visualization.NumberFormat({
-    suffix: ' V',
-    fractionDigits: 1
-  });
 
-  
-  formatTension.format(dataTension_01, 1);
-  chartTension_01.draw(dataTension_01, optionsTension);
-  formatTension.format(dataTension_02, 1);
-  chartTension_02.draw(dataTension_02, optionsTension);
-  formatTension.format(dataTension_03, 1);
-  chartTension_03.draw(dataTension_03, optionsTension);
-  formatTension.format(dataTension_04, 1);
-  chartTension_04.draw(dataTension_04, optionsTension);
+  var target_01 = document.getElementById('chart_Tension_01'); 
+  var gauge_01 = new Gauge(target_01).setOptions(opts);
+  gauge_01.maxValue = max_gauge;
+  gauge_01.setMinValue(min_gauge); 
+  gauge_01.animationSpeed = anim_gauge
 
+  var target_02 = document.getElementById('chart_Tension_02'); 
+  var gauge_02 = new Gauge(target_02).setOptions(opts);
+  gauge_02.maxValue = max_gauge;
+  gauge_02.setMinValue(min_gauge); 
+  gauge_02.animationSpeed = anim_gauge
+
+  var target_03 = document.getElementById('chart_Tension_03'); 
+  var gauge_03 = new Gauge(target_03).setOptions(opts);
+  gauge_03.maxValue = max_gauge;
+  gauge_03.setMinValue(min_gauge); 
+  gauge_03.animationSpeed = anim_gauge
+
+  var target_04 = document.getElementById('chart_Tension_04'); 
+  var gauge_04 = new Gauge(target_04).setOptions(opts);
+  gauge_04.maxValue = max_gauge;
+  gauge_04.setMinValue(min_gauge); 
+  gauge_04.animationSpeed = anim_gauge
+
+
+  // Pour mettre à jour des valeurs de la page et des gauges toute les seconde
   setInterval(function () {
+    // Envoi à socket un message pour faire une mise à jour des valeurs 
     socket.send("up_bat");
+    // Reçois les valeurs du socket
     socket.on('message', function(msg) {
       if (msg != null) {
         if(msg.includes("bat_")){
+          // Transforme le message en dictionaire
           myObj = JSON.parse(msg);
-          var voltage = Number(myObj.bat_psu_voltage_01).toFixed(3)
-          formatTension.format(dataTension_01, 1);
-          $("#shunt_voltage_01").text( voltage + " V");
-          dataTension_01.setValue(0, 1, voltage);
-          chartTension_01.draw(dataTension_01, optionsTension);
-          $("#current_01").text( Number(myObj.bat_current_01).toFixed(3) + " A");
-          $("#power_01").text( Number(myObj.bat_power_01).toFixed(3) + " W");
-          
-          voltage = Number(myObj.bat_psu_voltage_02).toFixed(3)
-          formatTension.format(dataTension_02, 1);
-          $("#shunt_voltage_02").text( voltage + " V");
-          dataTension_02.setValue(0, 1, voltage);
-          chartTension_02.draw(dataTension_02, optionsTension);
-          $("#current_02").text( Number(myObj.bat_current_02).toFixed(3) + " A");
-          $("#power_02").text( Number(myObj.bat_power_02).toFixed(3) + " W");
 
-          voltage = Number(myObj.bat_psu_voltage_03).toFixed(3)
-          formatTension.format(dataTension_03, 1);
-          $("#shunt_voltage_03").text( voltage + " V");
-          dataTension_03.setValue(0, 1, voltage);
-          chartTension_03.draw(dataTension_03, optionsTension);
-          $("#current_03").text( Number(myObj.bat_current_03).toFixed(3) + " A");
-          $("#power_03").text( Number(myObj.bat_power_03).toFixed(3) + " W");
+          // Met à jour la gauge N°1
+          voltage = Number(myObj.bat_psu_voltage_01).toFixed(3);
+          voltage_gauge = voltage;
+          current = Number(myObj.bat_current_01).toFixed(3);
+          power = Number(myObj.bat_power_01).toFixed(3);
+          checkValue();
+
+          gauge_01.set(voltage_gauge);
+          $("#psu_voltage_01").text( voltage + " V");
+          $("#current_01").text(current + " A");
+          $("#power_01").text(power + " W");
           
-          voltage = Number(myObj.bat_psu_voltage_04).toFixed(3)
-          formatTension.format(dataTension_04, 1);
-          $("#shunt_voltage_04").text( voltage + " V");
-          dataTension_04.setValue(0, 1, voltage);
-          chartTension_04.draw(dataTension_04, optionsTension);
-          $("#current_04").text( Number(myObj.bat_current_04).toFixed(3) + " A");
-          $("#power_04").text( Number(myObj.bat_power_04).toFixed(3) + " W");
+          // Met à jour la gauge N°2
+          voltage = Number(myObj.bat_psu_voltage_02).toFixed(value_precision);
+          voltage_gauge = voltage;
+          current = Number(myObj.bat_current_02).toFixed(value_precision);
+          power = Number(myObj.bat_power_02).toFixed(value_precision);
+          checkValue();
+
+          gauge_02.set(voltage_gauge);
+          $("#psu_voltage_02").text( voltage + " V");
+          $("#current_02").text( current + " A");
+          $("#power_02").text( power + " W");
+
+          // Met à jour la gauge N°3
+          voltage = Number(myObj.bat_psu_voltage_03).toFixed(3);
+          voltage_gauge = voltage;
+          current = Number(myObj.bat_current_03).toFixed(value_precision);
+          power = Number(myObj.bat_power_03).toFixed(value_precision);
+          checkValue();
+
+          gauge_03.set(voltage_gauge);
+          $("#psu_voltage_03").text( voltage + " V");
+          $("#current_03").text( current + " A");
+          $("#power_03").text( power + " W");
+          
+          // Met à jour la gauge N°4
+          voltage = Number(myObj.bat_psu_voltage_04).toFixed(value_precision);
+          voltage_gauge = voltage;
+          current = Number(myObj.bat_current_04).toFixed(value_precision);
+          power = Number(myObj.bat_power_04).toFixed(value_precision);
+          checkValue();
+
+          gauge_04.set(voltage_gauge);
+          $("#psu_voltage_04").text( voltage + " V");
+          $("#current_04").text( current + " A");
+          $("#power_04").text( power + " W");
         }
       }
     });
-  }, (1000));
+  }, (update_time));
+}
+
+function checkValue() {
+  
+  if(voltage < 1.0){
+    voltage = 0.0.toFixed(value_precision);
+    voltage_gauge = min_gauge.toFixed(value_precision);
+    current = 0.0.toFixed(value_precision);
+    power = 0.0.toFixed(value_precision);
+  } else if (voltage > 14) {
+    voltage_gauge = max_gauge.toFixed(value_precision);
+  } 
 }
