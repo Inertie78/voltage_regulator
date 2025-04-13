@@ -44,8 +44,9 @@ class Protect(Data):
                     message_protect = "Batterie chargée"
 
 
-            # si on est déjà dans le mode Protect, on vérifie que les consommateurs ont assez d'énergie
-            # on ne remet la charge que si la tension a baissé en 0.2V
+            # si on est déjà dans le mode Protect, on vérifie encore une fois que les consommateurs ont assez d'énergie
+            # si ce n'est pas le cas, on peut supposer qu'une coupure de courant a lieu, alors on passe en mode Observer
+           
              
             else :
 
@@ -57,6 +58,8 @@ class Protect(Data):
                     Data.run_observer(Data.dict_relay)
                     message_protect = "Erreur alimentation perdue."
 
+
+                # on ne remet la charge que si la tension a baissé en 0.2V
                 if Data.dict_relay['rs_02'] : 
                 
                     if Data.multi_dict_01['psu_voltage'] >= Data.FULL_CHARGE_TENSION - 0.2 :
