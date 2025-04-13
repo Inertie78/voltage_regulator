@@ -44,7 +44,6 @@ services :
       - ./script/modes/manuel.py:/usr/src/app/modes/manuel.py:ro
       - ./script/modes/observer.py:/usr/src/app/modes/observer.py:ro
       - ./script/modes/protect.py:/usr/src/app/modes/protect.py:ro
-      - ./script/modes/action.py:/usr/src/app/modes/action.py:ro
       
       # pour les gpio sur la raspberry p
       - /dev/gpiochip0:/dev/gpiochip0:ro
