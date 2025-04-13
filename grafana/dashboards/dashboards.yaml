@@ -1,4 +1,0 @@
-datasources:
-  - name: Graphite
-    url: http://localhost:3000
-    

@@ -33,7 +33,7 @@ class Main(Data):
         self.mode_consomation = Consomation()
         self.mode_manuel = Manuel()
 
-        self.transmitting = Transmitting('http://192.168.50.108:5000')
+        self.transmitting = Transmitting('http://flask:5000')
 
         super().initData()
         
