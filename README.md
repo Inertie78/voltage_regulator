@@ -5,28 +5,33 @@
 
 ## Introduction
 
-Dans le cadre d'une application réelle, des batteries sont utilisées comme alimentation de secours pour des appareils connectés en permanence au réseau 230 V. 
+Dans le cadre d'une application réelle, des batteries sont utilisées comme alimentations de secours pour des appareils connectés en permanence au réseau 230 V. 
 Toutes les batteries utilisées se sont révélées hors d'usage après une durée de vie d'environ 15 mois, alors que leur durée de vie annoncée est de 5-8 ans. 
-Notre projet à pour objectif de permettre la récolte de mesures sur l'activité de la batterie, de l'alimentation 230 V et du chargeur ainsi que de pouvoir effectuer des simulations de fonctionnement.
+Notre projet a pour objectif de permettre la récolte de mesures sur l'activité de la batterie, de l'alimentation 230 V et du chargeur ainsi que de pouvoir effectuer des simulations de fonctionnement.
 
 
 ## Hardware
 
 Un Raspberry Pi 5 - 16 Gb de RAM été choisi comme contrôleur. Plusieurs accessoires ont été ajoutés :
-- Module avec 4 relais 230 V
-- Module I2C avec 4 entrées permettant la mesure de tension de 0 à 26 V
-- Module I2C permettant la mesure de température
+- Module avec 4 relais 230 V ==> *PiRelay v2 Shield*
+- Module I2C avec 4 entrées permettant la mesure de tension, de courant et de puissance, de 0 à 26 V ==> *4-ch Current/Voltage/Power Monitor HAT for Raspberry Pi, I2C/SMBus*
+- *Module I2C permettant la mesure de température (pas encore implémenté)*
 
-## Installation
+## Installation *(voir schéma ci-dessous)*
 
-- L'alimentation électrique principale est connectée au relais no 1, ce qui permet de couper à distance le raccordement électrique de toute l'installation, ainsi de forcer le fonctionnement sur l'alimentation de secours.
+### Les relais : 
 
-- Le circuit de charge est connectée au relais no 2, ce qui permet d'interrompre la charge de la batterie.
+- **R1** : connecté NO sur l'**alimentation électrique principale 230V**, ce qui permet de couper à distance le raccordement électrique de toute l'installation, ainsi de forcer le fonctionnement sur l'alimentation de secours.
 
-- La batterie est raccordée à l'entrée numéro 1 du moniteur de tension, afin que des mesures de tensions puissent être effectuées de façon récurentes.
+- **R2** : connecté NO sur le **circuit de charge** ce qui permet d'interrompre la charge de la batterie. Dans notre cas, il interrompt également le secours énergétique de la batterie *(déconnecte complètement la batterie)*.
 
-- Le circuit de charge est raccordé en série sur l'entrée numéro 2 du moniteur de tension, afin de pouvoir récupérer la tension, la puissance ainsi que le courant envoyé par le chargeur sur la batterie
-- Le circuit d'alimentation des équipements est raccordé sur l'entrée numéro 3 du moniteur de tension, afin de pouvoir récupérer la tension, la puissance ainsi que le courant utilisés par les consommateurs. 
+### Le module I2C de mesures
+*(il faut noter que cet équipement nécessite une consommation de courant pour pouvoir effectuer les mesures)*
+
+- **V1** : connecté à la **batterie**, avec une résistence de 10 kOhm. Permet de mesurer la tension de la batterie.
+
+- **V2** : connecté au **circuit de charge**, afin de pouvoir récupérer les valeurs envoyées du chargeur vers la batterie
+- **V3** : connecté au circuit d'**alimentation des équipements** afin de  utilisés par les consommateurs. 
 
 ## Software (succinct)
 
@@ -256,41 +261,36 @@ E --> A
         ├── sensor.py
         └── __init__.py
 ```
-    - data.py ==> variable de classe
-    - main.py ==> script principal du projet. 
+### Informations complémentaires
+- **data.py** ==> variable de classe
+- **main.py** ==> script principal du projet. 
                     a) Récupère les valeurs du multimètre. 
                     b) Logique du contrôleur. 
                     c) Envoie les valeurs à la base de donnée.
-    - transmitting.py(Hérite de data.py) ==> Connection socket avec le server flask.
+- **transmitting.py**(Hérite de data.py) ==> Connection socket avec le server flask.
 
-    - dossier raspberry c'est fichier non pas de dépendance avec data.py, pour les garder nodulaire pour d'autre projet:
-        - infoPc.py ==> retrourne les infos du pc
-        - lineGpio.py ==> pour intèragir avec les gpio de la Raspberry
-        - multimetre.py ==> retourn en I2C les valeurs du module nultimètre
-        - relay.py ==> active ou désactive un relais (relais = objet lineGpio.py )
+- **dossier raspberry** : c'est fichier non pas de dépendance avec data.py, pour les garder modulaire pour d'autre projet:
+    - **infoPc.py** ==> retrourne les infos du pc
+    - **lineGpio.py** ==> pour intèragir avec les gpio de la Raspberry
+    - **multimetre.py** ==> retourn en I2C les valeurs du module multimètre
+    - **relay.py** ==> active ou désactive un relais (relais = objet lineGpio.py )
 
-    - dossier raspberry ces fichiers non pas de dépendance avec data.py, pour les garder nodulaire pour d'autre projet:
-        - infoPc.py ==> retrourne les infos du pc
-        - lineGpio.py ==> pour intèragir avec les gpio de la Raspberry
-        - multimetre.py ==> retourn en I2C les valeurs du module nultimètre
-        - relay.py ==> active ou désactive un relais (relais = objet lineGpio.py)
+- **dossier modes** :
+    - **observer.py** *(hérite de data.py)* ==> Mode de fonctionnement par défaut de l'installation. Il se contente de collecter des informations
+    - **consomation.py** *(hérite de data.py)* ==> Mode de fonctionnement qui va simuler une coupure d'alimentation électrique, afin de forcer la batterie à effectuer des cycles.
+    - **manuel.py** *(hérite de data.py)* ==> Mode qui permet à l'utilisateur d'interagir avec les relais, via la page Web.
+        
+    - **protect.py** *(hérite de data.py)* ==> Mode de fonctionnement qui va mesurer la tension de la batterie et une fois que la batterie a atteint la tension de charge maximale, le système va couper la charge, jusqu'à ce que la tension passe en dessous de 0.2v de la tension maximale
 
-    - dossier modes :
-        - consomation.py(Hérite de data.py) ==> Mode de fonctionnement qui va simuler une coupure d'alimentation électrique 
-                                                afin de forcer la batterie à effectuer des cycles.
-        - manuel.py(Hérite de data.py) ==> Mode qui permet à l'utilisateur d'interagir avec les relais.
-        - observer.py(Hérite de data.py) ==> Mode de fonctionnement normal de l'installation.
-        - protect.py(Hérite de data.py) ==> Mode de fonctionnement qui va mesurer la tension de la batterie et une fois 
-                                            que la batterie a atteint la tension de charge maximale, le système va couper 
-                                            la charge, jusqu'à ce que la tension passe en dessous de 0.2v de la tension maximale
-
-    - dossier dataBase :
-        - prometheus.py ==> 
-        - sensor.py ==> Créer des capteur pour prometheus, ici nous utiliseront deux ssortes de capteur
-                            a) le capteur gauge qui accepte des variable float. 
-                               Pour les datas du multimètres et des info sur la Raspberry
-                            b) le capteur enum qui accepte des varibles string dans notre cas (['starting', 'stopped']).
-                               Pour les états des relais et du mode de fonctionnent du programme
+- **dossier dataBase** :
+    - **prometheus.py** ==> 
+    - **sensor.py** ==> Créer des capteur pour prometheus, ici nous utiliseront deux sortes de capteurs
+        - le capteur **gauge** qui accepte des variable float pour :  
+            - les datas du multimètres 
+            - les info sur la Raspberry
+        - le capteur **enum** qui accepte des varibles string dans notre cas ```(['starting', 'stopped'])```, pour :
+            - les états des relais 
+            - le mode de fonctionnent du programme
 
 
 ### Liste de variable la raspberry pi 
