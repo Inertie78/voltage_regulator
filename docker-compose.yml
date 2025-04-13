@@ -44,6 +44,7 @@ services :
       - ./script/modes/manuel.py:/usr/src/app/modes/manuel.py:ro
       - ./script/modes/observer.py:/usr/src/app/modes/observer.py:ro
       - ./script/modes/protect.py:/usr/src/app/modes/protect.py:ro
+      - ./script/modes/action.py:/usr/src/app/modes/action.py:ro
       
       # pour les gpio sur la raspberry p
       - /dev/gpiochip0:/dev/gpiochip0:ro
@@ -71,32 +72,41 @@ services :
 
   prometheus:
     container_name: prometheus
-    image: prom/prometheus:v2.33.5
+    image: prom/prometheus:latest
     restart: always
     ports:
       - "9090:9090"
+    user: root
     volumes:
-      - ./prometheus:/workspace
-      - ./prometheus/data:/opt/bitnami/prometheus/data/*
+      - ./prometheus/prometheus.yml:/workspace/prometheus.yml
+      - ./prometheus/prometheus_data:/prometheus
     command:
       - '--config.file=/workspace/prometheus.yml'
 
   grafana:
     container_name: grafana
-    image: grafana/grafana:8.4.3
+    image: grafana/grafana:latest
     restart: always
     ports:
       - "3000:3000"
+    user: root
     volumes:
-      - ./grafana/provisioning:/etc/grafana/provisioning/*
-      #- ./grafana/data:/var/lib/grafana/*
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+
+      - ./grafana/data:/var/lib/grafana
       - ./grafana/grafana.ini:/etc/grafana/grafana.ini
+
     depends_on:
       - prometheus
     environment:
       GF_AUTH_ANONYMOUS_ENABLED: "true"
       GF_AUTH_ANONYMOUS_ORG_ROLE: "Admin"
       GF_AUTH_DISABLE_LOGIN_FORM: "true"
+      
+      GF_PATHS_PROVISIONING: "/etc/grafana/provisioning"
+      GF_PATHS_DATA: "/var/lib/grafana"
 
 volumes :
   prometheus :
+  grafana :
