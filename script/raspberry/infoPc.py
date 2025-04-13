@@ -1,8 +1,6 @@
 import psutil
-import subprocess
 import os
 import logging
-import json
 
 import platform
 
@@ -15,7 +13,7 @@ class InfoPc:
                             "porcent_disk_ussed":float(0.0), "disk_ussed":float(0.0), "disk_free":float(0.0), "disk_total":float(0.0)}
 
     def getCPUvoltage(self):
-        '''return dans une list["cpu_volt"] l'etat du cpu de la raspberry pi'''
+        '''return dans une list["cpu_volt"] l'etat de la tension du cpu de la raspberry pi'''
         if(platform.system() == 'Linux'):
             res = os.popen('vcgencmd measure_volts').readline()
             self.dict_sensor["cpu_volt"] = float(res.replace("volt=","").replace("V\n",""))
@@ -23,7 +21,7 @@ class InfoPc:
             self.dict_sensor["cpu_volt"] = float("- 0.0")
 
     def getSYSstatus(self):
-        '''return dans une list["sys_stat"] l'etat d'alimentation de la raspberry pi'''
+        '''return dans une list["sys_stat"] l'etat de la raspberry pi au niveau de son alimentation'''
         if(platform.system() == 'Linux'):
             res = os.popen('vcgencmd get_throttled').readline()
             res = int(res.replace("throttled=","").replace("\n",""),0)
@@ -44,20 +42,20 @@ class InfoPc:
             self.getCPUvoltage()
             self.getSYSstatus()
 
-            # return la température du processeur
+            #return dans une list["cpu_temp"] la températutre du processeur principal
             if hasattr(psutil, 'sensors_temperatures'):
                 self.dict_sensor["cpu_temp"] = psutil.sensors_temperatures()['cpu_thermal'][0].current
             else:
                 self.dict_sensor["cpu_temp"] = float(-1.0)
 
-            # return l'utilisation du processeur
+            #return dans une list["cpu_usage"] l'utilisation du processeur principal
             if hasattr(psutil, 'getloadavg'):
                 load1, load5, load15 = psutil.getloadavg()
                 self.dict_sensor["cpu_usage"] = (load15/psutil.cpu_count()) * 100
             else:
                 self.dict_sensor["cpu_usage"] = float(-1.0)
 
-            # return les info sur la mémoire ram
+            #return l'utilisation de la mémoire ram
             if hasattr(psutil, 'virtual_memory'):
                 self.dict_sensor["porcent_ram_ussed"] =  psutil.virtual_memory().percent
                 self.dict_sensor["ram_ussed"] =  psutil.virtual_memory().used/1000000000
@@ -69,8 +67,8 @@ class InfoPc:
                 self.dict_sensor["ram_free"]  = float(-1.0)
                 self.dict_sensor["ram_total"]  = float(-1.0)
 
-
-            # return les info sur le disque mémoire principal      
+            
+            #return l'utilisation du disque dur principal
             if hasattr(psutil, 'virtual_memory'):
                 self.dict_sensor["porcent_disk_ussed"] =  psutil.disk_usage('/').percent
                 self.dict_sensor["disk_ussed"] =  psutil.disk_usage('/').used/1000000000

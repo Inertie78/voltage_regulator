@@ -114,14 +114,8 @@ Si la température dépasse une certaine valeur, un message d'alerte est transmi
 
 Si la température dépasse une valeur limite, le système ouvre le relais 2 pour stopper la charge. Le message d'erreur sont également transmis. 
 
-### Lancer le projet :
-`docker compose build && docker compose up -d`
-
-### Url du projet:
-`http://"votre ip"/flask`
 
 ### Schémas
-
 
 ```mermaid
 graph LR
@@ -134,6 +128,170 @@ E --> A
 ```
 
 ![This is an alt text.](./schema.jpg "Schéma du régulateur de tension.")
+
+
+### Valeurs attendues de la charge des batteries
+
+![This is an alt text.](./cara_charge.jpg "Valeurs attendues selon la fiche technique de la batterie.")
+
+
+### Structure du projet générale
+
+```
+└── regulateur_tension
+    ├── .gitignore
+    ├── cara_charge.jpg
+    ├── docker-compose.yml
+    ├── README.md
+    ├── schema.jpg
+    ├── script
+    │   ├── .dockerignore
+    │   ├── data.py
+    │   ├── dockerfile.script
+    │   ├── main.py
+    │   ├── requirements.txt
+    │   ├── transmitting.py
+    │   ├── raspberry
+    │   │   ├── infoPc.py
+    │   │   ├── lineGpio.py
+    │   │   ├── multimetre.py
+    │   │   ├── relay.py
+    │   │   └── __init__.py
+    │   ├── modes
+    │   │   ├── consomation.py
+    │   │   ├── manuel.py
+    │   │   ├── observer.py
+    │   │   ├── protect.py
+    │   │   └── __init__.py
+    │   └── dataBase
+    │       ├── prometheus.py
+    │       ├── sensor.py
+    │       └── __init__.py
+    ├── prometheus
+    │   └── prometheus.yml
+    ├── nginx
+    │   ├── default.conf
+    │   ├── dockerfile.rev_proxy
+    │   └── nginx.conf
+    ├── grafana
+    │   ├── grafana.ini
+    │   └── dashboards
+    │       ├── dashboards.yaml
+    │       └── Raspberry_pi.json
+    └── flask
+        ├── dockerfile.flask
+        ├── main.py
+        ├── requirements.txt
+        ├── templates
+        │   ├── about.html
+        │   ├── grafana.html
+        │   ├── index.html
+        │   ├── multimeter.html
+        │   ├── prometheus.html
+        │   └── relay.html
+        └── static
+            ├── bootstrap_min.css
+            ├── Crimson_Pro.css
+            ├── gauge.js
+            ├── jquery.min.js
+            ├── menu.css
+            ├── script_about.js
+            ├── script_home.js
+            ├── script_multimeter.js
+            ├── script_relay.js
+            ├── socket.io.min.js
+            └── style.css
+```
+### Structure de l'onglet flask (server)
+```
+└── flask
+    ├── dockerfile.flask
+    ├── main.py
+    ├── requirements.txt
+    ├── templates
+    │   ├── about.html
+    │   ├── grafana.html
+    │   ├── index.html
+    │   ├── multimeter.html
+    │   ├── prometheus.html
+    │   └── relay.html
+    └── static
+        ├── bootstrap_min.css
+        ├── Crimson_Pro.css
+        ├── gauge.js
+        ├── jquery.min.js
+        ├── menu.css
+        ├── script_about.js
+        ├── script_home.js
+        ├── script_multimeter.js
+        ├── script_relay.js
+        ├── socket.io.min.js
+        └── style.css
+```
+
+### Structure l'onglet script
+
+```
+└── script
+    ├── .dockerignore
+    ├── data.py
+    ├── dockerfile.script
+    ├── main.py
+    ├── requirements.txt
+    ├── transmitting.py
+    ├── raspberry
+    │   ├── infoPc.py
+    │   ├── lineGpio.py
+    │   ├── multimetre.py
+    │   ├── relay.py
+    │   └── __init__.py
+    ├── modes
+    │   ├── consomation.py
+    │   ├── manuel.py
+    │   ├── observer.py
+    │   ├── protect.py
+    │   └── __init__.py
+    └── dataBase
+        ├── prometheus.py
+        ├── sensor.py
+        └── __init__.py
+```
+    - data.py ==> variable de classe
+    - main.py ==> script principal du projet. 
+                    a) Récupère les valeurs du multimètre. 
+                    b) Logique du contrôleur. 
+                    c) Envoie les valeurs à la base de donnée.
+    - transmitting.py(Hérite de data.py) ==> Connection socket avec le server flask.
+
+    - dossier raspberry c'est fichier non pas de dépendance avec data.py, pour les garder nodulaire pour d'autre projet:
+        - infoPc.py ==> retrourne les infos du pc
+        - lineGpio.py ==> pour intèragir avec les gpio de la Raspberry
+        - multimetre.py ==> retourn en I2C les valeurs du module nultimètre
+        - relay.py ==> active ou désactive un relais (relais = objet lineGpio.py )
+
+    - dossier raspberry ces fichiers non pas de dépendance avec data.py, pour les garder nodulaire pour d'autre projet:
+        - infoPc.py ==> retrourne les infos du pc
+        - lineGpio.py ==> pour intèragir avec les gpio de la Raspberry
+        - multimetre.py ==> retourn en I2C les valeurs du module nultimètre
+        - relay.py ==> active ou désactive un relais (relais = objet lineGpio.py)
+
+    - dossier modes :
+        - consomation.py(Hérite de data.py) ==> Mode de fonctionnement qui va simuler une coupure d'alimentation électrique 
+                                                afin de forcer la batterie à effectuer des cycles.
+        - manuel.py(Hérite de data.py) ==> Mode qui permet à l'utilisateur d'interagir avec les relais.
+        - observer.py(Hérite de data.py) ==> Mode de fonctionnement normal de l'installation.
+        - protect.py(Hérite de data.py) ==> Mode de fonctionnement qui va mesurer la tension de la batterie et une fois 
+                                            que la batterie a atteint la tension de charge maximale, le système va couper 
+                                            la charge, jusqu'à ce que la tension passe en dessous de 0.2v de la tension maximale
+
+    - dossier dataBase :
+        - prometheus.py ==> 
+        - sensor.py ==> Créer des capteur pour prometheus, ici nous utiliseront deux ssortes de capteur
+                            a) le capteur gauge qui accepte des variable float. 
+                               Pour les datas du multimètres et des info sur la Raspberry
+                            b) le capteur enum qui accepte des varibles string dans notre cas (['starting', 'stopped']).
+                               Pour les états des relais et du mode de fonctionnent du programme
+
 
 ### Liste de variable la raspberry pi 
 
@@ -158,13 +316,14 @@ E --> A
 
 |  numéro |     bus voltage      |      shun tvoltage    |     power     |     current     |      
 |---------|----------------------|-----------------------|---------------|-----------------|
-|   N°1   |"bat_bus_voltage_01"  |"bat_shunt_voltage_01" |"bat_power_01" |"bat_current_01" |
-|   N°2   |"bat_bus_voltage_02"  |"bat_shunt_voltage_02" |"bat_power_02" |"bat_current_02" |
-|   N°3   |"bat_bus_voltage_03"  |"bat_shunt_voltage_03" |"bat_power_03" |"bat_current_03" |
-|   N°4   |"bat_bus_voltage_04"  |"bat_shunt_voltage_04" |"bat_power_04" |"bat_current_04" |
+|   N°1   |"bus_voltage_01"  |"shunt_voltage_01" |"power_01" |"current_01" |
+|   N°2   |"bus_voltage_02"  |"shunt_voltage_02" |"power_02" |"current_02" |
+|   N°3   |"bus_voltage_03"  |"shunt_voltage_03" |"power_03" |"current_03" |
+|   N°4   |"bus_voltage_04"  |"shunt_voltage_04" |"power_04" |"current_04" |
 
 
 ### Mode de fonctionnement du système
+
 |   mode     |varaible |      
 |------------|---------|
 | bservateur | "au_ob" |
@@ -172,6 +331,9 @@ E --> A
 |Consommation| "au_co" |
 |   Manuel   | "au_ma" |
 
-### Valeurs attendues 
 
-![This is an alt text.](./cara_charge.jpg "Valeurs attendues selon la fiche technique de la batterie.")
+### Lancer le projet :
+`docker compose build && docker compose up -d`
+
+### Url du projet:
+`http://"ip du raspberry pi"/flask`

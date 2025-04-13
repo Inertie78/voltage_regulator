@@ -1,5 +1,5 @@
 from prometheus_client import start_http_server
-from sensor import Sensor
+from dataBase.sensor import Sensor
 import logging, os
 
 # Pour les logs pour le debbugage
@@ -8,7 +8,7 @@ level = os.getenv("LOG_LEVEL", "INFO")
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
-class  Prometheus:
+class Prometheus:
     '''Classe por Créer  les capteurs pour la base de donnée prometheus'''
     def createSensors(self, dict_sensor, type, index):
         '''Créer de nouveaux capteurs en function d'un dictonaire d'un type de capteur et d'un index. 
