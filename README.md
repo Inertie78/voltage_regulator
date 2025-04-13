@@ -137,6 +137,7 @@ E --> A
 
 ### Structure du projet générale
 
+```
 └── regulateur_tension
     ├── .gitignore
     ├── cara_charge.jpg
@@ -200,9 +201,9 @@ E --> A
             ├── script_relay.js
             ├── socket.io.min.js
             └── style.css
-
+```
 ### Structure de l'onglet flask (server)
-
+```
 └── flask
     ├── dockerfile.flask
     ├── main.py
@@ -226,9 +227,11 @@ E --> A
         ├── script_relay.js
         ├── socket.io.min.js
         └── style.css
+```
 
 ### Structure l'onglet script
 
+```
 └── script
     ├── .dockerignore
     ├── data.py
@@ -252,7 +255,7 @@ E --> A
         ├── prometheus.py
         ├── sensor.py
         └── __init__.py
-
+```
     - data.py ==> variable de classe
     - main.py ==> script principal du projet. 
                     a) Récupère les valeurs du multimètre. 

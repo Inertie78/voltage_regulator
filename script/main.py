@@ -44,6 +44,10 @@ class Main(Data):
         last_update_multi = 0
 
         count = 0
+        
+        count_modes = 0
+
+        bool_modes = False
 
         while True:
             current_time = time.time()
@@ -66,6 +70,13 @@ class Main(Data):
                     Data.multi_dict_04 = Data.multimetre_04.get_dict()
 
                     count = 0
+
+                    count_modes += 1
+
+                    if (count_modes == 12):
+                        bool_modes = True
+                    else:
+                        bool_modes = False
 
                 last_update_multi = current_time
 

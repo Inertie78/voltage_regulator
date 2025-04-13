@@ -1,5 +1,10 @@
 from data import Data
 class Manuel(Data):
+     
+     def init():
+        # En construction
+        pass
+     
      def run(self) :
         '''Mode qui permet à l'utilisateur d'interagir avec les relais.'''
         Data.change_etat_relay_1.relayAction(self.relay_01, Data.dict_relay["rs_01"])
