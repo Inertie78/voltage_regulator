@@ -5,7 +5,6 @@ import json
 from data import Data
 from transmitting import Transmitting
 
-from modes.action import Action
 from modes.observer import Observer
 from modes.protect import Protect
 from modes.consomation import Consomation
@@ -27,7 +26,6 @@ logging.basicConfig(level=logging.DEBUG,
 class Main(Data):
     def __init__(self):
 
-        self.action = Action()
         self.mode_observer = Observer()
         self.mode_protect = Protect()
         self.mode_consomation = Consomation()
