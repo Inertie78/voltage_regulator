@@ -1,9 +1,7 @@
 from data import Data
 class Observer(Data):
 
-    def init():
-        # En construction
-        pass
+    
 
     def run(self) :
         ''' mode de fonctionnement qui n'intervient pas sur le fonctionnement normal de l'installation surveillée

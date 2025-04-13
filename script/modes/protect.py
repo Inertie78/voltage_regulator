@@ -1,10 +1,7 @@
 from data import Data
 class Protect(Data):
     
-    def init():
-        # En construction
-        pass
-
+    
     def run(self, observer) :
         '''mode de fonctionnement qui va mesurer la tension de la batterie et une fois que la batterie a atteint la tension de charge
         maximale, le système va couper la charge par le relais 2, jusqu'à ce que la tension passe en dessous de 0.2v de la tension maximale'''

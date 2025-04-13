@@ -2,9 +2,7 @@ from data import Data
 
 class Consomation(Data):
 
-    def init():
-        # En construction
-        pass
+    
 
     def run(self, observer) :
         '''mode de fonctionnement qui va simuler une coupure d'alimentation electrique afin de forcer la batterie a effectuer des cycles. '''

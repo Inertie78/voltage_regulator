@@ -31,7 +31,7 @@ Un Raspberry Pi 5 - 16 Gb de RAM été choisi comme contrôleur. Plusieurs acces
 - **V1** : connecté à la **batterie**, avec une résistence de 10 kOhm. Permet de mesurer la tension de la batterie.
 
 - **V2** : connecté au **circuit de charge**, afin de pouvoir récupérer les valeurs envoyées du chargeur vers la batterie
-- **V3** : connecté au circuit d'**alimentation des équipements** afin de  utilisés par les consommateurs. 
+- **V3** : connecté au circuit d'**alimentation des équipements** afin de récupérer les valeurs utilisées par les consommateurs. 
 
 ## Software (succinct)
 
@@ -52,12 +52,12 @@ Ces deux dernières instances constituent le tiers 3/3, soit la partie de stocka
 ## Modes de fonctionnement 
 
 *note : \
-relais ouvert = circuit électrique coupé* \
-*relais fermé = circuit électrique connecté*
+relais ouvert = circuit électrique coupé\
+relais fermé = circuit électrique connecté*
 
 Rpi5 = Raspberry Pi 5 et accessoires
 
-### **Observateur** (fonctionnement par défaut)
+### **Observeur** (mode par défaut)
 
 Le système se limite à effectuer des mesures lors du fonctionnement normal des objets. 
 
@@ -66,9 +66,9 @@ Le Rpi5 :
 - récolte 10 mesures de tension, de courant, de puissance 
 - une moyenne de ces valeurs est faite (pour limiter le risque d'erreur de mesure) et la transmet au serveur Prometheus
 
-### **Protection contre la surcharge**
+### **Protection contre la surcharge ou Protect**
 
-Le système mesure la tension de la batterie et lorsqu'elle atteint la tension de 12.9 V, ouvre le relais pour interrompre la charge.
+Le système mesure la tension de la batterie et lorsqu'elle atteint la tension de 12.8 V, ouvre le relais pour interrompre la charge.
 
 Le Rpi5 :
 - ferme le relais 1 et le relais 2
@@ -81,11 +81,11 @@ Lorsque la valeur moyenne des mesures dépasse 12.9 V
 - récolte 10 mesures de tension, de courant, de puissance et de température. 
 - effectue une moyenne de ces valeurs et la transmet au serveur Prometheus
 
-Lorsque la valeur moyenne des mesures est en dessous de 12.7 V 
+Lorsque la valeur moyenne des mesures est en dessous de 12.6 V 
 
 - ferme le relais 2 pour relancer la charge et reprend le processus de départ.
 
-### **Cycle de consommation**
+### **Cycle de consommation ou Conso**
 
 Le système coupe l'alimentation électrique principale forçant les équipements à se servir de l'alimentation de secours. La batterie est donc forcée d'effectuer un cycle partiel. Une fois déchargée à la tension voulue, le système reconnecte l'alimentation 230 V et recharge la batterie. Une fois la batterie atteignant la tension souhaitée, la charge sera interrompue par le relais.
 
@@ -100,7 +100,7 @@ Lorsque la valeur moyenne des mesures est en dessous de  12.4 V
 - récolte 10 mesures de tension, de courant, de puissance. 
 - effectue une moyenne de ces valeurs et la transmet au serveur Prometheus
 
-Lorsque la valeur moyenne des mesures dépasse 12.9 V 
+Lorsque la valeur moyenne des mesures dépasse 12.8 V 
 
 - ouvre le relais 2 pour stopper la charge 
 - récolte 10 mesures de tension, de courant, de puissance. 
@@ -180,15 +180,9 @@ E --> A
     │   └── nginx.conf
     ├── grafana
     │   ├── grafana.ini
-    │   ├── dashboards
-    │   │   └── Raspberry_pi.json
-    │   ├── data
-    │   │   └── grafana.db
-    │   └── provisioning
-    │       ├── dashboards
-    │       │   └── dashboards.yaml
-    │       └── datasources
-    │           └── datasource.yaml
+    │   └── dashboards
+    │       ├── dashboards.yaml
+    │       └── Raspberry_pi.json
     └── flask
         ├── dockerfile.flask
         ├── main.py
@@ -270,12 +264,12 @@ E --> A
 ### Informations complémentaires
 - **data.py** ==> variable de classe
 - **main.py** ==> script principal du projet. 
-                    a) Récupère les valeurs du multimètre. 
-                    b) Logique du contrôleur. 
-                    c) Envoie les valeurs à la base de donnée.
-- **transmitting.py**(Hérite de data.py) ==> Connection socket avec le server flask.
+    - Récupère les valeurs du multimètre. 
+    - Logique du contrôleur. 
+    - Envoie les valeurs à la base de donnée.
+- **transmitting.py** *(hérite de data.py)* ==> Connection socket avec le server flask.
 
-- **dossier raspberry** : c'est fichier non pas de dépendance avec data.py, pour les garder modulaire pour d'autre projet:
+- **dossier raspberry** : ces fichiers n'ont pas de dépendance avec data.py. De ce fait, ils sont modulaires pour d'autre projet:
     - **infoPc.py** ==> retrourne les infos du pc
     - **lineGpio.py** ==> pour intèragir avec les gpio de la Raspberry
     - **multimetre.py** ==> retourn en I2C les valeurs du module multimètre
@@ -283,17 +277,18 @@ E --> A
 
 - **dossier modes** :
     - **observer.py** *(hérite de data.py)* ==> Mode de fonctionnement par défaut de l'installation. Il se contente de collecter des informations
-    - **consomation.py** *(hérite de data.py)* ==> Mode de fonctionnement qui va simuler une coupure d'alimentation électrique, afin de forcer la batterie à effectuer des cycles.
-    - **manuel.py** *(hérite de data.py)* ==> Mode qui permet à l'utilisateur d'interagir avec les relais, via la page Web.
-        
+           
     - **protect.py** *(hérite de data.py)* ==> Mode de fonctionnement qui va mesurer la tension de la batterie et une fois que la batterie a atteint la tension de charge maximale, le système va couper la charge, jusqu'à ce que la tension passe en dessous de 0.2v de la tension maximale
+    - **consomation.py** *(hérite de data.py)* ==> Mode de fonctionnement qui va simuler une coupure d'alimentation électrique, afin de forcer la batterie à effectuer des cycles.
+
+    - **manuel.py** *(hérite de data.py)* ==> Mode qui permet à l'utilisateur d'interagir avec les relais, via la page Web.
 
 - **dossier dataBase** :
-    - **prometheus.py** ==> 
-    - **sensor.py** ==> Créer des capteur pour prometheus, ici nous utiliseront deux sortes de capteurs
+    - **prometheus.py** ==> Crée une une liste d'objets capteurs liés à sensor.py et démarre le serveur client Prometheus.
+    - **sensor.py** ==> Crée des capteur pour Prometheus, ici nous utiliseront deux sortes de capteurs
         - le capteur **gauge** qui accepte des variable float pour :  
             - les datas du multimètres 
-            - les info sur la Raspberry
+            - les infos sur la Raspberry
         - le capteur **enum** qui accepte des varibles string dans notre cas ```(['starting', 'stopped'])```, pour :
             - les états des relais 
             - le mode de fonctionnent du programme
@@ -340,6 +335,10 @@ E --> A
 
 ### Lancer le projet :
 `docker compose build && docker compose up -d`
+
+*Le projet est prévu pour tourner sur un Raspberry Pi 5.\
+Pour le lancer sur un Raspberry d'ancienne génération, il faut décommenter la ligne 18 du fichier script/requirements.txt pour activer l'installation de la librairie RPi.GPIO.\
+Il est impossible à faire fonctionner sur un appareil dépourvu de GPIO*
 
 ### Url du projet:
 `http://"ip du raspberry pi"/flask`
