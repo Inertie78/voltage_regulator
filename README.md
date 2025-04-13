@@ -180,9 +180,15 @@ E --> A
     │   └── nginx.conf
     ├── grafana
     │   ├── grafana.ini
-    │   └── dashboards
-    │       ├── dashboards.yaml
-    │       └── Raspberry_pi.json
+    │   ├── dashboards
+    │   │   └── Raspberry_pi.json
+    │   ├── data
+    │   │   └── grafana.db
+    │   └── provisioning
+    │       ├── dashboards
+    │       │   └── dashboards.yaml
+    │       └── datasources
+    │           └── datasource.yaml
     └── flask
         ├── dockerfile.flask
         ├── main.py
