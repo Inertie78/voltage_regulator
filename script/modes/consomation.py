@@ -39,6 +39,7 @@ class Consomation(Data):
                 message_conso = ("Mode Consommation est activé.")
 
             # ensuite deux possibilité, soit l'alimentation est coupée ou non
+            # soit on laisse se décharger la batterie jusqu'à la valeur voulue, soit on continue la charge jusqu'à une valeur maximum 
             if Data.counter_conso >= 2 :     
 
                 if Data.dict_relay['rs_01'] :
