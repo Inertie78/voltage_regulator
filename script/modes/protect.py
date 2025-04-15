@@ -5,7 +5,9 @@ class Protect(Data):
     def run(self, observer) :
         '''mode de fonctionnement qui va mesurer la tension de la batterie et une fois que la batterie a atteint la tension de charge
         maximale, le système va couper la charge par le relais 2, jusqu'à ce que la tension passe en dessous de 0.2v de la tension maximale'''
-        message_protect = None      
+        message_protect = None     
+        Data.counter_protect += 1
+        Data.counter_conso = 0 
 
         # vérifier que le relais R1 est fermé pour ne pas couper toute alimentation le cas échéant
         if self.dict_relay['rs_01'] :

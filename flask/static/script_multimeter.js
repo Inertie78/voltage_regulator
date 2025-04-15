@@ -50,8 +50,7 @@ function drawChart() {
     staticZones: [
       {strokeStyle: "#FF0000", min: 11, max: 11.9},
       {strokeStyle: "#FFDD00", min: 11.9, max: 12.4},
-      {strokeStyle: "#30B32D", min: 12.4, max: 12.8},
-      {strokeStyle: "#FF0000", min: 12.8, max: 14}
+      {strokeStyle: "#30B32D", min: 12.4, max: 14.0},
     ],
     // render ticks
     renderTicks: {

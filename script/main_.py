@@ -1,4 +1,3 @@
-
 import  os, time, logging
 import json
 
@@ -31,7 +30,7 @@ class Main(Data):
         self.mode_consomation = Consomation()
         self.mode_manuel = Manuel()
 
-        self.transmitting = Transmitting('http://flask:5000')
+        self.transmitting = Transmitting('http://192.168.1.202:5000')
 
         super().initData()
         
