@@ -1,7 +1,7 @@
 {
-	"ulid": "01JRVX6NXS5PC092RYQNNQED0N",
-	"minTime": 1744682459604,
-	"maxTime": 1744689600000,
+	"ulid": "01JRWAY4DSF3Q4S731PT4KAKVA",
+	"minTime": 1744696859604,
+	"maxTime": 1744704000000,
 	"stats": {
 		"numSamples": 600,
 		"numSeries": 5,
@@ -10,7 +10,7 @@
 	"compaction": {
 		"level": 1,
 		"sources": [
-			"01JRVX6NXS5PC092RYQNNQED0N"
+			"01JRWAY4DSF3Q4S731PT4KAKVA"
 		]
 	},
 	"version": 1

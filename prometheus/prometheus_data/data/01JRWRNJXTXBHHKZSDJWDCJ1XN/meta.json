@@ -1,7 +1,7 @@
 {
-	"ulid": "01JRW42D5SHRBVN4NRKZEBT0Y5",
-	"minTime": 1744689659604,
-	"maxTime": 1744696800000,
+	"ulid": "01JRWRNJXTXBHHKZSDJWDCJ1XN",
+	"minTime": 1744711259604,
+	"maxTime": 1744718400000,
 	"stats": {
 		"numSamples": 600,
 		"numSeries": 5,
@@ -10,7 +10,7 @@
 	"compaction": {
 		"level": 1,
 		"sources": [
-			"01JRW42D5SHRBVN4NRKZEBT0Y5"
+			"01JRWRNJXTXBHHKZSDJWDCJ1XN"
 		]
 	},
 	"version": 1

@@ -10,6 +10,9 @@ class Observer(Data):
     Les valeurs de tensions, de puissance et de consommation des différents composants surveillés sont collectées et 
     transmises au serveur Prometheus'''
         
+        Data.counter_protect = 0
+        Data.counter_conso = 0
+        
         # vérifie dans le dict_relay si le relais sont fermés, sinon il passe ses lignes
         if Data.dict_relay['rs_01'] or Data.dict_relay['rs_02'] or Data.dict_relay['rs_03'] or Data.dict_relay['rs_04']:
             Data.change_etat_relay_1.relayAction(Data.relay_01, False)
@@ -22,5 +25,4 @@ class Observer(Data):
             Data.dict_relay["rs_02"] = False
             Data.dict_relay["rs_03"] = False
             Data.dict_relay["rs_04"] = False
-            Data.counter_protect = 0
-            Data.counter_conso = 0
+          

@@ -30,7 +30,7 @@ class Main(Data):
         self.mode_consomation = Consomation()
         self.mode_manuel = Manuel()
 
-        self.transmitting = Transmitting('http://192.168.1.202:5000')
+        self.transmitting = Transmitting('http://flask:5000')
 
         super().initData()
         
@@ -78,13 +78,29 @@ class Main(Data):
 
             elif self.dict_relay["au_pr"] :
                 
-                message = self.mode_protect.run(self.mode_observer)
+                if Data.counter_protect == 0:
+                    message = self.mode_protect.run_first(self.mode_observer)
+
+                else : 
+                    if Data.dict_relay['rs_02'] :
+                        message = self.mode_protect.run_open(self.mode_observer)
+
+                    else:
+                        message = self.mode_protect.run_close()
                 
                 logging.info(f'Protect ==> {message}')
                 
             elif self.dict_relay["au_co"] :
-            
-                message = self.mode_consomation.run(self.mode_observer)
+
+                if Data.counter_conso == 0 :
+                    message = self.mode_consomation.run_first(self.mode_observer)
+                else :
+                    if Data.dict_relay['rs_01'] :
+                        message = self.mode_consomation.run_open()
+                        
+                    else:
+                        message = self.mode_consomation.run_close()
+        
                 
                 logging.info(f'Consomation ==> {message}')
 
