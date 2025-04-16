@@ -6,7 +6,7 @@ from transmitting import Transmitting
 
 from modes.observer import Observer
 from modes.protect import Protect
-from modes.consomation import Consomation
+from modes.consommation import Consommation
 from modes.manuel import Manuel
 
 format = "%(asctime)s %(levelname)s: %(message)s"
@@ -27,10 +27,10 @@ class Main(Data):
 
         self.mode_observer = Observer()
         self.mode_protect = Protect()
-        self.mode_consomation = Consomation()
+        self.mode_consommation = Consommation()
         self.mode_manuel = Manuel()
 
-        self.transmitting = Transmitting('http://flask:5000')
+        self.transmitting = Transmitting('http://192.168.1.202:5000')
 
         super().initData()
         
@@ -72,38 +72,76 @@ class Main(Data):
                 last_update_multi = current_time
 
             # Sélection du mode de fonctionnement 
-
+            # Contrôles du mode Observer
             if Data.dict_relay["au_ob"] :
                 self.mode_observer.run()
 
+
+            #Contrôles du mode Protect
             elif self.dict_relay["au_pr"] :
                 
+                #Si activation du mode Protect, on passe par une fonction de contrôle
                 if Data.counter_protect == 0:
                     message = self.mode_protect.run_first(self.mode_observer)
-
+                    
+                #Une fois de le mode Protect, on permet la prise de mesure et en fonction de la tension et de l'état du Relais R2
                 else : 
+                    self.mode_protect.run_open_relay2()
+                    #on attends sur la mise à jour du dictionnaire
+
                     if Data.dict_relay['rs_02'] :
+
+                        #On passe par les contrôles tant que le Relais 2 est ouvert
                         message = self.mode_protect.run_open(self.mode_observer)
 
-                    else:
-                        message = self.mode_protect.run_close()
+                    else :
+                        self.mode_protect.run_open_relay2()
+                        if bool_modes :
+                            self.mode_protect.run_close_relay2()
+                            #Ou par des contrôles tant que le Relais 2 est fermé
+                            message = self.mode_protect.run_close()
+                        else :
+                            continue
+
+                    
                 
                 logging.info(f'Protect ==> {message}')
-                
+            #Contrôles du mode Consommation    
             elif self.dict_relay["au_co"] :
 
+                #Si activation du mode Consommation, on passe par une fonction de contrôle
                 if Data.counter_conso == 0 :
-                    message = self.mode_consomation.run_first(self.mode_observer)
-                else :
+                    message = self.mode_consommation.run_first(self.mode_observer)
+                    self.mode_consommation.run_open_relay2()
+
+                    #on attends sur la mise à jour du dictionnaire
+                    if bool_modes:
+                        self.mode_consommation.run_close_relay2()
+                        message = self.mode_consommation.run_first_check_tension(self, self.mode_observer)
+                    else : 
+                        continue
+                    
+                #Une fois de le mode Consommation, on permet la prise de mesure et en fonction de la tension et de l'état du Relais R1
+                else:
+                    self.mode_consommation.run_close_relay2()
+                                        
                     if Data.dict_relay['rs_01'] :
-                        message = self.mode_consomation.run_open()
+                        message = self.mode_consommation.run_open()
                         
                     else:
-                        message = self.mode_consomation.run_close()
+                        self.mode_consommation.run_open_relay2()
+                        if bool_modes :
+                            self.mode_consommation.run_close_relay2()
+                            message = self.mode_consommation.run_close()
+
+                        else :
+                            continue
         
                 
-                logging.info(f'Consomation ==> {message}')
+                logging.info(f'Consommation ==> {message}')
 
+
+            #Contrôles du mode Manuel
             elif Data.dict_relay["au_ma"] :
                 
                 self.mode_manuel.run()

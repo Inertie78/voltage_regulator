@@ -19,7 +19,7 @@ class Protect(Data):
             # si le relais est coupé, alors on corrige le mode et on passe observer              
             Data.dict_relay['au_ob'] = True
             Data.dict_relay['au_pr'] = False
-            self.run_observer(Data.dict_relay)
+            observer.run()
             message_protect = "Mode de Protection non disponible, car il n'y a pas d'électricité (Relais 1 : Ouvert)"
 
         # si la tension des consommateurs est en dessous de la tension minimale de fonctionnement 
@@ -32,32 +32,30 @@ class Protect(Data):
             observer.run()
             message_protect = "Mode de Protection non disponible, car la prise n'est pas mise"
 
+    #fonction d'ouverture du relais R2 pour permettre à main la récolte de valeurs
+    def run_open_relay2(self) :
+
+        Data.change_etat_relay_2.relayAction(Data.relay_02, True)
+        Data.dict_relay['rs_02'] = True  
+    
+    #fonction de fermeture du relais R2 
+    def run_close_relay2(self) :
+
+        Data.change_etat_relay_2.relayAction(Data.relay_02, False)
+        Data.dict_relay['rs_02'] = False  
+            
+    #fonction d'analyse de la valeur récoltée
+    def run_check_tension(self) :        
+
+        if Data.multi_dict_01['psu_voltage'] < (Data.FULL_CHARGE_TENSION - 0.2) :
+                Data.change_etat_relay_2.relayAction(Data.relay_02, False)
+                Data.dict_relay["rs_02"] = False
+                message_protect = "Batterie en charge"
+                        
+                        
         else :
-
-            Data.change_etat_relay_2.relayAction(Data.relay_02, True)
-            Data.dict_relay['rs_02'] = True  
-            sleep(5)
-
-            while Protect.count < Data.LIMIT_COUNT:
-                Data.multimetre_01.add_value()
-                Protect.count += 1
-                    
-            Data.multi_dict_01 = Data.multimetre_01.get_dict()
-            Protect.count = 0   
-
-            Data.change_etat_relay_2.relayAction(Data.relay_02, False)
-            Data.dict_relay['rs_02'] = False 
-            sleep(5)   
-
-            if Data.multi_dict_01['psu_voltage'] < Data.FULL_CHARGE_TENSION :
-                    Data.change_etat_relay_2.relayAction(self.relay_02, False)
-                    Data.dict_relay["rs_02"] = False
-                    message_protect = "Batterie en charge"
-                        
-                        
-            else :
-                Data.dict_relay["rs_02"] = True
-                message_protect = "Batterie chargée"
+            Data.dict_relay["rs_02"] = True
+            message_protect = "Batterie chargée"
 
         return message_protect
     
@@ -83,7 +81,7 @@ class Protect(Data):
                 # on ne remet la charge que si la tension a baissé en 0.2V
         if Data.dict_relay['rs_02'] : 
             
-            if Data.multi_dict_01['psu_voltage'] >= Data.FULL_CHARGE_TENSION - 0.2 :
+            if Data.multi_dict_01['psu_voltage'] > (Data.FULL_CHARGE_TENSION - 0.2) :
                 Data.change_etat_relay_2.relayAction(Data.relay_02, True)
                 Data.dict_relay["rs_02"] = True
                 message_protect = "Batterie pleine"
@@ -96,21 +94,7 @@ class Protect(Data):
 
     def run_close(self) :  
 
-        Data.change_etat_relay_2.relayAction(Data.relay_02, True)
-        Data.dict_relay['rs_02'] = True  
-        sleep(5)
-
-        while Protect.count < Data.LIMIT_COUNT:
-            Data.multimetre_01.add_value()
-            Protect.count += 1
                 
-        Data.multi_dict_01 = Data.multimetre_01.get_dict()
-        Protect.count = 0   
-
-        Data.change_etat_relay_2.relayAction(Data.relay_02, False)
-        Data.dict_relay['rs_02'] = False 
-        sleep(5)   
-        
         if Data.multi_dict_01['psu_voltage'] <= Data.FULL_CHARGE_TENSION :
             Data.change_etat_relay_2.relayAction(Data.relay_02, False)
             Data.dict_relay["rs_02"] = False
