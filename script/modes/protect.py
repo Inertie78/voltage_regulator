@@ -32,17 +32,7 @@ class Protect(Data):
             observer.run()
             message_protect = "Mode de Protection non disponible, car la prise n'est pas mise"
 
-    #fonction d'ouverture du relais R2 pour permettre à main la récolte de valeurs
-    def run_open_relay2(self) :
-
-        Data.change_etat_relay_2.relayAction(Data.relay_02, True)
-        Data.dict_relay['rs_02'] = True  
     
-    #fonction de fermeture du relais R2 
-    def run_close_relay2(self) :
-
-        Data.change_etat_relay_2.relayAction(Data.relay_02, False)
-        Data.dict_relay['rs_02'] = False  
             
     #fonction d'analyse de la valeur récoltée
     def run_check_tension(self) :        
@@ -82,8 +72,6 @@ class Protect(Data):
         if Data.dict_relay['rs_02'] : 
             
             if Data.multi_dict_01['psu_voltage'] > (Data.FULL_CHARGE_TENSION - 0.2) :
-                Data.change_etat_relay_2.relayAction(Data.relay_02, True)
-                Data.dict_relay["rs_02"] = True
                 message_protect = "Batterie pleine"
             else :
                 Data.change_etat_relay_2.relayAction(Data.relay_02, False)
@@ -96,8 +84,6 @@ class Protect(Data):
 
                 
         if Data.multi_dict_01['psu_voltage'] <= Data.FULL_CHARGE_TENSION :
-            Data.change_etat_relay_2.relayAction(Data.relay_02, False)
-            Data.dict_relay["rs_02"] = False
             message_protect = "Batterie en charge"
         else :
             Data.change_etat_relay_2.relayAction(Data.relay_02, True)

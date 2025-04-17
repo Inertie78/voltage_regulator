@@ -8,6 +8,7 @@ from dataBase.prometheus import Prometheus
 class Data:
 
     TIME_UPDATE_PROM = 10
+    TIME_UPDATE_LOADING = 60
     TIME_UPDATE_MULTI = 0.1
     LIMIT_COUNT = 10
 
@@ -17,6 +18,7 @@ class Data:
 
     counter_protect = 0
     counter_conso = 0
+    load_timer = 600000
 
     prometheus = None
 
@@ -107,3 +109,15 @@ class Data:
         Data.sensors_multi_02 = Data.prometheus.createSensors(Data.multi_dict_02, 'gauge', 2)
         Data.sensors_multi_03 = Data.prometheus.createSensors(Data.multi_dict_03, 'gauge', 3)
         Data.sensors_multi_04 = Data.prometheus.createSensors(Data.multi_dict_04, 'gauge', 4)
+
+    #fonction d'ouverture du relais R2
+    def run_open_relay2(self) :
+
+        Data.change_etat_relay_2.relayAction(Data.relay_02, True)
+        Data.dict_relay['rs_02'] = True  
+
+    #fonction de fermeture du relais R2 
+    def run_close_relay2(self) :
+
+        Data.change_etat_relay_2.relayAction(Data.relay_02, False)
+        Data.dict_relay['rs_02'] = False  

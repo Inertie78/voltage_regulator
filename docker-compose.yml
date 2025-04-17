@@ -40,7 +40,7 @@ services :
 
       # Pour script pour les modes de fonctionnement
       - ./script/modes/__init__.py:/usr/src/app/modes/__init__.py:ro
-      - ./script/modes/consomation.py:/usr/src/app/modes/consomation.py:ro
+      - ./script/modes/consommation.py:/usr/src/app/modes/consommation.py:ro
       - ./script/modes/manuel.py:/usr/src/app/modes/manuel.py:ro
       - ./script/modes/observer.py:/usr/src/app/modes/observer.py:ro
       - ./script/modes/protect.py:/usr/src/app/modes/protect.py:ro

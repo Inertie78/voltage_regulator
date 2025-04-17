@@ -1,4 +1,4 @@
-import  os, time, logging
+import  os, logging, time
 import json
 
 from data import Data
@@ -44,6 +44,7 @@ class Main(Data):
 
         count = 0
         bool_modes = False
+        timer = 0
 
         while True:
             current_time = time.time()
@@ -83,57 +84,72 @@ class Main(Data):
                 #Si activation du mode Protect, on passe par une fonction de contrôle
                 if Data.counter_protect == 0:
                     message = self.mode_protect.run_first(self.mode_observer)
+                    Data.run_open_relay2(self)
+                    if bool_modes :
+                        Data.run_close_relay2(self)
+                        message = self.mode_protect.run_check_tension()
                     
                 #Une fois de le mode Protect, on permet la prise de mesure et en fonction de la tension et de l'état du Relais R2
                 else : 
-                    self.mode_protect.run_open_relay2()
-                    #on attends sur la mise à jour du dictionnaire
+                    
+                    if(current_time - last_update_multi > Data.TIME_UPDATE_LOADING or last_update_multi == 0):
+                        if Data.dict_relay['rs_02'] and timer == 0 :
 
-                    if Data.dict_relay['rs_02'] :
-
-                        #On passe par les contrôles tant que le Relais 2 est ouvert
-                        message = self.mode_protect.run_open(self.mode_observer)
+                            #On passe par les contrôles tant que le Relais 2 est ouvert
+                            message = self.mode_protect.run_open(self.mode_observer)
 
                     else :
-                        self.mode_protect.run_open_relay2()
-                        if bool_modes :
-                            self.mode_protect.run_close_relay2()
-                            #Ou par des contrôles tant que le Relais 2 est fermé
-                            message = self.mode_protect.run_close()
-                        else :
-                            continue
+                       
+                            Data.run_open_relay2(self)
+                            if bool_modes :
+                                Data.run_close_relay2(self)
+                                #Ou par des contrôles tant que le Relais 2 est fermé
+                                message = self.mode_protect.run_close()
+                                timer = 0
+                            else :
+                                continue
+                        
 
                     
                 
                 logging.info(f'Protect ==> {message}')
+
+
             #Contrôles du mode Consommation    
             elif self.dict_relay["au_co"] :
 
                 #Si activation du mode Consommation, on passe par une fonction de contrôle
                 if Data.counter_conso == 0 :
                     message = self.mode_consommation.run_first(self.mode_observer)
-                    self.mode_consommation.run_open_relay2()
+                    Data.run_open_relay2(self)
 
                     #on attends sur la mise à jour du dictionnaire
                     if bool_modes:
-                        self.mode_consommation.run_close_relay2()
+                        Data.run_close_relay2(self)
                         message = self.mode_consommation.run_first_check_tension(self, self.mode_observer)
                     else : 
                         continue
                     
                 #Une fois de le mode Consommation, on permet la prise de mesure et en fonction de la tension et de l'état du Relais R1
                 else:
-                    self.mode_consommation.run_close_relay2()
-                                        
+                   
+                                                        
                     if Data.dict_relay['rs_01'] :
                         message = self.mode_consommation.run_open()
                         
                     else:
-                        self.mode_consommation.run_open_relay2()
-                        if bool_modes :
-                            self.mode_consommation.run_close_relay2()
-                            message = self.mode_consommation.run_close()
+                         
+                        timer += 1
+                        if timer >= Data.load_timer :
 
+                            Data.run_open_relay2(self)
+                            if bool_modes :
+                                Data.run_close_relay2(self)
+                                message = self.mode_consommation.run_close()
+                                timer = 0
+
+                            else : 
+                                continue
                         else :
                             continue
         

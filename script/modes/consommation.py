@@ -19,17 +19,6 @@ class Consommation(Data):
             Data.dict_relay['rs_01'] = False
 
        
-    #fonction d'ouverture du relais R2 pour permettre à main la récolte de valeurs
-    def run_open_relay2(self) :
-
-        Data.change_etat_relay_2.relayAction(Data.relay_02, True)
-        Data.dict_relay['rs_02'] = True  
-
-    #fonction de fermeture du relais R2 
-    def run_close_relay2(self) :
-
-        Data.change_etat_relay_2.relayAction(Data.relay_02, False)
-        Data.dict_relay['rs_02'] = False  
 
     def run_first_check_tension(self, observer) :
         
@@ -57,8 +46,6 @@ class Consommation(Data):
         #on laisse se décharger la batterie jusqu'à la valeur voulue     
              
         if Data.multi_dict_01['psu_voltage'] >= Data.CYCLE_CHARGE_TENSION :
-            Data.change_etat_relay_1.relayAction(self.relay_01, True)
-            Data.dict_relay["rs_01"] = True
             message_conso = "Batterie suffisamment chargée, cycle en cours"
         else :
             Data.change_etat_relay_1.relayAction(self.relay_01, False)
@@ -77,8 +64,6 @@ class Consommation(Data):
     
         #soit on continue la charge jusqu'à une valeur maximum
         if Data.multi_dict_01['psu_voltage'] <= Data.FULL_CHARGE_TENSION :
-            Data.change_etat_relay_1.relayAction(self.relay_01, False)
-            Data.dict_relay["rs_01"] = False
             message_conso = "La batterie est en charge."
         else :
             Data.change_etat_relay_1.relayAction(self.relay_01, True)
