@@ -8,3 +8,4 @@ script/__pycache__/
 script/modes/__pycache__/
 script/raspberry/__pycache__/
 script/dataBase/__pycache__/
+prometheus/prometheus_data

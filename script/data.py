@@ -8,9 +8,11 @@ from dataBase.prometheus import Prometheus
 class Data:
 
     TIME_UPDATE_PROM = 10
-    TIME_UPDATE_LOADING = 60
+    TIME_UPDATE_LOADING = 10
     TIME_UPDATE_MULTI = 0.1
+    LAST_UPDATE_LOADING = 0
     LIMIT_COUNT = 10
+    IS_CHECKING_TENSION = False
 
     FULL_CHARGE_TENSION = 12.8
     CYCLE_CHARGE_TENSION = 12.4
@@ -18,7 +20,7 @@ class Data:
 
     counter_protect = 0
     counter_conso = 0
-    load_timer = 600000
+    
 
     prometheus = None
 

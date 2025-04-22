@@ -30,7 +30,7 @@ class Main(Data):
         self.mode_consommation = Consommation()
         self.mode_manuel = Manuel()
 
-        self.transmitting = Transmitting('http://192.168.1.202:5000')
+        self.transmitting = Transmitting('http://flask:5000')
 
         super().initData()
         
@@ -92,26 +92,35 @@ class Main(Data):
                 #Une fois de le mode Protect, on permet la prise de mesure et en fonction de la tension et de l'état du Relais R2
                 else : 
                     
-                    if(current_time - last_update_multi > Data.TIME_UPDATE_LOADING or last_update_multi == 0):
-                        if Data.dict_relay['rs_02'] and timer == 0 :
+                    if Data.dict_relay['rs_02'] and timer == 0 :
 
-                            #On passe par les contrôles tant que le Relais 2 est ouvert
-                            message = self.mode_protect.run_open(self.mode_observer)
+                        #On passe par les contrôles tant que le Relais 2 est ouvert
+                        message = self.mode_protect.run_open(self.mode_observer)
 
                     else :
-                       
-                            Data.run_open_relay2(self)
+
+                        if not Data.IS_CHECKING_TENSION :
+                            
+                            if(current_time - Data.LAST_UPDATE_LOADING > Data.TIME_UPDATE_LOADING or Data.LAST_UPDATE_LOADING == 0):
+                           
+                                Data.run_open_relay2(self)
+                                timer +=1
+                                Data.IS_CHECKING_TENSION = True
+                                Data.LAST_UPDATE_LOADING = current_time
+                                logging.info("Début contrôle de tension")
+
+                        else:
                             if bool_modes :
+                                logging.info("Les 10 mesures ont été effectuées.")
                                 Data.run_close_relay2(self)
                                 #Ou par des contrôles tant que le Relais 2 est fermé
                                 message = self.mode_protect.run_close()
+                                Data.IS_CHECKING_TENSION = False
                                 timer = 0
+                                
                             else :
                                 continue
-                        
-
-                    
-                
+                            
                 logging.info(f'Protect ==> {message}')
 
 
@@ -139,19 +148,24 @@ class Main(Data):
                         
                     else:
                          
-                        timer += 1
-                        if timer >= Data.load_timer :
+                        if not Data.IS_CHECKING_TENSION :
+                            if(current_time - Data.LAST_UPDATE_LOADING > Data.TIME_UPDATE_LOADING or Data.LAST_UPDATE_LOADING == 0):
+                                Data.run_open_relay2(self)
+                                Data.IS_CHECKING_TENSION = True
+                                Data.LAST_UPDATE_LOADING = current_time
+                                logging.info("Début contrôle de tension")
 
-                            Data.run_open_relay2(self)
+                        else : 
                             if bool_modes :
+                                logging.info("Les 10 mesures ont été effectuées.")
                                 Data.run_close_relay2(self)
                                 message = self.mode_consommation.run_close()
-                                timer = 0
+                                Data.IS_CHECKING_TENSION = False
+                                
 
                             else : 
                                 continue
-                        else :
-                            continue
+                        
         
                 
                 logging.info(f'Consommation ==> {message}')
