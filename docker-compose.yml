@@ -81,6 +81,8 @@ services :
       - ./prometheus/prometheus_data:/prometheus
     command:
       - '--config.file=/workspace/prometheus.yml'
+      - '--storage.tsdb.retention.size=20000MB'
+
 
   grafana:
     container_name: grafana
