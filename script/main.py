@@ -37,13 +37,21 @@ class Main(Data):
     
     # Function principale
     def run(self):
+        '''Fonction principale du script. Cette fonction gère le temps d'exécution des fonctions appelées, 
+        gère la récolte des tensions, la création de valeurs moyennes et la transmission de ces valeurs au 
+        serveur Prometheus. 
+        
+        Cette fonction gère également l'appel des modes et '''
 
         last_update_prom = 0
 
         last_update_multi = 0
 
+        last_update_loading = 0
+
         count = 0
         bool_modes = False
+        is_checking_tension = False
         timer = 0
 
         while True:
@@ -81,41 +89,47 @@ class Main(Data):
             #Contrôles du mode Protect
             elif self.dict_relay["au_pr"] :
                 
-                #Si activation du mode Protect, on passe par une fonction de contrôle
+                #Si activation du mode Protect, on passe par une série de contrôles
                 if Data.counter_protect == 0:
-                    message = self.mode_protect.run_first(self.mode_observer)
                     Data.run_open_relay2(self)
                     if bool_modes :
                         Data.run_close_relay2(self)
-                        message = self.mode_protect.run_check_tension()
-                    
-                #Une fois de le mode Protect, on permet la prise de mesure et en fonction de la tension et de l'état du Relais R2
+                        message = self.mode_protect.run_first(self.mode_observer) 
+
+                        if self.dict_relay["au_pr"]:
+                            message = self.mode_protect.run_check_tension()
+                    else : 
+                        continue
+                #Une fois dans le mode Protect, on permet la prise de mesure et en fonction de la tension et de l'état du Relais R2
                 else : 
                     
                     if Data.dict_relay['rs_02'] and timer == 0 :
 
                         #On passe par les contrôles tant que le Relais 2 est ouvert
                         message = self.mode_protect.run_open(self.mode_observer)
-
+                    
+                    #si le relais est fermé
                     else :
-
-                        if not Data.IS_CHECKING_TENSION :
+                        #si le script n'est pas en train de mettre à jour le dictionnaire de tension de la batterie
+                        #on gère à quelle fréquence on fait le contrôle de la tension
+                        if not is_checking_tension :
                             
-                            if(current_time - Data.LAST_UPDATE_LOADING > Data.TIME_UPDATE_LOADING or Data.LAST_UPDATE_LOADING == 0):
+                            if(current_time - last_update_loading > Data.TIME_UPDATE_LOADING or last_update_loading == 0):
                            
                                 Data.run_open_relay2(self)
                                 timer +=1
-                                Data.IS_CHECKING_TENSION = True
-                                Data.LAST_UPDATE_LOADING = current_time
+                                is_checking_tension = True
+                                last_update_loading = current_time
                                 logging.info("Début contrôle de tension")
-
+                        
+                        #si le script met à jour le dictionnaire on le laisse faire
                         else:
                             if bool_modes :
                                 logging.info("Les 10 mesures ont été effectuées.")
                                 Data.run_close_relay2(self)
                                 #Ou par des contrôles tant que le Relais 2 est fermé
                                 message = self.mode_protect.run_close()
-                                Data.IS_CHECKING_TENSION = False
+                                is_checking_tension = False
                                 timer = 0
                                 
                             else :
@@ -142,25 +156,28 @@ class Main(Data):
                 #Une fois de le mode Consommation, on permet la prise de mesure et en fonction de la tension et de l'état du Relais R1
                 else:
                    
-                                                        
+                    #si l'alimentation est coupée on passe par la fonction qui fait les contrôles alimentation coupée                                    
                     if Data.dict_relay['rs_01'] :
                         message = self.mode_consommation.run_open()
-                        
+
+                    #sinon on passe par des fonctions qui vérifie tous les x secondes l'état de la tension de la batterie    
                     else:
+                        #permet d'éviter d'être freiné lors de la mise à jour du dictionnaire pour la mesure de tension
                          
-                        if not Data.IS_CHECKING_TENSION :
-                            if(current_time - Data.LAST_UPDATE_LOADING > Data.TIME_UPDATE_LOADING or Data.LAST_UPDATE_LOADING == 0):
+                        if not is_checking_tension :
+                            if(current_time - last_update_loading > Data.TIME_UPDATE_LOADING or last_update_loading == 0):
                                 Data.run_open_relay2(self)
-                                Data.IS_CHECKING_TENSION = True
-                                Data.LAST_UPDATE_LOADING = current_time
+                                is_checking_tension = True
+                                last_update_loading = current_time
                                 logging.info("Début contrôle de tension")
 
+                        #permet de boucler pour récupérer la valeur moyenne des tensions de la batterie
                         else : 
                             if bool_modes :
                                 logging.info("Les 10 mesures ont été effectuées.")
                                 Data.run_close_relay2(self)
                                 message = self.mode_consommation.run_close()
-                                Data.IS_CHECKING_TENSION = False
+                                is_checking_tension = False
                                 
 
                             else : 
