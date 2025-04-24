@@ -22,6 +22,8 @@ class Consommation(Data):
 
     def run_first_check_tension(self, observer) :
         
+        #Data.prometheus.set_sensors(Data.sensors_multi_01, Data.multi_dict_01, 1)
+
         if Data.multi_dict_01['psu_voltage'] < Data.MIN_CHARGE_TENSION :
             Data.change_etat_relay_2.relayAction(Data.relay_02, False)
             Data.dict_relay['rs_02'] = False
@@ -59,7 +61,7 @@ class Consommation(Data):
 
         Data.counter_protect = 0
         Data.counter_conso += 1
-           
+        #Data.prometheus.set_sensors(Data.sensors_multi_01, Data.multi_dict_01, 1)   
         
     
         #soit on continue la charge jusqu'à une valeur maximum

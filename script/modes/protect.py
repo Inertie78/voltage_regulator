@@ -35,8 +35,9 @@ class Protect(Data):
     
             
     #fonction d'analyse de la valeur récoltée
-    def run_check_tension(self) :        
+    def run_check_tension(self) :  
 
+        #Data.prometheus.set_sensors(Data.sensors_multi_01, Data.multi_dict_01, 1)
         if Data.multi_dict_01['psu_voltage'] < (Data.FULL_CHARGE_TENSION - 0.2) :
                 Data.change_etat_relay_2.relayAction(Data.relay_02, False)
                 Data.dict_relay["rs_02"] = False
@@ -82,6 +83,7 @@ class Protect(Data):
 
     def run_close(self) :  
 
+        #Data.prometheus.set_sensors(Data.sensors_multi_01, Data.multi_dict_01, 1)
                 
         if Data.multi_dict_01['psu_voltage'] <= Data.FULL_CHARGE_TENSION :
             message_protect = "Batterie en charge"
