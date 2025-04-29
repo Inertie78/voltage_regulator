@@ -8,7 +8,6 @@ import logging
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-global menuDict
 menuDict = {'prom':'', 'graf':'', 'rela':'', 'multi':'', 'multi':'','abou':''}
 
 ################################################# Fonction #################################################
@@ -32,7 +31,6 @@ def changeMenu(name):
         menuDict[key] = ''
     
     menuDict[name] = 'active'
-
 
 ################################################# route soketio #################################################
 @socketio.on('message')

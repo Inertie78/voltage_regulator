@@ -90,12 +90,10 @@ services :
     restart: always
     ports:
       - "3000:3000"
-    user: root
+
     volumes:
       - ./grafana/provisioning:/etc/grafana/provisioning
       - ./grafana/dashboards:/var/lib/grafana/dashboards
-
-      - ./grafana/data:/var/lib/grafana
       - ./grafana/grafana.ini:/etc/grafana/grafana.ini
 
     depends_on:
@@ -106,7 +104,6 @@ services :
       GF_AUTH_DISABLE_LOGIN_FORM: "true"
       
       GF_PATHS_PROVISIONING: "/etc/grafana/provisioning"
-      GF_PATHS_DATA: "/var/lib/grafana"
 
 volumes :
   prometheus :

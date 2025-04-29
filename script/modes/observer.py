@@ -15,10 +15,6 @@ class Observer(Data):
         
         # vérifie dans le dict_relay si le relais sont fermés, sinon il passe ses lignes
         if Data.dict_relay['rs_01'] or Data.dict_relay['rs_02'] or Data.dict_relay['rs_03'] or Data.dict_relay['rs_04']:
-            Data.change_etat_relay_1.relayAction(Data.relay_01, False)
-            Data.change_etat_relay_2.relayAction(Data.relay_02, False)
-            Data.change_etat_relay_3.relayAction(Data.relay_03, False)
-            Data.change_etat_relay_4.relayAction(Data.relay_04, False)
 
             #corrige le dict relay avec le nouvel état des relais
             Data.dict_relay["rs_01"] = False

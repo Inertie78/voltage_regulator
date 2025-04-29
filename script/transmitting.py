@@ -12,12 +12,12 @@ class Transmitting(Data):
         # Connection au server falsk
         try:
             # Inisialize une communication client
-            self.socketio = socketio.Client(logger=True, engineio_logger=True)
+            self.socketio = socketio.Client(logger=False, engineio_logger=False)
             self.socketio.connect(url, wait_timeout = 10, transports=['websocket'])
             logging.info("Socket established")
             self.call_backs()
         except ConnectionError as e:
-            logging.info('Connection error: {e}')
+            logging.info(f'Connection error: {e}')
 
      # Retour du server flask et envoie des message au server flask
     def call_backs(self):
@@ -50,16 +50,22 @@ class Transmitting(Data):
                             logging.info(f'Dict ==> {key}:{Data.dict_relay[key]}')
             # Mise à jour de l'état des relais
             elif (datareceived == 'up_relay'):
-                data_string = json.dumps(self.dict_relay)
+                data_string = json.dumps(Data.dict_relay)
                 self.socketio.send(data_string)
             # Mise à jour des valeurs du multimètre
             elif (datareceived == 'up_bat'):
                 multimetre_list = {}
-                for key in self.multi_dict_01.keys():
+                for key in Data.multi_dict_01.keys():
                     multimetre_list[f'bat_{key}_01'] = Data.multi_dict_01[key]
                     multimetre_list[f'bat_{key}_02'] = Data.multi_dict_02[key]
                     multimetre_list[f'bat_{key}_03'] = Data.multi_dict_03[key]
                     multimetre_list[f'bat_{key}_04'] = Data.multi_dict_04[key]
+                    if(key == 'bus_voltage'):
+                        logging.info(f'Multimetre ==> bat_{key}_01 = {Data.multi_dict_01[key]}')
+                        logging.info(f'Multimetre ==> bat_{key}_02 = {Data.multi_dict_02[key]}')
+                        logging.info(f'Multimetre ==> bat_{key}_03 = {Data.multi_dict_03[key]}')
+                        logging.info(f'Multimetre ==> bat_{key}_04 = {Data.multi_dict_04[key]}')
+
                 data_string = json.dumps(multimetre_list)
-                logging.info(f'Multimetre ==> {multimetre_list}')
+                #logging.info(f'Multimetre ==> {multimetre_list}')
                 self.socketio.send(data_string)

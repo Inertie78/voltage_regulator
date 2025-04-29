@@ -1,5 +1,5 @@
 from prometheus_client import start_http_server
-from dataBase.sensor import Sensor
+import dataBase
 import logging, os
 
 # Pour les logs pour le debbugage
@@ -17,7 +17,7 @@ class Prometheus:
         sensors = []
         for name in dict_sensor:
             try: 
-                sensor = Sensor(name, type, index)
+                sensor = dataBase.Sensor(name, type, index)
                 sensors.append(sensor)
             except Exception as e:
                 logging.error(f"Une erreur c'est produit quand nous avons essayer de crée le capteur pour prometheus: {e}")

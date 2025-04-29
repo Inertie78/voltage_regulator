@@ -9,7 +9,7 @@ class MetaIterable(type):
         dct['add_to_list'] = lambda self, key, value: self.data.setdefault(key, []).append(value) if not key in self.data.keys() else \
             self.data.setdefault(key, []).append(value) if len(self.data[key]) < self.limit else (self.data[key].pop(0), self.data.setdefault(key, []).append(value))
         return super().__new__(cls, name, bases, dct)
-        return super().__new__(cls, name, bases, dct)
+
 
 # Pour l'apprentissage méthode retourné par une IA
 # Methode qui additionne les valeurs d'une liste

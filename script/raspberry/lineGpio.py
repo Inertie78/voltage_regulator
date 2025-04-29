@@ -12,6 +12,7 @@ class LineGpio :
             un numéro de pin ==> int)
         '''
         self.pin = pin
+        self.name = name
         self.gpio_line = gpiod.request_lines(
             LineGpio.CHIP,
             consumer=name,
@@ -21,6 +22,12 @@ class LineGpio :
                     )
                 }
         )
+
+    def get_pin(self):
+        return self.pin
+    
+    def get_name(self):
+        return self.name
 
     def activate(self) :
        '''Active le pin'''

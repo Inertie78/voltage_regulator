@@ -11,21 +11,19 @@ class Consommation(Data):
         Data.counter_protect = 0
         Data.counter_conso += 1     
         
-        
-
         # Si le relais R1 est ouvert, alors on le ferme pour ne pas couper toute alimentation et coupe le R2  
         if Data.dict_relay['rs_01'] :
-            Data.change_etat_relay_1.relayAction(Data.relay_01, False)
             Data.dict_relay['rs_01'] = False
-
-       
+        
+        Data.dict_relay['rs_02'] = True
 
     def run_first_check_tension(self, observer) :
+
+        Data.dict_relay['rs_02'] = False
         
-        #Data.prometheus.set_sensors(Data.sensors_multi_01, Data.multi_dict_01, 1)
+        Data.prometheus.set_sensors(Data.sensors_multi_01, Data.multi_dict_01, 1)
 
         if Data.multi_dict_01['psu_voltage'] < Data.MIN_CHARGE_TENSION :
-            Data.change_etat_relay_2.relayAction(Data.relay_02, False)
             Data.dict_relay['rs_02'] = False
             Data.dict_relay['au_ob'] = True
             Data.dict_relay['au_co'] = False
@@ -33,7 +31,6 @@ class Consommation(Data):
             message_conso = ("La batterie n'a pas assez de tension, Mode Observateur activé.")  
 
         else:
-            Data.change_etat_relay_2.relayAction(Data.relay_02, False)
             Data.dict_relay['rs_02'] = False
             message_conso = ("Mode Consommation est activé.")
 
@@ -50,7 +47,6 @@ class Consommation(Data):
         if Data.multi_dict_01['psu_voltage'] >= Data.CYCLE_CHARGE_TENSION :
             message_conso = "Batterie suffisamment chargée, cycle en cours"
         else :
-            Data.change_etat_relay_1.relayAction(self.relay_01, False)
             Data.dict_relay["rs_01"] = False
             message_conso = "La batterie a atteint la tension minimum voulue, recharge en cours."
         
@@ -59,16 +55,17 @@ class Consommation(Data):
                                         
     def run_close(self) :
 
+        Data.dict_relay['rs_02'] = False
+
         Data.counter_protect = 0
         Data.counter_conso += 1
-        #Data.prometheus.set_sensors(Data.sensors_multi_01, Data.multi_dict_01, 1)   
+        Data.prometheus.set_sensors(Data.sensors_multi_01, Data.multi_dict_01, 1)   
         
     
         #soit on continue la charge jusqu'à une valeur maximum
         if Data.multi_dict_01['psu_voltage'] <= Data.FULL_CHARGE_TENSION :
             message_conso = "La batterie est en charge."
         else :
-            Data.change_etat_relay_1.relayAction(self.relay_01, True)
             Data.dict_relay["rs_01"] = True
             message_conso = "La batterie est suffisamment chargée, charge stoppée"
 

@@ -1,6 +1,4 @@
 from data import Data
-from time import sleep
-
 
 class Protect(Data):
     
@@ -9,6 +7,9 @@ class Protect(Data):
     def run_first(self, observer) :
         '''mode de fonctionnement qui va mesurer la tension de la batterie et une fois que la batterie a atteint la tension de charge
         maximale, le système va couper la charge par le relais 2, jusqu'à ce que la tension passe en dessous de 0.2v de la tension maximale'''
+
+        Data.dict_relay['rs_02'] = False
+        
         message_protect = None     
         Data.counter_protect += 1
         Data.counter_conso = 0 
@@ -25,24 +26,19 @@ class Protect(Data):
         # si la tension des consommateurs est en dessous de la tension minimale de fonctionnement 
         # potentiellement il n'y pas de courant, alors on ferme le circuit pour éviter de tout perdre.
         if Data.multi_dict_03['psu_voltage'] <= Data.MIN_CHARGE_TENSION :
-            Data.change_etat_relay_2.relayAction(Data.relay_02, False)
             Data.dict_relay["rs_02"] = False
             Data.dict_relay['au_ob'] = True
             Data.dict_relay['au_pr'] = False
             observer.run()
             message_protect = "Mode de Protection non disponible, car la prise n'est pas mise"
-
-    
-            
+ 
     #fonction d'analyse de la valeur récoltée
     def run_check_tension(self) :  
 
         #Data.prometheus.set_sensors(Data.sensors_multi_01, Data.multi_dict_01, 1)
         if Data.multi_dict_01['psu_voltage'] < (Data.FULL_CHARGE_TENSION - 0.2) :
-                Data.change_etat_relay_2.relayAction(Data.relay_02, False)
                 Data.dict_relay["rs_02"] = False
                 message_protect = "Batterie en charge"
-                        
                         
         else :
             Data.dict_relay["rs_02"] = True
@@ -61,7 +57,6 @@ class Protect(Data):
         # on est déjà dans le mode Protect, on vérifie encore une fois que les consommateurs ont assez d'énergie
         # si ce n'est pas le cas, on peut supposer qu'une coupure de courant a lieu, alors on passe en mode Observer
         if Data.multi_dict_03['psu_voltage'] <= Data.MIN_CHARGE_TENSION :
-            Data.change_etat_relay_2.relayAction(Data.relay_02, False)
             Data.dict_relay["rs_02"] = False
             Data.dict_relay['au_ob'] = True
             Data.dict_relay['au_pr'] = False
@@ -75,7 +70,6 @@ class Protect(Data):
             if Data.multi_dict_01['psu_voltage'] > (Data.FULL_CHARGE_TENSION - 0.2) :
                 message_protect = "Batterie pleine"
             else :
-                Data.change_etat_relay_2.relayAction(Data.relay_02, False)
                 Data.dict_relay["rs_02"] = False
                 message_protect = "Batterie en charge"
 
@@ -83,12 +77,13 @@ class Protect(Data):
 
     def run_close(self) :  
 
-        #Data.prometheus.set_sensors(Data.sensors_multi_01, Data.multi_dict_01, 1)
-                
+        Data.dict_relay['rs_02'] = False
+
+        Data.prometheus.set_sensors(Data.sensors_multi_01, Data.multi_dict_01, 1)
+
         if Data.multi_dict_01['psu_voltage'] <= Data.FULL_CHARGE_TENSION :
             message_protect = "Batterie en charge"
         else :
-            Data.change_etat_relay_2.relayAction(Data.relay_02, True)
             Data.dict_relay["rs_02"] = True
             message_protect = "Batterie pleine" 
 
