@@ -42,6 +42,29 @@ def handle_message(msg):
 # Affiche la page web home
 @app.route("/")
 def index():
+    # Retourne une variable pour l'url du soket à la page htm pour le retour des informations
+    socketio_ip =  get_url("5000")
+
+    #Pour changer ajouter le mode active du menu sur multimètre et enlèver sur les autres items du menu.
+    changeMenu('multi')
+
+    return render_template('multimeter.html', _socketio_ip=socketio_ip, _menuDict=menuDict)
+
+# Affiche la page web des relaies
+@app.route("/relay")
+def relay():
+    # Retourne une variable pour l'url du soket à la page htm pour le retour des informations
+    socketio_ip =  get_url("5000")
+
+    #Pour changer ajouter le mode active du menu sur GPIO et enlèver sur les autres items du menu.
+    changeMenu('rela')
+
+    return render_template('relay.html', _socketio_ip=socketio_ip, _menuDict=menuDict)
+
+# Affiche la page web des settings des batteries
+@app.route("/prometheuse")
+def prometheuse():
+
     # Retourne une variable pour l'url de prometheus à la page htm pour l'afficher
     prometheuse_ip =  get_url("9090")
 
@@ -61,28 +84,6 @@ def grafana():
 
     return render_template('grafana.html', _grafana_ip=grafana_ip, _menuDict=menuDict)
 
-# Affiche la page web des relaies
-@app.route("/relay")
-def relay():
-    # Retourne une variable pour l'url du soket à la page htm pour le retour des informations
-    socketio_ip =  get_url("5000")
-
-    #Pour changer ajouter le mode active du menu sur GPIO et enlèver sur les autres items du menu.
-    changeMenu('rela')
-
-    return render_template('relay.html', _socketio_ip=socketio_ip, _menuDict=menuDict)
-
-
-# Affiche la page web des settings des batteries
-@app.route("/multimeter")
-def multimeter():
-    # Retourne une variable pour l'url du soket à la page htm pour le retour des informations
-    socketio_ip =  get_url("5000")
-
-    #Pour changer ajouter le mode active du menu sur multimètre et enlèver sur les autres items du menu.
-    changeMenu('multi')
-
-    return render_template('multimeter.html', _socketio_ip=socketio_ip, _menuDict=menuDict)
 
 # Affiche la page web sur les infos de la raspberry pi
 @app.route("/about")

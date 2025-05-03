@@ -25,6 +25,7 @@ services :
       - ./script/main.py:/usr/src/app/main.py:ro
       - ./script/data.py:/usr/src/app/data.py:ro
       - ./script/transmitting.py:/usr/src/app/transmitting.py:ro
+      - ./script/mode.py:/usr/src/app/mode.py:ro
 
       # Pour script pour la raspberry pi
       - ./script/raspberry/__init__.py:/usr/src/app/raspberry/__init__.py:ro
@@ -38,13 +39,6 @@ services :
       - ./script/dataBase/sensor.py:/usr/src/app/dataBase/sensor.py:ro
       - ./script/dataBase/prometheus.py:/usr/src/app/dataBase/prometheus.py:ro
 
-      # Pour script pour les modes de fonctionnement
-      - ./script/modes/__init__.py:/usr/src/app/modes/__init__.py:ro
-      - ./script/modes/consommation.py:/usr/src/app/modes/consommation.py:ro
-      - ./script/modes/manuel.py:/usr/src/app/modes/manuel.py:ro
-      - ./script/modes/observer.py:/usr/src/app/modes/observer.py:ro
-      - ./script/modes/protect.py:/usr/src/app/modes/protect.py:ro
-      
       # pour les gpio sur la raspberry p
       - /dev/gpiochip0:/dev/gpiochip0:ro
       

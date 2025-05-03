@@ -56,7 +56,7 @@ class Multimetre() :
         self.iterable_dict = IterableDict(self.limit)
 
     def add_value(self):
-        '''Add les valeurs dans aux listes glissante du dictionnaire.'''
+        '''Add les valeurs aux listes glissante du dictionnaire.'''
         if (not self.ina == None):
             self.iterable_dict.add_to_list('psu_voltage', abs((self.ina.bus_voltage + self.ina.shunt_voltage)))
             self.iterable_dict.add_to_list('bus_voltage', abs(self.ina.bus_voltage))
@@ -71,6 +71,9 @@ class Multimetre() :
             self.iterable_dict.add_to_list('shunt_voltage', self.number)
             self.iterable_dict.add_to_list('current', self.number)
             self.iterable_dict.add_to_list('power', self.number)
+
+    def get_psu_voltage(self):
+        return abs((self.ina.bus_voltage + self.ina.shunt_voltage))
 
     def get_dict(self):
         '''Itération sur les éléments du dictionnaire pour faire la moyenne des éléments et retouner les moyennes dans nouveau dictionnaire'''

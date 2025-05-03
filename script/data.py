@@ -5,22 +5,33 @@ from dataBase.prometheus import Prometheus
 class Data:
 
     TIME_UPDATE_PROM = 10
-    TIME_UPDATE_LOADING = 10
     TIME_UPDATE_MULTI = 0.1
-    LAST_UPDATE_LOADING = 0
+
     LIMIT_COUNT = 10
 
-    FULL_CHARGE_TENSION = 12.8
-    CYCLE_CHARGE_TENSION = 12.4
-    MIN_CHARGE_TENSION = 11.9
-    LOADING_TENSION = 14
+    # Valeur reel du systeme
+    MAX_BATTERY_TENSION = 12.8
+    MIN_BATTERY_TENSION = 12
+    MIN_GENERATOR_TENSION = 13.5
+    
+    MIN_PROTEC_TENSION = 12.6
+    MIN_CONSO_TENSION = 12.4
+    
+    # Valeur pour test
+    #MAX_BATTERY_TENSION = 9
+    #MIN_BATTERY_TENSION = 8
+    #MIN_GENERATOR_TENSION = 10
+    
+    #MIN_PROTEC_TENSION = 8.8
+    #MIN_CONSO_TENSION = 8.6
 
-    counter_protect = 0
-    counter_conso = 0
+    bool_mode = False
 
     prometheus = None
 
     info_pc = None
+
+    message = None
 
     # Initialise les relais. Décommenter les lignes au besoin
     relay_01 = None
@@ -59,9 +70,9 @@ class Data:
     sensors_multi_04 = None
 
     # Pour initialisé le programme en mode observation
-    dict_relay = {'au_ob':True, 'au_pr':False, 'au_co':False, 'au_ma':False, 'rs_01':False, 'rs_02':False, 'rs_03':False, 'rs_04':False}
+    dict_relay = {'au_ob':True, 'au_pr':False, 'au_co':False, 'au_ma':False, 'rs_01':True, 'rs_02':True, 'rs_03':True, 'rs_04':False}
 
-    dict_last_relay = {'rs_01':False, 'rs_02':False, 'rs_03':False, 'rs_04':False}
+    dict_last_relay = {'rs_01':True, 'rs_02':True, 'rs_03':True, 'rs_04':False}
 
     def initData(self):
 

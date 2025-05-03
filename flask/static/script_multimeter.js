@@ -163,6 +163,22 @@ function drawChart() {
           $("#psu_voltage_04").text( voltage + " V");
           $("#current_04").text( current + " A");
           $("#power_04").text( power + " W");
+
+          if(myObj["au_ob"] === true){
+            $("#selectMode").text('Observateur')
+          }else if(myObj["au_pr"] === true){
+            $("#selectMode").text('Protection')
+          }else if(myObj["au_co"] === true){
+            $("#selectMode").text('Consomation')
+          }else if(myObj["au_ma"] === true){
+            $("#selectMode").text('Manuel')
+          }
+
+          if(myObj["message"] === null){
+            $("#etatSyteme").text('Normal')
+          }else{
+            $("#etatSyteme").text(myObj["message"])
+          }
         }
       }
     });

@@ -38,7 +38,7 @@ class Transmitting(Data):
                 Data.info_pc.infoPc()
                 dict_sensor = Data.info_pc.get_dict()
                 data_string = json.dumps(dict_sensor)
-                logging.info(f'Info pc ==> {dict_sensor}')
+                #logging.info(f'Info pc ==> {dict_sensor}')
                 self.socketio.send(data_string)
             # Si les relais change d'état
             elif ('rs_0' in datareceived or 'au_' in datareceived ):
@@ -47,10 +47,12 @@ class Transmitting(Data):
                     for key in json_object.keys():
                         if key in Data.dict_relay:
                             Data.dict_relay[key] = json_object[key]
-                            logging.info(f'Dict ==> {key}:{Data.dict_relay[key]}')
+                           #logging.info(f'Dict ==> {key}:{Data.dict_relay[key]}')
             # Mise à jour de l'état des relais
             elif (datareceived == 'up_relay'):
-                data_string = json.dumps(Data.dict_relay)
+                relay_list = Data.dict_relay.copy()
+                relay_list.update({'message': Data.message})
+                data_string = json.dumps(relay_list)
                 self.socketio.send(data_string)
             # Mise à jour des valeurs du multimètre
             elif (datareceived == 'up_bat'):
@@ -60,11 +62,14 @@ class Transmitting(Data):
                     multimetre_list[f'bat_{key}_02'] = Data.multi_dict_02[key]
                     multimetre_list[f'bat_{key}_03'] = Data.multi_dict_03[key]
                     multimetre_list[f'bat_{key}_04'] = Data.multi_dict_04[key]
-                    if(key == 'bus_voltage'):
-                        logging.info(f'Multimetre ==> bat_{key}_01 = {Data.multi_dict_01[key]}')
-                        logging.info(f'Multimetre ==> bat_{key}_02 = {Data.multi_dict_02[key]}')
-                        logging.info(f'Multimetre ==> bat_{key}_03 = {Data.multi_dict_03[key]}')
-                        logging.info(f'Multimetre ==> bat_{key}_04 = {Data.multi_dict_04[key]}')
+                    #if(key == 'bus_voltage'):
+                        #logging.info(f'Multimetre ==> bat_{key}_01 = {Data.multi_dict_01[key]}')
+                        #logging.info(f'Multimetre ==> bat_{key}_02 = {Data.multi_dict_02[key]}')
+                        #logging.info(f'Multimetre ==> bat_{key}_03 = {Data.multi_dict_03[key]}')
+                        #logging.info(f'Multimetre ==> bat_{key}_04 = {Data.multi_dict_04[key]}')
+                    
+                    multimetre_list.update({'message':Data.message, 'au_ob':Data.dict_relay['au_ob'], 'au_pr':Data.dict_relay['au_pr'],\
+                                            'au_co':Data.dict_relay['au_co'], 'au_ma':Data.dict_relay['au_ma']})
 
                 data_string = json.dumps(multimetre_list)
                 #logging.info(f'Multimetre ==> {multimetre_list}')
