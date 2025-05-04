@@ -21,7 +21,7 @@ class Main(Data):
         super().initData()
         self.mode = Mode()
 
-        self.transmitting = Transmitting('http://192.168.50.108:5000')
+        self.transmitting = Transmitting('http://flask:5000')
 
     # Function principale
     def run(self):
