@@ -123,12 +123,7 @@ function updatePage() {
             }
             
           }
-          if(myObj["message"] === null){
-            $("#etatSyteme").text('Normal')
-          }else{
-            $("#etatSyteme").text(myObj["message"])
-          }
-          
+          $("#etatSyteme").text(myObj["message"])
         }
       }
     });

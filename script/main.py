@@ -21,7 +21,7 @@ class Main(Data):
         super().initData()
         self.mode = Mode()
 
-        self.transmitting = Transmitting('http://flask:5000')
+        self.transmitting = Transmitting('http://192.168.50.108:5000')
 
     # Function principale
     def run(self):
@@ -113,6 +113,8 @@ class Main(Data):
 
             if(bool_count):
                 Data.message = message
+                if (message == None):
+                    Data.message = 'En fonction'
 
                 if (not message == None):
                     logging.info(f'Etat systeme ==> {message}')
@@ -145,7 +147,7 @@ class Main(Data):
                 Data.prometheus.set_sensors(Data.sensors_pc, Data.info_pc.get_dict(), 0)
 
                 # Envoie le nouvelle état des relaies et des boutons utilisateur (automatique ou manuel) à prometheus
-                Data.prometheus.set_sensors(Data.sensors_relay, Data.dict_relay, 0)
+                Data.prometheus.set_sensors(Data.sensors_relay, Data.dict_relay, -1)
 
                 # Envoie les nouvelles état des batteries à prometheus
                 Data.prometheus.set_sensors(Data.sensors_multi_01, Data.multi_dict_01, 1)

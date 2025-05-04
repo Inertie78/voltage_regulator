@@ -173,12 +173,7 @@ function drawChart() {
           }else if(myObj["au_ma"] === true){
             $("#selectMode").text('Manuel')
           }
-
-          if(myObj["message"] === null){
-            $("#etatSyteme").text('Normal')
-          }else{
-            $("#etatSyteme").text(myObj["message"])
-          }
+          $("#etatSyteme").text(myObj["message"])
         }
       }
     });

@@ -44,7 +44,6 @@ class Prometheus:
                         if (not type(value) == type('str')):
                             sensor_type = sensor.get_type()
                             if(sensor_type == 'enum'):
-                                data = ''
                                 if(value == True):
                                     value = 'starting'
                                 else:
@@ -52,6 +51,12 @@ class Prometheus:
 
                                 sensor.set_enum(value)
                             elif(sensor_type == 'gauge'):
+                                if(index == -1):
+                                    value = dict_sensor[name]
+                                    if(value == True):
+                                        value = 1.0
+                                    else:
+                                        value = 0.0
                                 sensor.set_gauge(value)
                 except Exception as e:
                     logging.error(f"Une erreurs c'est produite lors de la mise à jour de la valeur sur le capteur: {e}")
