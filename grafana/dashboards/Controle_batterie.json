@@ -172,6 +172,30 @@
                 }
               }
             ]
+          },
+          {
+            "__systemRef": "hideSeriesFrom",
+            "matcher": {
+              "id": "byNames",
+              "options": {
+                "mode": "exclude",
+                "names": [
+                  "Mode Protect"
+                ],
+                "prefix": "All except:",
+                "readOnly": true
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": true
+                }
+              }
+            ]
           }
         ]
       },
@@ -337,16 +361,14 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "exemplar": false,
           "expr": "au_pr",
-          "format": "time_series",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": true,
-          "instant": true,
-          "legendFormat": "Mode Protect",
-          "range": false,
-          "refId": "J",
+          "instant": false,
+          "legendFormat": "Mode protection",
+          "range": true,
+          "refId": "F",
           "useBackend": false
         }
       ],
@@ -368,5 +390,5 @@
   "timezone": "browser",
   "title": "Contrôleur batterie",
   "uid": "dejy4ygzsi1hcf",
-  "version": 2
+  "version": 1
 }
