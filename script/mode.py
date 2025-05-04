@@ -4,6 +4,10 @@ class Mode(Data):
     def __init__(self):
         self.etatBattery = False
 
+    def observ(self):
+        Data.dict_relay["rs_01"] = True
+        Data.dict_relay["rs_02"] = True
+
     def protect(self):
         if (Data.multi_dict_01['psu_voltage'] <= Data.MIN_PROTEC_TENSION or self.etatBattery):
             Data.bool_mode = False #Pour être sur qu'on contrôle la tention du générateur

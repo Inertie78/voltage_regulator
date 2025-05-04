@@ -78,11 +78,11 @@ class Main(Data):
             # Sélection du mode de fonctionnement 
             if (Data.dict_relay["au_ob"] and bool_count): # mode Observer
                 Data.bool_mode = False
-                Data.dict_relay["rs_01"] = True
-                Data.dict_relay["rs_02"] = True
+                self.mode.observ()
 
             elif (self.dict_relay["au_ma"] and bool_count): # mode Manuel
                 Data.bool_mode = True
+
                 message = "Libre"
             
             if(Data.multimetre_03.get_psu_voltage() > Data.MIN_GENERATOR_TENSION or Data.bool_mode ): # Controle l'état du systeme
@@ -98,9 +98,7 @@ class Main(Data):
                 Data.dict_relay["au_pr"] = False
                 Data.dict_relay["au_co"] = False
                 Data.dict_relay["au_ma"] = False
-
-                Data.dict_relay["rs_01"] = True
-                Data.dict_relay["rs_02"] = True
+                self.mode.observ()
 
                 message = 'Erreur alimentation perdue.'
 
