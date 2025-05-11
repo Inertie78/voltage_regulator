@@ -26,13 +26,49 @@
   
   <body>
     <div class="Center_container">
-      <ul id="menu">
-        <li class="menuclass {{_menuDict['multi']}}"><a href="/flask/">Multimètre</a></li>
-        <li class="menuclass {{_menuDict['rela']}}"><a href="/flask/relay">Relais</a></li>
-        <li class="menuclass {{_menuDict['prom']}}"><a href="/flask/prometheuse">Prometheus</a></li>
-        <li class="menuclass {{_menuDict['graf']}}"><a href="/flask/grafana">Grafana</a></li>
+      {% if _active == "multi" %}
+        {% set  multi  = "menuclass active" %}
+        {% set rela  = "menuclass" %}
+        {% set prom  = "menuclass" %}
+        {% set graf  = "menuclass" %}
+        {% set  abou  = "menuclass" %}
+      {% elif _active == "rela" %}
+        {% set  multi  = "menuclass" %}
+        {% set rela  = "menuclass active" %}
+        {% set prom  = "menuclass" %}
+        {% set graf  = "menuclass" %}
+        {% set abou  = "menuclass" %}
 
-        <li class="menuclass {{_menuDict['abou']}}" style="float:right"><a href="/flask/about" id="#btMenuAbout">About</a></li>
+      {% elif _active == "prom" %}
+        {% set multi  = "menuclass" %}
+        {% set rela  = "menuclass" %}
+        {% set prom  = "active" %}
+        {% set graf  = "menuclass" %}
+        {% set abou  = "menuclass" %}
+
+      {% elif _active == "graf" %}
+        {% set multi  = "menuclass" %}
+        {% set rela  = "menuclass" %}
+        {% set prom  = "menuclass" %}
+        {% set graf  = "menuclass active" %}
+        {% set abou  = "menuclass" %}
+
+      {% elif _active == "abou" %}
+        {% set multi  = "menuclass" %}
+        {% set rela  = "menuclass" %}
+        {% set prom  = "menuclass" %}
+        {% set graf  = "menuclass" %}
+        {% set abou  = "menuclass active" %}
+      {% endif %}
+
+      <ul id="menu">
+        
+        <li class="{{multi}}"><a href="/flask/">Multimètre</a></li>
+        <li class="{{rela}}"><a href="/flask/relay">Relais</a></li>
+        <li class="{{prom}}"><a href="/flask/prometheuse">Prometheus</a></li>
+        <li class="{{graf}}"><a href="/flask/grafana">Grafana</a></li>
+
+        <li class="{{abou}}" style="float:right"><a href="/flask/about" id="#btMenuAbout">About</a></li>
       </ul>
       
       <div class="Center_container">

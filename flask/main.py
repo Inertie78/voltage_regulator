@@ -8,7 +8,7 @@ import logging
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-menuDict = {'prom':'', 'graf':'', 'rela':'', 'multi':'', 'multi':'','abou':''}
+menuDict = {'prom':'', 'graf':'', 'rela':'', 'multi':'','abou':''}
 
 ################################################# Fonction #################################################
 # Fonction qui renvoi l'url pour prometheus et grafana
@@ -48,7 +48,7 @@ def index():
     #Pour changer ajouter le mode active du menu sur multimètre et enlèver sur les autres items du menu.
     changeMenu('multi')
 
-    return render_template('multimeter.html', _socketio_ip=socketio_ip, _menuDict=menuDict)
+    return render_template('multimeter.html', _socketio_ip=socketio_ip, _active="multi")
 
 # Affiche la page web des relaies
 @app.route("/relay")
@@ -59,7 +59,7 @@ def relay():
     #Pour changer ajouter le mode active du menu sur GPIO et enlèver sur les autres items du menu.
     changeMenu('rela')
 
-    return render_template('relay.html', _socketio_ip=socketio_ip, _menuDict=menuDict)
+    return render_template('relay.html', _socketio_ip=socketio_ip, _active="rela")
 
 # Affiche la page web des settings des batteries
 @app.route("/prometheuse")
@@ -71,7 +71,7 @@ def prometheuse():
     #Pour changer ajouter le mode active du menu sur prometheus et enlèver sur les autres items du menu.
     changeMenu('prom')
 
-    return render_template('prometheus.html', _prometheuse_ip=prometheuse_ip, _menuDict=menuDict)
+    return render_template('prometheus.html', _prometheuse_ip=prometheuse_ip, _active="prom")
 
 # Affiche la page web grafana
 @app.route("/grafana")
@@ -82,7 +82,7 @@ def grafana():
     #Pour changer ajouter le mode active du menu sur grafana et enlèver sur les autres items du menu.
     changeMenu('graf')
 
-    return render_template('grafana.html', _grafana_ip=grafana_ip, _menuDict=menuDict)
+    return render_template('grafana.html', _grafana_ip=grafana_ip, _active="graf")
 
 
 # Affiche la page web sur les infos de la raspberry pi
@@ -94,7 +94,7 @@ def about():
      #Pour changer ajouter le mode active du menu sur multimètre et enlèver sur les autres items du menu.
     changeMenu('abou')
 
-    return render_template('about.html', _socketio_ip=socketio_ip, _menuDict=menuDict)
+    return render_template('about.html', _socketio_ip=socketio_ip, _active="abou")
 
 
 # Reboot la raspberry pi

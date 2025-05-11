@@ -1,13 +1,13 @@
 import socketio
 import  os, json, logging
-from data import Data
+import data
 
 format = "%(asctime)s %(levelname)s: %(message)s"
 level = os.getenv("LOG_LEVEL", "INFO")
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
-class Transmitting(Data):
+class Transmitting():
     def __init__(self, url):
         # Connection au server falsk
         try:
@@ -35,8 +35,8 @@ class Transmitting(Data):
         def message(datareceived):
             # Mise à jour des informamtions du pc
             if (datareceived == 'up_PI'):
-                Data.info_pc.infoPc()
-                dict_sensor = Data.info_pc.get_dict()
+                data.info_pc.infoPc()
+                dict_sensor = data.info_pc.get_dict()
                 data_string = json.dumps(dict_sensor)
                 #logging.info(f'Info pc ==> {dict_sensor}')
                 self.socketio.send(data_string)
@@ -45,31 +45,28 @@ class Transmitting(Data):
                 json_object = json.loads(datareceived)
                 if(len(json_object) >= 1):
                     for key in json_object.keys():
-                        if key in Data.dict_relay:
-                            Data.dict_relay[key] = json_object[key]
-                           #logging.info(f'Dict ==> {key}:{Data.dict_relay[key]}')
+                        if key in data.dict_relay:
+                            data.dict_relay[key] = json_object[key]
+                           #logging.info(f'Dict ==> {key}:{data.dict_relay[key]}')
             # Mise à jour de l'état des relais
             elif (datareceived == 'up_relay'):
-                relay_list = Data.dict_relay.copy()
-                relay_list.update({'message': Data.message})
+                relay_list = data.dict_relay.copy()
+                relay_list.update({'message': data.message})
                 data_string = json.dumps(relay_list)
                 self.socketio.send(data_string)
             # Mise à jour des valeurs du multimètre
             elif (datareceived == 'up_bat'):
                 multimetre_list = {}
-                for key in Data.multi_dict_01.keys():
-                    multimetre_list[f'bat_{key}_01'] = Data.multi_dict_01[key]
-                    multimetre_list[f'bat_{key}_02'] = Data.multi_dict_02[key]
-                    multimetre_list[f'bat_{key}_03'] = Data.multi_dict_03[key]
-                    multimetre_list[f'bat_{key}_04'] = Data.multi_dict_04[key]
-                    #if(key == 'bus_voltage'):
-                        #logging.info(f'Multimetre ==> bat_{key}_01 = {Data.multi_dict_01[key]}')
-                        #logging.info(f'Multimetre ==> bat_{key}_02 = {Data.multi_dict_02[key]}')
-                        #logging.info(f'Multimetre ==> bat_{key}_03 = {Data.multi_dict_03[key]}')
-                        #logging.info(f'Multimetre ==> bat_{key}_04 = {Data.multi_dict_04[key]}')
+                for key in data.multi_dict[0].keys():
+                    for i in range(len(data.multi_dict)):
+                        multimetre_list[f'bat_{key}_0' + str(i + 1)] = data.multi_dict[i][key]
+
+                        #if(key == 'bus_voltage'):
+                            #logging.info(f'Multimetre ==> bat_{key}_0 + str(i + 1) = {data.multi_dict[i][key]}')
+                        
                     
-                    multimetre_list.update({'message':Data.message, 'au_ob':Data.dict_relay['au_ob'], 'au_pr':Data.dict_relay['au_pr'],\
-                                            'au_co':Data.dict_relay['au_co'], 'au_ma':Data.dict_relay['au_ma']})
+                    multimetre_list.update({'message':data.message, 'au_ob':data.dict_relay['au_ob'], 'au_pr':data.dict_relay['au_pr'],\
+                                            'au_co':data.dict_relay['au_co'], 'au_ma':data.dict_relay['au_ma']})
 
                 data_string = json.dumps(multimetre_list)
                 #logging.info(f'Multimetre ==> {multimetre_list}')
