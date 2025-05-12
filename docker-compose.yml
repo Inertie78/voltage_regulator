@@ -13,38 +13,32 @@ services :
     ports :
       - 5000:5000
 
-  script :
-    container_name: script
+  program :
+    container_name: program
     privileged: true
     build :
-      context : ./script
+      context : ./program
       dockerfile : dockerfile.script 
     restart : always
     volumes :
       # fchier pour le scrip principal
-      - ./script/main.py:/usr/src/app/main.py:ro
-      - ./script/data.py:/usr/src/app/data.py:ro
-      - ./script/transmitting.py:/usr/src/app/transmitting.py:ro
+      - ./program/main.py:/usr/src/app/main.py:ro
+      - ./program/data.py:/usr/src/app/data.py:ro
+      - ./program/transmitting.py:/usr/src/app/transmitting.py:ro
+      - ./program/mode.py:/usr/src/app/mode.py:ro
 
-      # Pour script pour la raspberry pi
-      - ./script/raspberry/__init__.py:/usr/src/app/raspberry/__init__.py:ro
-      - ./script/raspberry/infoPc.py:/usr/src/app/raspberry/infoPc.py:ro
-      - ./script/raspberry/multimetre.py:/usr/src/app/raspberry/multimetre.py:ro
-      - ./script/raspberry/lineGpio.py:/usr/src/app/raspberry/lineGpio.py:ro
-      - ./script/raspberry/relay.py:/usr/src/app/raspberry/relay.py:ro
+      # Pour program pour la raspberry pi
+      - ./program/raspberry/__init__.py:/usr/src/app/raspberry/__init__.py:ro
+      - ./program/raspberry/infoPc.py:/usr/src/app/raspberry/infoPc.py:ro
+      - ./program/raspberry/multimetre.py:/usr/src/app/raspberry/multimetre.py:ro
+      - ./program/raspberry/lineGpio.py:/usr/src/app/raspberry/lineGpio.py:ro
+      - ./program/raspberry/relay.py:/usr/src/app/raspberry/relay.py:ro
       
-      # Pour script pour la dataBase prometheus
-      - ./script/dataBase/__init__.py:/usr/src/app/dataBase/__init__.py:ro
-      - ./script/dataBase/sensor.py:/usr/src/app/dataBase/sensor.py:ro
-      - ./script/dataBase/prometheus.py:/usr/src/app/dataBase/prometheus.py:ro
+      # Pour program pour la dataBase prometheus
+      - ./program/dataBase/__init__.py:/usr/src/app/dataBase/__init__.py:ro
+      - ./program/dataBase/sensor.py:/usr/src/app/dataBase/sensor.py:ro
+      - ./program/dataBase/prometheus.py:/usr/src/app/dataBase/prometheus.py:ro
 
-      # Pour script pour les modes de fonctionnement
-      - ./script/modes/__init__.py:/usr/src/app/modes/__init__.py:ro
-      - ./script/modes/consommation.py:/usr/src/app/modes/consommation.py:ro
-      - ./script/modes/manuel.py:/usr/src/app/modes/manuel.py:ro
-      - ./script/modes/observer.py:/usr/src/app/modes/observer.py:ro
-      - ./script/modes/protect.py:/usr/src/app/modes/protect.py:ro
-      
       # pour les gpio sur la raspberry p
       - /dev/gpiochip0:/dev/gpiochip0:ro
       
@@ -67,7 +61,7 @@ services :
     restart : always
     depends_on : 
       - flask
-      - script
+      - program
 
   prometheus:
     container_name: prometheus
@@ -90,12 +84,10 @@ services :
     restart: always
     ports:
       - "3000:3000"
-    user: root
+
     volumes:
       - ./grafana/provisioning:/etc/grafana/provisioning
       - ./grafana/dashboards:/var/lib/grafana/dashboards
-
-      - ./grafana/data:/var/lib/grafana
       - ./grafana/grafana.ini:/etc/grafana/grafana.ini
 
     depends_on:
@@ -106,7 +98,6 @@ services :
       GF_AUTH_DISABLE_LOGIN_FORM: "true"
       
       GF_PATHS_PROVISIONING: "/etc/grafana/provisioning"
-      GF_PATHS_DATA: "/var/lib/grafana"
 
 volumes :
   prometheus :

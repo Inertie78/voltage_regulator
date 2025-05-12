@@ -4,8 +4,9 @@
 flask/.flask_venv/
 .venv/
 .old/
-script/__pycache__/
-script/modes/__pycache__/
-script/raspberry/__pycache__/
-script/dataBase/__pycache__/
-prometheus/prometheus_data
+program/__pycache__/
+program/modes/__pycache__/
+program/raspberry/__pycache__/
+program/dataBase/__pycache__/
+
+prometheus/prometheus_data/

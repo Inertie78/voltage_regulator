@@ -58,13 +58,13 @@ function handleInputChange(event) {
       Object.assign(etat_switch, { "au_ob": false });
       Object.assign(etat_switch, { "au_co": false });
 
-      $("#rs_01").prop('checked', false);
-      $("#rs_02").prop('checked', false);
+      $("#rs_01").prop('checked', true);
+      $("#rs_02").prop('checked', true);
       $("#rs_03").prop('checked', false);
       $("#rs_04").prop('checked', false);
 
-      Object.assign(etat_switch, { "rs_01": false });
-      Object.assign(etat_switch, { "rs_02": false });
+      Object.assign(etat_switch, { "rs_01": true });
+      Object.assign(etat_switch, { "rs_02": true });
       Object.assign(etat_switch, { "rs_03": false });
       Object.assign(etat_switch, { "rs_04": false });
     }
@@ -123,6 +123,7 @@ function updatePage() {
             }
             
           }
+          $("#etatSyteme").text(myObj["message"])
         }
       }
     });
