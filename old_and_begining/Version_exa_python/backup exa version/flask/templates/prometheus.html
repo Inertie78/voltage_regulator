@@ -1,0 +1,15 @@
+{% extends "index.html" %}
+{% block content %}
+
+  <div class="classTitre">
+    <section class="wrapper" style="margin: 10px;">
+      <div class="top">Prometheus</div>
+      <div class="bottom" aria-hidden="true">Prometheus</div>
+    </section>
+  </div>
+
+  
+  <iframe  src="{{_prometheuse_ip}}"></iframe>
+
+
+{% endblock %}

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <title>Controleur batterie</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Crimson+Pro">
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <link rel="stylesheet" href="menu.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js"></script>
+  </head>
+  <body>
+    <div>
+      <ul id="menu">
+        <li><a id="btMenuBatterie">Batterie</a></li>
+        <li><a id="btMenuBatterie">Graphique</a></li>
+        <li><a id="btMenuSettings">Settings</a></li>
+        <li style="float:right"><a id="#btMenuAbout">About</a></li>
+      </ul>
+
+      <div class="Center_container">
+
+        <div class="classTitre">
+          <section class="wrapperH1">
+            <div class="top">Controleur de batterie</div>
+            <div class="bottomH1" aria-hidden="true">Controleur de batterie</div>
+          </section>
+        </div>
+
+        <div class="centered">
+
+          <div class="configuInput" style="margin-bottom: 20px;" >
+            <h4 class="classMois" id="current_date"></h4>
+            <h4 class="classHeure" id="current_time"></h4>
+          </div>
+
+          <div class="configuInput">
+            <div class="configuInput">
+                <div style="margin-right: 50px;" id="chart_Tension"></div>
+                <div id="chart_Temp"></div>
+            </div>
+          </div>
+
+          <div class="classTitre">
+            <section class="wrapper" style="margin: 10px;">
+              <div class="top">Graphique</div>
+              <div class="bottom" aria-hidden="true">Graphique</div>
+            </section>
+          </div>
+
+          <div class="tab-pane fade" id="tab_graphs">
+            <div  style="margin: 20px;">
+              <div id="chartContainer" style="height: 360px; width: auto;"></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

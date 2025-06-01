@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <title>Controleur batterie</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Crimson+Pro">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		<link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/superhero/bootstrap.min.css" rel="stylesheet" title="main">
+    <script src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
+		<script src="https://canvasjs.com/assets/script/jquery.canvasjs.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.0/bootstrap-table.min.css">
+    <script src="https://unpkg.com/bootstrap-table@1.14.2/dist/bootstrap-table.min.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+
+    <link rel="stylesheet" href="menu.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js"></script>
+  </head>
+  <body>
+    <div>
+      <ul id="menu">
+        <li><a id="btMenuBatterie">Batterie</a></li>
+        <li><a id="btMenuBatterie">Graphique</a></li>
+        <li><a id="btMenuSettings">Settings</a></li>
+        <li style="float:right"><a id="#btMenuAbout">About</a></li>
+      </ul>
+      <div class="Center_container">
+
+        <div class="classTitre">
+          <section class="wrapperH1">
+            <div class="top">Controleur de batterie</div>
+            <div class="bottomH1" aria-hidden="true">Controleur de batterie</div>
+          </section>
+        </div>
+            
+        <div class="classTitre">
+          <div class="configuInput" style="margin-bottom: 20px;" >
+            <h4 class="classMois" id="current_date"></h4>
+            <h4 class="classHeure" id="current_time"></h4>
+          </div>
+
+          <div class="configuInput">
+            <div class="configuInput">
+                <div style="margin-right: 50px;" id="chart_Tension"></div>
+                <div id="chart_Temp"></div>
+            </div>
+          </div>
+
+          <div class="classTitre">
+            <section class="wrapper" style="margin: 10px;">
+              <div class="top">Raspberry</div>
+              <div class="bottom" aria-hidden="true">Raspberry</div>
+            </section>
+          </div>  
+
+          <p>Status: <span id="val_systmeStatus"></span></p>
+          <p>Temperature CPU: <span id="val_TempRapberry"></span></p>
+          <p>Usage CPU: <span id="val_UsageRapberry"></span></p>
+          <p>Volts Core: <span id="val_CoreRapberry"></span></p>
+          <p>Ram total: <span id="val_RamTotalRapberry"></span></p>
+          <p>Ram used: <span id="val_RamUsedRapberry"></span></p>
+          <p>Ram free: <span id="val_RamFreeRapberry"></span></p>
+          <p>Disk total: <span id="val_DiskTotalRapberry"></span></p>
+          <p>Disk free: <span id="val_DiskFreeRapberry"></span></p>
+          <p>Disk pourcent: <span id="val_DiskPercRapberry"></span></p>
+
+        <button class="classButton" id="raspberryReboot">Reboot</button>
+        <button class="classButton" id="raspberryShutdown">Shutdown</button>
+
+      </div>
+    </div>
+  </body>
+</html> 

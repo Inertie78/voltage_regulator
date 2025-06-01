@@ -1,0 +1,15 @@
+global:
+  scrape_interval: 60s # By default, scrape targets every 60 seconds.
+  evaluation_interval: 15s # Evaluate rules every 15 seconds.
+
+  # Attach these extra labels to all timeseries collected by this Prometheus instance.
+  external_labels:
+    monitor: "temperature-monitor"
+
+scrape_configs:
+  - job_name: "Temperature from API script"
+
+    scrape_interval: 60s
+
+    static_configs:
+      - targets: ["script:8000"]

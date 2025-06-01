@@ -1,0 +1,10 @@
+# Compiled source #
+###################
+.vscode/
+flask/.flask_venv/
+.venv/
+.old/
+script/__pycache__/
+script/modes/__pycache__/
+script/raspberry/__pycache__/
+script/dataBase/__pycache__/
