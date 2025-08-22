@@ -54,7 +54,7 @@ class Multimetre() :
             # Pour faire varier les valeurs sans le multimètre connecté
             self.number += 0.1 
             self.multiSum.append('psu_voltage', self.number)
-            self.multiSum.aappenddd_to_list('bus_voltage', self.number)
+            self.multiSum.append('bus_voltage', self.number)
             self.multiSum.append('shunt_voltage', self.number)
             self.multiSum.append('current', self.number)
             self.multiSum.append('power', self.number)
