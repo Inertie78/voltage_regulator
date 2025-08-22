@@ -1,4 +1,5 @@
 import raspberry
+import Adafruit_DHT
 
 from dataBase.prometheus import Prometheus
 
@@ -54,8 +55,19 @@ etat_relay = [raspberry.Relay() for i in range(numberCapteur)]
 # Initialise les relaimultimètres. Décommenter les lignes au besoin
 multimetre = [raspberry.Multimetre((int("0x40", base=16) + i), LIMIT_COUNT) for i in range(numberCapteur)]
 
+# Type et GPIO du capteur de température et humidité
+SENSOR_DHT = Adafruit_DHT.DHT22
+PIN_DHT = 4  # GPIO4 (pin physique 7)
+
 # Crée des dictionaires pour les valeurs du multimètres
 multi_dict = [mult.get_dict() for mult in multimetre]
+
+# Dictionnaire pour température et humidité
+dht_dict = {'temperature': 0.0, 'humidity': 0.0}
+
+# Capteur Prometheus pour T° et Humidité
+# ID = 99 choisi pour éviter tout conflit avec les multimètres
+sensors_dht = prometheus.createSensors(dht_dict, 'gauge', 99)
 
 # Crée un sensor prometheus pour les inforamtions du pc
 sensors_pc = prometheus.createSensors(info_pc.get_dict(), 'gauge', 0)
