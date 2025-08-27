@@ -68,13 +68,6 @@ class Main():
                     bool_init = False
 
                 last_update_multi = current_time
-            humidity, temperature = Adafruit_DHT.read_retry(data.DHT_SENSOR, data.DHT_PIN)
-
-            # Mise à jour des valeurs si lecture valide
-            if humidity is not None and temperature is not None:
-                data.dht_dict['temperature'] = round(temperature, 1)
-                data.dht_dict['humidity'] = round(humidity, 1)
-
 
             # Sélection du mode de fonctionnement 
             if (data.dict_relay["au_ob"] and bool_count): # mode Observer
