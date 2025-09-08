@@ -30,6 +30,8 @@ class Main():
         
         Cette fonction gère également l'appel des modes et '''
 
+        multimetre_count = 0
+
         last_update_prom = 0
 
         last_update_multi = 0
@@ -52,36 +54,29 @@ class Main():
             # Quand la limit des valeurs et atteinte nous faisons la moyenne de la listes.
             if(current_time - last_update_multi > data.TIME_UPDATE_MULTI or last_update_multi == 0):
 
-                if(data.multimetre_count < data.LIMIT_COUNT):
+                if(multimetre_count < data.LIMIT_COUNT):
                     for mult in data.multimetre:
                         mult.add_value()
 
-                    data.multimetre_count += 1
+                    multimetre_count += 1
                     bool_count = False
-                elif (data.multimetre_count == data.LIMIT_COUNT  or last_update_multi == 0):
+                elif (multimetre_count == data.LIMIT_COUNT  or last_update_multi == 0):
                     for mult in data.multimetre:
                         for mult_d in data.multi_dict:
                             mult_d = mult.get_dict()
 
-                    data.multimetre_count = 0
+                    multimetre_count = 0
                     bool_count = True
                     bool_init = False
 
                 last_update_multi = current_time
-            humidity, temperature = Adafruit_DHT.read_retry(data.DHT_SENSOR, data.DHT_PIN)
-
-            # Mise à jour des valeurs si lecture valide
-            if humidity is not None and temperature is not None:
-                data.dht_dict['temperature'] = round(temperature, 1)
-                data.dht_dict['humidity'] = round(humidity, 1)
-
 
             # Sélection du mode de fonctionnement 
             if (data.dict_relay["au_ob"] and bool_count): # mode Observer
                 data.bool_mode = False
                 self.mode.observ()
 
-            elif (data.dict_relay["au_ma"] and bool_count): # mode Manuel
+            elif (data.dict_relay["au_ma"]): # mode Manuel
                 data.bool_mode = True
 
                 message = "Libre"
@@ -106,10 +101,6 @@ class Main():
 
                 if (bool_init):
                     message = 'Initialisation du système.'
-
-            # Ne sont pas utilisé pour l'instant
-            data.dict_relay["rs_03"] = False
-            data.dict_relay["rs_04"] = False
 
             if(bool_count):
                 data.message = message

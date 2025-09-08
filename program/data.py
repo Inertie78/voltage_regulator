@@ -1,20 +1,19 @@
 import raspberry
-import Adafruit_DHT
 
 from dataBase.prometheus import Prometheus
 
 TIME_UPDATE_PROM = 10
 TIME_UPDATE_MULTI = 0.1
 
-TIME_CHARGE_BAT = 5 * 60
-TIME_CHECK_BAT = 60
+TIME_CHARGE_BAT = 10
+TIME_CHECK_BAT = 2
 
 LIMIT_COUNT = 10
 
 # Valeur reel du systeme
 MAX_BATTERY_TENSION = 12.8
-MIN_BATTERY_TENSION = 12
-MIN_GENERATOR_TENSION = 13.5
+MIN_BATTERY_TENSION = 11.6
+MIN_GENERATOR_TENSION = 10
 
 MIN_PROTEC_TENSION = 12.6
 MIN_CONSO_TENSION = 12.4
@@ -27,16 +26,14 @@ MIN_CONSO_TENSION = 12.4
 #MIN_PROTEC_TENSION = 8.8
 #MIN_CONSO_TENSION = 11.2
 
-multimetre_count = 0
-
 bool_mode = False
 
 message = None
 
 # Pour initialisé le programme en mode observation
-dict_relay = {'au_ob':True, 'au_pr':False, 'au_co':False, 'au_ma':False, 'rs_01':True, 'rs_02':True, 'rs_03':True, 'rs_04':False}
+dict_relay = {'au_ob':True, 'au_pr':False, 'au_co':False, 'au_ma':False, 'rs_01':True, 'rs_02':True, 'rs_03':True, 'rs_04':True}
 
-dict_last_relay = {'rs_01':True, 'rs_02':True, 'rs_03':True, 'rs_04':False}
+dict_last_relay = {'rs_01':True, 'rs_02':True, 'rs_03':True, 'rs_04':True}
 
 prometheus = Prometheus()
 prometheus.startServer()
@@ -55,19 +52,8 @@ etat_relay = [raspberry.Relay() for i in range(numberCapteur)]
 # Initialise les relaimultimètres. Décommenter les lignes au besoin
 multimetre = [raspberry.Multimetre((int("0x40", base=16) + i), LIMIT_COUNT) for i in range(numberCapteur)]
 
-# Type et GPIO du capteur de température et humidité
-SENSOR_DHT = Adafruit_DHT.DHT22
-PIN_DHT = 4  # GPIO4 (pin physique 7)
-
 # Crée des dictionaires pour les valeurs du multimètres
 multi_dict = [mult.get_dict() for mult in multimetre]
-
-# Dictionnaire pour température et humidité
-dht_dict = {'temperature': 0.0, 'humidity': 0.0}
-
-# Capteur Prometheus pour T° et Humidité
-# ID = 99 choisi pour éviter tout conflit avec les multimètres
-sensors_dht = prometheus.createSensors(dht_dict, 'gauge', 99)
 
 # Crée un sensor prometheus pour les inforamtions du pc
 sensors_pc = prometheus.createSensors(info_pc.get_dict(), 'gauge', 0)
