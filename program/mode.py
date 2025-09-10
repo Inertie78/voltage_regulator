@@ -8,6 +8,7 @@ class Mode():
         self.battery_Voltage = data.multi_dict[0]['psu_voltage']
 
     def observ(self):
+        self.overheat()
         data.dict_relay["rs_01"] = True
         data.dict_relay["rs_02"] = True
     
@@ -57,13 +58,24 @@ class Mode():
         return message , relay_01, relay_02
 
     def protect(self, current_time):
+        self.overheat()
         message , relay_01, relay_02 =  self.checkBattery(current_time)
         data.dict_relay["rs_01"] = relay_02
         data.dict_relay["rs_02"] = relay_01
         return message
     
     def conso(self, current_time):
+        self.overheat()
         message , relay_01, relay_02 =  self.checkBattery(current_time)
         data.dict_relay["rs_01"] = relay_01
         data.dict_relay["rs_02"] = relay_02
         return message
+    
+    def overheat(self, current_time):
+        if (data.temp_dict['temperature'] >= data.MAX_SECURITY_TEMPERATURE):
+            data.dict_relay["rs_01"] = False
+            data.dict_relay["rs_02"] = False
+            data.dict_relay["rs_03"] = False
+            message = "Température trop élevée"
+            return message
+            

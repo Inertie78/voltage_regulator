@@ -1,12 +1,14 @@
 import raspberry
 
 from dataBase.prometheus import Prometheus
+from program.raspberry.DHT22_GPIOD import get_dht22
 
 TIME_UPDATE_PROM = 10
 TIME_UPDATE_MULTI = 0.1
 
 TIME_CHARGE_BAT = 10
 TIME_CHECK_BAT = 2
+TIME_CHECK_TEMP = 2
 
 LIMIT_COUNT = 10
 
@@ -14,6 +16,7 @@ LIMIT_COUNT = 10
 MAX_BATTERY_TENSION = 12.8
 MIN_BATTERY_TENSION = 11.6
 MIN_GENERATOR_TENSION = 10
+MAX_SECURITY_TEMPERATURE = 60
 
 MIN_PROTEC_TENSION = 12.6
 MIN_CONSO_TENSION = 12.4
@@ -54,6 +57,12 @@ multimetre = [raspberry.Multimetre((int("0x40", base=16) + i), LIMIT_COUNT) for 
 
 # Crée des dictionaires pour les valeurs du multimètres
 multi_dict = [mult.get_dict() for mult in multimetre]
+
+# Dictionnaire pour stocker les valeurs du capteur
+temp_dict = {'temperature': 0.0, 'humidity': 0.0}
+
+# Capteurs Prometheus pour température et humidité
+sensors_temp = prometheus.createSensors(temp_dict, 'gauge', -2)
 
 # Crée un sensor prometheus pour les inforamtions du pc
 sensors_pc = prometheus.createSensors(info_pc.get_dict(), 'gauge', 0)

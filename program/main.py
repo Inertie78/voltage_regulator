@@ -2,6 +2,7 @@ import  os, logging, time
 
 import data
 from transmitting import Transmitting
+from raspberry.DHT22_GPIOD import get_dht22
 
 from mode import Mode
 
@@ -35,6 +36,8 @@ class Main():
         last_update_prom = 0
 
         last_update_multi = 0
+
+        last_update_temp = 0
 
         last_check_bat = 0
 
@@ -70,6 +73,23 @@ class Main():
                     bool_init = False
 
                 last_update_multi = current_time
+
+            # Lecture température toutes les 2 secondes
+            if current_time - last_update_temp > data.TIME_CHECK_TEMP or last_update_temp == 0:
+                temp, hum = get_dht22()
+                if temp is not None and hum is not None:
+                    data.temp_dict['temperature'] = temp
+                    data.temp_dict['humidity'] = hum
+
+                    # Envoi à Prometheus
+                    data.prometheus.set_sensors(data.sensors_temp, data.temp_dict, -2)
+
+                    last_update_temp = 0
+
+                else:
+                    logging.warning("[DHT22] ❌ Lecture invalide")
+
+                last_update_temp = current_time
 
             # Sélection du mode de fonctionnement 
             if (data.dict_relay["au_ob"] and bool_count): # mode Observer
@@ -141,7 +161,7 @@ class Main():
                 for i in range(len(data.multi_dict)):
                     logging.info("PSU Voltage:{:6.3f} [V]    Shunt Voltage:{:9.6f} [V]    Load Voltage:{:6.3f} [V]   Power:{:9.6f} [W]   Current:{:9.6f} [A]"
                                 .format((data.multi_dict[i]['psu_voltage']),(data.multi_dict[i]['shunt_voltage']),(data.multi_dict[i]['bus_voltage']),(data.multi_dict[i]['power']),(data.multi_dict[i]['current'])))
-
+                    logging.info(f"[DHT22] 🌡️ Température : {temp:.1f} °C | 💧 Humidité : {hum:.1f} %")
                 logging.info("")
                 logging.info("")
 
