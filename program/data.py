@@ -1,7 +1,7 @@
 import raspberry
+#import raspberry.dht
 
 from dataBase.prometheus import Prometheus
-from program.raspberry.DHT22_GPIOD import get_dht22
 
 TIME_UPDATE_PROM = 10
 TIME_UPDATE_MULTI = 0.1
@@ -44,6 +44,9 @@ prometheus.startServer()
 info_pc = raspberry.InfoPc()
 
 numberCapteur = 4
+
+#dht_capteur = raspberry.dht.DHT22()
+
 
 # Initialise les relais. Décommenter les lignes au besoin
 relay = [raspberry.LineGpio(name='relay 01', pin=19), raspberry.LineGpio(name='relay 02', pin=13), \
