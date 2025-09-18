@@ -71,3 +71,10 @@ class Transmitting():
                 data_string = json.dumps(multimetre_list)
                 #logging.info(f'Multimetre ==> {multimetre_list}')
                 self.socketio.send(data_string)
+
+            elif (datareceived == 'up_temp'):
+                temp_list = data.temp_dict.copy()
+                temp_list.update({'message':data.message, 'au_ob':data.dict_relay['au_ob'], 'au_pr':data.dict_relay['au_pr'],\
+                                            'au_co':data.dict_relay['au_co'], 'au_ma':data.dict_relay['au_ma']})
+                data_string = json.dumps(temp_list)
+                self.socketio.send(data_string)
