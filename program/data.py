@@ -48,7 +48,6 @@ info_pc = raspberry.InfoPc()
 
 numberCapteur = 4
 
-#dht_capteur = raspberry.dht.DHT22()
 
 
 # Initialise les relais. Décommenter les lignes au besoin

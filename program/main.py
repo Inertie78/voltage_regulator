@@ -81,8 +81,6 @@ class Main():
                     data.temp_dict['temperature'] = temp
                     data.temp_dict['humidity'] = hum
 
-                    # Envoi à Prometheus
-                    data.prometheus.set_sensors(data.sensors_temp, data.temp_dict, -2)
 
                     last_update_temp = current_time
 
@@ -149,6 +147,10 @@ class Main():
 
                 # Envoie le nouvelle état des relaies et des boutons utilisateur (automatique ou manuel) à prometheus
                 data.prometheus.set_sensors(data.sensors_relay, data.dict_relay, -1)
+
+                data.prometheus.set_sensors(data.sensors_temp, data.temp_dict, -2)
+
+
 
                 # Envoie les nouvelles état des batteries à prometheus
                 for i in range(len(data.sensors_multi)):
