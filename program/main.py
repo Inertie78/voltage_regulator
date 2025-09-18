@@ -80,9 +80,7 @@ class Main():
                 if temp is not None and hum is not None:
                     data.temp_dict['temperature'] = temp
                     data.temp_dict['humidity'] = hum
-
-
-                    last_update_temp = current_time
+                    
 
                 else:
                     logging.warning("[DHT22] ❌ Lecture invalide")
@@ -164,6 +162,7 @@ class Main():
                     logging.info("PSU Voltage:{:6.3f} [V]    Shunt Voltage:{:9.6f} [V]    Load Voltage:{:6.3f} [V]   Power:{:9.6f} [W]   Current:{:9.6f} [A]"
                                 .format((data.multi_dict[i]['psu_voltage']),(data.multi_dict[i]['shunt_voltage']),(data.multi_dict[i]['bus_voltage']),(data.multi_dict[i]['power']),(data.multi_dict[i]['current'])))
 
+                    logging.info("Température:{:6.2f} °C   Humidité:{:6.2f} %".format(data.temp_dict['temperature'], data.temp_dict['humidity']))
                 logging.info("")
                 logging.info("")
 
