@@ -3,7 +3,6 @@ import  os, logging, time
 import data
 from transmitting import Transmitting
 
-
 from mode import Mode
 
 format = "%(asctime)s %(levelname)s: %(message)s"
@@ -74,7 +73,7 @@ class Main():
 
                 last_update_multi = current_time
 
-             # Lecture température toutes les 2 secondes
+                        # Lecture température toutes les 2 secondes
             if current_time - last_update_temp > data.TIME_CHECK_TEMP or last_update_temp == 0:
                 temp, hum = data.dht_capteur.read_dht22()
 
@@ -91,7 +90,6 @@ class Main():
                     logging.warning("[DHT22] ❌ Lecture invalide")
 
                 last_update_temp = current_time
-
 
             # Sélection du mode de fonctionnement 
             if (data.dict_relay["au_ob"] and bool_count): # mode Observer
@@ -163,7 +161,7 @@ class Main():
                 for i in range(len(data.multi_dict)):
                     logging.info("PSU Voltage:{:6.3f} [V]    Shunt Voltage:{:9.6f} [V]    Load Voltage:{:6.3f} [V]   Power:{:9.6f} [W]   Current:{:9.6f} [A]"
                                 .format((data.multi_dict[i]['psu_voltage']),(data.multi_dict[i]['shunt_voltage']),(data.multi_dict[i]['bus_voltage']),(data.multi_dict[i]['power']),(data.multi_dict[i]['current'])))
-                    #logging.info(f"[DHT22] 🌡️ Température : {temp:.1f} °C | 💧 Humidité : {hum:.1f} %")
+
                 logging.info("")
                 logging.info("")
 
