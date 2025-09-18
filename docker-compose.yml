@@ -33,6 +33,7 @@ services :
       - ./program/raspberry/multimetre.py:/usr/src/app/raspberry/multimetre.py:ro
       - ./program/raspberry/lineGpio.py:/usr/src/app/raspberry/lineGpio.py:ro
       - ./program/raspberry/relay.py:/usr/src/app/raspberry/relay.py:ro
+      - ./program/raspberry/dht.py:/usr/src/app/raspberry/dht.py:ro
       
       # Pour program pour la dataBase prometheus
       - ./program/dataBase/__init__.py:/usr/src/app/dataBase/__init__.py:ro
