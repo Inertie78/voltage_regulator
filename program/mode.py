@@ -71,11 +71,11 @@ class Mode():
         data.dict_relay["rs_02"] = relay_02
         return message
     
-    #def overheat(self, current_time):
-    #    if (data.temp_dict['temperature'] >= data.MAX_SECURITY_TEMPERATURE):
-    #        data.dict_relay["rs_01"] = False
-    #        data.dict_relay["rs_02"] = False
-    #        data.dict_relay["rs_03"] = False
-    #        message = "Température trop élevée"
-    #        return message
+    def overheat(self, current_time):
+        if (data.temp_dict['temperature'] >= data.MAX_SECURITY_TEMPERATURE):
+            data.dict_relay["rs_01"] = False
+            data.dict_relay["rs_02"] = False
+            data.dict_relay["rs_03"] = False
+            message = "Température trop élevée"
+            return message
             

@@ -1,5 +1,5 @@
 import raspberry
-#import raspberry.dht
+
 
 from dataBase.prometheus import Prometheus
 
@@ -28,6 +28,9 @@ MIN_CONSO_TENSION = 12.4
 
 #MIN_PROTEC_TENSION = 8.8
 #MIN_CONSO_TENSION = 11.2
+
+
+dht_capteur = raspberry.dht.DHT22()
 
 bool_mode = False
 
