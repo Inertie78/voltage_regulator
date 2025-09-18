@@ -1,6 +1,7 @@
 import raspberry
 
 
+
 from dataBase.prometheus import Prometheus
 
 TIME_UPDATE_PROM = 10
@@ -30,7 +31,7 @@ MIN_CONSO_TENSION = 12.4
 #MIN_CONSO_TENSION = 11.2
 
 
-dht_capteur = raspberry.dht.DHT22()
+dht_capteur = raspberry.DHT22()
 
 bool_mode = False
 
