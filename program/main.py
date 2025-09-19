@@ -75,9 +75,11 @@ class Main():
 
                         # Lecture température toutes les 2 secondes
             if current_time - last_update_temp > data.TIME_CHECK_TEMP or last_update_temp == 0:
-                temp, hum = data.dht_capteur.read_dht22()
+                result = data.dht_capteur.read_dht22()
+                if result is not None:
+                    temp, hum = result
 
-                if temp is not None and hum is not None:
+                
                     data.temp_dict['temperature'] = temp
                     data.temp_dict['humidity'] = hum
                     
