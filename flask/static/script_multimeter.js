@@ -8,8 +8,8 @@ var voltage_gauge = 11.0;
 var current = 0.0;
 var power = 0.0;
 
-var temp = 20.0;
-var humi = 60.0;
+var temp = -50.0;
+var humi = 0.0;
 
 
 var value_precision = 2;
@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
   drawChart();
 });
 
-function createGaugeOptions(labels, zones) {
+function createGaugeOptions(labels, zones, divison, subDivisions) {
   return {
     colorStart: "#6fadcf",
     colorStop: void 0,
@@ -49,11 +49,11 @@ function createGaugeOptions(labels, zones) {
     },
     staticZones: zones,
     renderTicks: {
-      divisions: 6,
+      divisions: divison,
       divWidth: 1.1,
       divLength: 0.3,
       divColor: "#333333",
-      subDivisions: 5,
+      subDivisions: subDivisions,
       subLength: 0.2,
       subWidth: 0.6,
       subColor: "#666666"
@@ -70,14 +70,16 @@ function createGaugeOptions(labels, zones) {
 
 // Pour les gauge et la mise à jour des variables du multimètre
 function drawChart() {
-
+  
   var opts_voltage = createGaugeOptions(
     [11, 12, 13, 14],
     [
       {strokeStyle: "#FF0000", min: 11, max: 11.9},
       {strokeStyle: "#FFDD00", min: 11.9, max: 12.4},
-      {strokeStyle: "#30B32D", min: 12.4, max: 14.0}
-    ]
+      {strokeStyle: "#30B32D", min: 12.4, max: 14}
+    ],
+    6, 
+    5
   );
 
   var opts_temp = createGaugeOptions(
@@ -86,7 +88,9 @@ function drawChart() {
       {strokeStyle: "#FF0000", min: -50, max: 0},
       {strokeStyle: "#FFDD00", min: 0, max: 90},
       {strokeStyle: "#30B32D", min: 90, max: 150}
-    ]
+    ],
+    8, 
+    5
   );
 
   var opts_humi = createGaugeOptions(
@@ -95,36 +99,38 @@ function drawChart() {
       {strokeStyle: "#FF0000", min: 0, max: 30},
       {strokeStyle: "#FFDD00", min: 30, max: 70},
       {strokeStyle: "#30B32D", min: 70, max: 100}
-    ]
+    ],
+    10, 
+    10
   );
-
+ 
 
   var target_01 = document.getElementById('chart_Tension_01'); 
-  var gauge_01 = new Gauge(target_01).setOptions(opts);
+  var gauge_01 = new Gauge(target_01).setOptions(opts_voltage);
   gauge_01.maxValue = max_gauge;
   gauge_01.setMinValue(min_gauge); 
   gauge_01.animationSpeed = anim_gauge
 
   var target_02 = document.getElementById('chart_Tension_02'); 
-  var gauge_02 = new Gauge(target_02).setOptions(opts);
+  var gauge_02 = new Gauge(target_02).setOptions(opts_voltage);
   gauge_02.maxValue = max_gauge;
   gauge_02.setMinValue(min_gauge); 
   gauge_02.animationSpeed = anim_gauge
 
   var target_03 = document.getElementById('chart_Tension_03'); 
-  var gauge_03 = new Gauge(target_03).setOptions(opts);
+  var gauge_03 = new Gauge(target_03).setOptions(opts_voltage);
   gauge_03.maxValue = max_gauge;
   gauge_03.setMinValue(min_gauge); 
   gauge_03.animationSpeed = anim_gauge
 
   var target_04 = document.getElementById('chart_Tension_04'); 
-  var gauge_04 = new Gauge(target_04).setOptions(opts);
+  var gauge_04 = new Gauge(target_04).setOptions(opts_voltage);
   gauge_04.maxValue = max_gauge;
   gauge_04.setMinValue(min_gauge); 
   gauge_04.animationSpeed = anim_gauge
 
   var target_Tremp = document.getElementById('chart_Temp'); 
-  var gauge_Temp = new Gauge(target_Tremp).setOptions(opts_Temp);
+  var gauge_Temp = new Gauge(target_Tremp).setOptions(opts_temp);
   gauge_Temp.maxValue = max_Temp;
   gauge_Temp.setMinValue(min_Temp); 
   gauge_Temp.animationSpeed = anim_gauge
