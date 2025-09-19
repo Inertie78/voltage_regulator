@@ -73,7 +73,7 @@ class Main():
 
                 last_update_multi = current_time
 
-                        # Lecture température toutes les 2 secondes
+            # Lecture température toutes les 2 secondes
             if current_time - last_update_temp > data.TIME_CHECK_TEMP or last_update_temp == 0:
                 result = data.dht_capteur.read_dht22()
                 if result is not None:
@@ -99,15 +99,14 @@ class Main():
 
                 message = "Libre"
             
-            if(data.multimetre[2].get_psu_voltage() > data.MIN_GENERATOR_TENSION or data.bool_mode ): # Controle l'état du systeme
+            # Controle l'état du systeme
+            if(data.multimetre[2].get_psu_voltage() > data.MIN_GENERATOR_TENSION or data.bool_mode ):
 
                 if (data.dict_relay["au_pr"] and bool_count): # mode Protect
                     message = self.mode.protect(current_time)
 
                 elif (data.dict_relay["au_co"] and bool_count): # mode Consommation
                     message = self.mode.conso(current_time)
-                    
-
             else:
                 data.dict_relay["au_ob"] = True
                 data.dict_relay["au_pr"] = False

@@ -8,51 +8,46 @@ var voltage_gauge = 11.0;
 var current = 0.0;
 var power = 0.0;
 
+var temp = 20.0;
+var humi = 60.0;
+
+
 var value_precision = 2;
 
 var min_gauge = 11;
 var max_gauge  = 14;
 var anim_gauge = 32;
 
+var min_Temp = -50;
+var max_Temp  = 150;
+var min_Humi = 0;
+var max_Humi  = 100;
+
 document.addEventListener("DOMContentLoaded", () => {
   drawChart();
 });
 
-
-// Pour les gauge et la mise à jour des variables du multimètre
-function drawChart() {
-
-  // Variable pour les options des gauges 
-  var opts = {
-    // color configs
+function createGaugeOptions(labels, zones) {
+  return {
     colorStart: "#6fadcf",
     colorStop: void 0,
     gradientType: 0,
     strokeColor: "#e0e0e0",
     generateGradient: true,
-    percentColors: [[0.0, "#a9d70b" ], [0.50, "#f9c802"], [1.0, "#ff0000"]],
-    // customize pointer
+    percentColors: [[0.0, "#a9d70b"], [0.50, "#f9c802"], [1.0, "#ff0000"]],
     pointer: {
       length: 0.6,
       strokeWidth: 0.035,
       iconScale: 1.0,
       color: '#ffffff'
     },
-    // static labels
     staticLabels: {
       font: "10px sans-serif",
-      labels: [11, 12, 13, 14],
+      labels: labels,
       fractionDigits: 0,
       color: '#ffffff'
-
     },
-    // static zones
-    staticZones: [
-      {strokeStyle: "#FF0000", min: 11, max: 11.9},
-      {strokeStyle: "#FFDD00", min: 11.9, max: 12.4},
-      {strokeStyle: "#30B32D", min: 12.4, max: 14.0},
-    ],
-    // render ticks
+    staticZones: zones,
     renderTicks: {
       divisions: 6,
       divWidth: 1.1,
@@ -63,21 +58,45 @@ function drawChart() {
       subWidth: 0.6,
       subColor: "#666666"
     },
-    // the span of the gauge arc
     angle: 0.15,
-    // line thickness
     lineWidth: 0.44,
-    // radius scale
     radiusScale: 1.0,
-    // font size
     fontSize: 30,
-    // if false, max value increases automatically if value > maxValue
     limitMax: false,
-    // if true, the min value of the gauge will be fixed
     limitMin: false,
-    // High resolution support
     highDpiSupport: true
   };
+}
+
+// Pour les gauge et la mise à jour des variables du multimètre
+function drawChart() {
+
+  var opts_voltage = createGaugeOptions(
+    [11, 12, 13, 14],
+    [
+      {strokeStyle: "#FF0000", min: 11, max: 11.9},
+      {strokeStyle: "#FFDD00", min: 11.9, max: 12.4},
+      {strokeStyle: "#30B32D", min: 12.4, max: 14.0}
+    ]
+  );
+
+  var opts_temp = createGaugeOptions(
+    [-50, -25, 0, 25, 50, 75, 100, 125, 150],
+    [
+      {strokeStyle: "#FF0000", min: -50, max: 0},
+      {strokeStyle: "#FFDD00", min: 0, max: 90},
+      {strokeStyle: "#30B32D", min: 90, max: 150}
+    ]
+  );
+
+  var opts_humi = createGaugeOptions(
+    [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+    [
+      {strokeStyle: "#FF0000", min: 0, max: 30},
+      {strokeStyle: "#FFDD00", min: 30, max: 70},
+      {strokeStyle: "#30B32D", min: 70, max: 100}
+    ]
+  );
 
 
   var target_01 = document.getElementById('chart_Tension_01'); 
@@ -103,6 +122,18 @@ function drawChart() {
   gauge_04.maxValue = max_gauge;
   gauge_04.setMinValue(min_gauge); 
   gauge_04.animationSpeed = anim_gauge
+
+  var target_Tremp = document.getElementById('chart_Temp'); 
+  var gauge_Temp = new Gauge(target_Tremp).setOptions(opts_Temp);
+  gauge_Temp.maxValue = max_Temp;
+  gauge_Temp.setMinValue(min_Temp); 
+  gauge_Temp.animationSpeed = anim_gauge
+
+  var target_Humi = document.getElementById('chart_Humi'); 
+  var gauge_Humi = new Gauge(target_Humi).setOptions(opts_humi);
+  gauge_Humi.maxValue = max_Humi;
+  gauge_Humi.setMinValue(min_Humi); 
+  gauge_Humi.animationSpeed = anim_gauge
 
 
   // Pour mettre à jour des valeurs de la page et des gauges toute les seconde
@@ -163,6 +194,21 @@ function drawChart() {
           $("#psu_voltage_04").text( voltage + " V");
           $("#current_04").text( current + " A");
           $("#power_04").text( power + " W");
+          
+          // Met à jour la gauge température
+          temp = Number(myObj.temp).toFixed(value_precision);
+          value_gauge = temp;
+
+          gauge_Temp.set(value_gauge);
+          $("#temp_value").text( temp + " °C");
+
+          // Met à jour la gauge humidité
+          humi = Number(myObj.humi).toFixed(value_precision);
+          value_gauge = humi;
+
+          gauge_Humi.set(value_gauge);
+          $("#humi_value").text( humi + " %");
+
 
           if(myObj["au_ob"] === true){
             $("#selectMode").text('Observateur')
@@ -181,7 +227,6 @@ function drawChart() {
 }
 
 function checkValue() {
-  
   if(voltage < 1.0){
     voltage = 0.0.toFixed(value_precision);
     voltage_gauge = min_gauge.toFixed(value_precision);

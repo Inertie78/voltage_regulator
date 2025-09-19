@@ -49,8 +49,6 @@ info_pc = raspberry.InfoPc()
 
 numberCapteur = 4
 
-
-
 # Initialise les relais. Décommenter les lignes au besoin
 relay = [raspberry.LineGpio(name='relay 01', pin=19), raspberry.LineGpio(name='relay 02', pin=13), \
                 raspberry.LineGpio(name='relay 03', pin=6), raspberry.LineGpio(name='relay 04', pin=5)]
