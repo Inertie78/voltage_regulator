@@ -1,176 +1,133 @@
-import  os, logging, time
+import os
+import logging
+import time
 
 import data
 from transmitting import Transmitting
-
 from mode import Mode
 
-format = "%(asctime)s %(levelname)s: %(message)s"
-level = os.getenv("LOG_LEVEL", "INFO")
-logging.basicConfig(level=logging.DEBUG,
-                    format='%(asctime)s - %(levelname)s - %(message)s')
+# Configuration du logging
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
 
-# Tensions in Volts for 12v nominal Lead Acid Battery
-#MIN_BUFFER_TENSION = 13.5      #-18mV/°C
-#MAX_BUFFER_TENSION = 13.8      #-18mV/°C
-#MIN_CYCLE_TENSION = 14.4       #-30mV/°C
-#MAX_CYCLE_TENSION = 14.9       #-30mV/°C
-
-class Main():
+class Main:
     def __init__(self):
         self.mode = Mode(time.time())
-
         self.transmitting = Transmitting('http://flask:5000')
 
-    # Function principale
-    def run(self):
-        '''Fonction principale du script. Cette fonction gère le temps d'exécution des fonctions appelées, 
-        gère la récolte des tensions, la création de valeurs moyennes et la transmission de ces valeurs au 
-        serveur Prometheus. 
-        
-        Cette fonction gère également l'appel des modes et '''
+        self.last_update_prom = 0
+        self.last_update_multi = 0
+        self.last_update_temp = 0
 
-        multimetre_count = 0
+        self.multimetre_count = 0
+        self.bool_count = False
+        self.bool_init = True
 
-        last_update_prom = 0
+        # Initialisation des relais
+        for i in range(len(data.etat_relay)):
+            data.etat_relay[i].relayAction(data.relay[i], data.dict_relay[f'rs_0{i + 1}'])
 
-        last_update_multi = 0
-
-        last_update_temp = 0
-
-        last_check_bat = 0
-
-        bool_count = False
-
-        bool_init = True
-
-        # Initialise les relais
-        for i in range (len(data.etat_relay)):
-            data.etat_relay[i].relayAction(data.relay[i], data.dict_relay['rs_0'+ str(i + 1)])
-
-        while True:
-            message = None
-            current_time = time.time()
-
-            # add les valeurs à la class multimètre toute les x secondes (TIME_UPDATE_MULTI) et un nombres limite de valeurs (LIMIT_COUNT).
-            # Quand la limit des valeurs et atteinte nous faisons la moyenne de la listes.
-            if(current_time - last_update_multi > data.TIME_UPDATE_MULTI or last_update_multi == 0):
-
-                if(multimetre_count < data.LIMIT_COUNT):
-                    for mult in data.multimetre:
-                        mult.add_value()
-
-                    multimetre_count += 1
-                    bool_count = False
-                elif (multimetre_count == data.LIMIT_COUNT  or last_update_multi == 0):
-                    for mult in data.multimetre:
-                        for mult_d in data.multi_dict:
-                            mult_d = mult.get_dict()
-
-                    multimetre_count = 0
-                    bool_count = True
-                    bool_init = False
-
-                last_update_multi = current_time
-
-            # Lecture température toutes les 2 secondes
-            if current_time - last_update_temp > data.TIME_CHECK_TEMP or last_update_temp == 0:
-                result = data.dht_capteur.read_dht22()
-                if result is not None:
-                    temp, hum = result
-
-                
-                    data.temp_dict['temperature'] = temp
-                    data.temp_dict['humidity'] = hum
-                    
-
-                else:
-                    logging.warning("[DHT22] ❌ Lecture invalide")
-
-                last_update_temp = current_time
-
-            # Sélection du mode de fonctionnement 
-            if (data.dict_relay["au_ob"] and bool_count): # mode Observer
-                data.bool_mode = False
-                self.mode.observ()
-
-            elif (data.dict_relay["au_ma"]): # mode Manuel
-                data.bool_mode = True
-
-                message = "Libre"
-            
-            # Controle l'état du systeme
-            if(data.multimetre[2].get_psu_voltage() > data.MIN_GENERATOR_TENSION or data.bool_mode ):
-
-                if (data.dict_relay["au_pr"] and bool_count): # mode Protect
-                    message = self.mode.protect(current_time)
-
-                elif (data.dict_relay["au_co"] and bool_count): # mode Consommation
-                    message = self.mode.conso(current_time)
+    def update_multimetre(self, current_time):
+        if current_time - self.last_update_multi > data.TIME_UPDATE_MULTI:
+            if self.multimetre_count < data.LIMIT_COUNT:
+                for mult in data.multimetre:
+                    mult.add_value()
+                self.multimetre_count += 1
+                self.bool_count = False
             else:
-                data.dict_relay["au_ob"] = True
-                data.dict_relay["au_pr"] = False
-                data.dict_relay["au_co"] = False
-                data.dict_relay["au_ma"] = False
-                self.mode.observ()
+                for i, mult in enumerate(data.multimetre):
+                    data.multi_dict[i] = mult.get_dict()
+                self.multimetre_count = 0
+                self.bool_count = True
+                self.bool_init = False
+            self.last_update_multi = current_time
 
-                message = 'Erreur alimentation perdue.'
+    def update_temperature(self, current_time):
+        if current_time - self.last_update_temp > data.TIME_CHECK_TEMP:
+            result = data.dht_capteur.read_dht22()
+            if result:
+                temp, hum = result
+                data.temp_dict['temperature'] = temp
+                data.temp_dict['humidity'] = hum
+            else:
+                logging.warning("[DHT22] ❌ Lecture invalide")
+            self.last_update_temp = current_time
 
-                if (bool_init):
-                    message = 'Initialisation du système.'
+    def update_relays(self):
+        for i in range(len(data.etat_relay)):
+            key = f'rs_0{i + 1}'
+            if data.dict_relay[key] != data.dict_last_relay[key]:
+                data.etat_relay[i].relayAction(data.relay[i], data.dict_relay[key])
+                data.dict_last_relay[key] = data.dict_relay[key]
+                if i == 0:
+                    time.sleep(0.3)
 
-            if(bool_count):
-                data.message = message
-                if (message == None):
-                    data.message = 'En fonction'
+    def send_to_prometheus(self, current_time):
+        if current_time - self.last_update_prom > data.TIME_UPDATE_PROM:
+            data.info_pc.infoPc()
+            data.prometheus.set_sensors(data.sensors_pc, data.info_pc.get_dict(), 0)
+            data.prometheus.set_sensors(data.sensors_relay, data.dict_relay, -1)
+            data.prometheus.set_sensors(data.sensors_temp, data.temp_dict, -2)
 
-                if (not message == None):
-                    logging.info(f'Etat systeme ==> {message}')
-                
+            for i in range(len(data.sensors_multi)):
+                data.prometheus.set_sensors(data.sensors_multi[i], data.multi_dict[i], i + 1)
 
-            # Contrôle l'état des relais
-            for i in range(len(data.etat_relay)):
-                if(not data.dict_relay['rs_0' + str(i + 1)] == data.dict_last_relay['rs_0' + str(i + 1)]):
-                    data.etat_relay[i].relayAction(data.relay[i], data.dict_relay['rs_0' + str(i + 1)])
-                    data.dict_last_relay['rs_0' + str(i + 1)] = data.dict_relay['rs_0' + str(i + 1)]
-                    if (i == 0):
-                        time.sleep(0.3)
+            logging.info("\n--- Données Multimètre ---")
+            for i in range(len(data.multi_dict)):
+                d = data.multi_dict[i]
+                logging.info(
+                    f"PSU Voltage: {d['psu_voltage']:.3f} V | Shunt: {d['shunt_voltage']:.6f} V | "
+                    f"Bus: {d['bus_voltage']:.3f} V | Power: {d['power']:.6f} W | Current: {d['current']:.6f} A"
+                )
+            logging.info(f"Température: {data.temp_dict['temperature']:.2f} °C | Humidité: {data.temp_dict['humidity']:.2f} %\n")
+            self.last_update_prom = current_time
 
-            # Récupère l'état du système, les infos sur la batterie toute les 60 secondes et les envoie à Prometheus.
-            if (current_time - last_update_prom > data.TIME_UPDATE_PROM or last_update_prom == 0):
-                #Mise à jour des info du pc.
-                data.info_pc.infoPc()
+    def select_mode(self, current_time):
+        message = None
 
-                # Envoie les nouvelles valeurs du pc à prometheus
-                data.prometheus.set_sensors(data.sensors_pc, data.info_pc.get_dict(), 0)
+        if data.dict_relay["au_ob"] and self.bool_count:
+            data.bool_mode = False
+            message = self.mode.observ()
 
-                # Envoie le nouvelle état des relaies et des boutons utilisateur (automatique ou manuel) à prometheus
-                data.prometheus.set_sensors(data.sensors_relay, data.dict_relay, -1)
+        elif data.dict_relay["au_ma"]:
+            data.bool_mode = True
+            message = "Libre"
 
-                data.prometheus.set_sensors(data.sensors_temp, data.temp_dict, -2)
-
-
-
-                # Envoie les nouvelles état des batteries à prometheus
-                for i in range(len(data.sensors_multi)):
-                    data.prometheus.set_sensors(data.sensors_multi[i], data.multi_dict[i], (i + 1))
-
-                #Inscrit dans la console les valeurs du mulitmètre
-                logging.info("")
-                logging.info("")
-
-                for i in range(len(data.multi_dict)):
-                    logging.info("PSU Voltage:{:6.3f} [V]    Shunt Voltage:{:9.6f} [V]    Load Voltage:{:6.3f} [V]   Power:{:9.6f} [W]   Current:{:9.6f} [A]"
-                                .format((data.multi_dict[i]['psu_voltage']),(data.multi_dict[i]['shunt_voltage']),(data.multi_dict[i]['bus_voltage']),(data.multi_dict[i]['power']),(data.multi_dict[i]['current'])))
-
-                    logging.info("Température:{:6.2f} °C   Humidité:{:6.2f} %".format(data.temp_dict['temperature'], data.temp_dict['humidity']))
-                logging.info("")
-                logging.info("")
-
-                last_update_prom = current_time
-
+        if data.multimetre[2].get_psu_voltage() > data.MIN_GENERATOR_TENSION or data.bool_mode:
+            if data.dict_relay["au_pr"] and self.bool_count:
+                message = self.mode.protect(current_time)
+            elif data.dict_relay["au_co"] and self.bool_count:
+                message = self.mode.conso(current_time)
         else:
-            for rel in data.relay():
+            data.dict_relay.update({
+                "au_ob": True,
+                "au_pr": False,
+                "au_co": False,
+                "au_ma": False
+            })
+            temp_message = self.mode.observ()
+            message = temp_message or message
+            if self.bool_init:
+                message = "Initialisation du système."
+
+        if self.bool_count:
+            data.message = message or "En fonction"
+            logging.info(f"État système ==> {data.message}")
+
+    def run(self):
+        try:
+            while True:
+                current_time = time.time()
+                self.update_multimetre(current_time)
+                self.update_temperature(current_time)
+                self.select_mode(current_time)
+                self.update_relays()
+                self.send_to_prometheus(current_time)
+        except KeyboardInterrupt:
+            logging.info("🛑 Arrêt manuel du programme.")
+            for rel in data.relay:
                 rel.release()
 
 if __name__ == "__main__":
