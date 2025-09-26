@@ -68,9 +68,10 @@ class DHT22:
         if checksum != data[4]:
             print(f"[{time.strftime('%H:%M:%S')}] ❌ Trame rejetée (checksum)")
             return None, None
-
-        humidity = ((data[0] << 8) | data[1]) / 10.0
-        temp_raw = (data[2] << 8) | data[3]
-        temperature = -(temp_raw & 0x7FFF) / 10.0 if temp_raw & 0x8000 else temp_raw / 10.0
-        print(f"[{time.strftime('%H:%M:%S')}] 🌡️ {temperature:.1f} °C | 💧 {humidity:.1f} %")
-        return temperature, humidity
+        
+        else :
+            humidity = ((data[0] << 8) | data[1]) / 10.0
+            temp_raw = (data[2] << 8) | data[3]
+            temperature = -(temp_raw & 0x7FFF) / 10.0 if temp_raw & 0x8000 else temp_raw / 10.0
+            print(f"[{time.strftime('%H:%M:%S')}] 🌡️ {temperature:.1f} °C | 💧 {humidity:.1f} %")
+            return temperature, humidity

@@ -85,9 +85,9 @@ function drawChart() {
   var opts_temp = createGaugeOptions(
     [-50, -25, 0, 25, 50, 75, 100, 125, 150],
     [
-      {strokeStyle: "#FF0000", min: -50, max: 0},
-      {strokeStyle: "#FFDD00", min: 0, max: 90},
-      {strokeStyle: "#30B32D", min: 90, max: 150}
+      {strokeStyle: "#2600ffff", min: -50, max: 0},
+      {strokeStyle: "#00ff22ff", min: 0, max: 90},
+      {strokeStyle: "#ff0000ff", min: 90, max: 150}
     ],
     8, 
     5
@@ -96,8 +96,8 @@ function drawChart() {
   var opts_humi = createGaugeOptions(
     [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
     [
-      {strokeStyle: "#FF0000", min: 0, max: 30},
-      {strokeStyle: "#FFDD00", min: 30, max: 70},
+      {strokeStyle: "#d9ff00ff", min: 0, max: 30},
+      {strokeStyle: "#00ff00ff", min: 30, max: 70},
       {strokeStyle: "#30B32D", min: 70, max: 100}
     ],
     10, 

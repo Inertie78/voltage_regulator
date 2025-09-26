@@ -48,7 +48,7 @@ class Mode:
             return "✅ Batterie pleine", False, True
 
     def overheat(self):
-        if data.temp_dict['temperature'] >= data.MAX_SECURITY_TEMPERATURE:
+        if data.temp_dict['temperature'] is not None and data.temp_dict['temperature'] >= data.MAX_SECURITY_TEMPERATURE:
             self.update_relays(False, False, False)
             return "🔥 Température trop élevée"
         return None
