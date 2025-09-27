@@ -3,7 +3,6 @@
 .vscode/
 flask/.flask_venv/
 .venv/
-.old/
 program/__pycache__/
 program/modes/__pycache__/
 program/raspberry/__pycache__/
