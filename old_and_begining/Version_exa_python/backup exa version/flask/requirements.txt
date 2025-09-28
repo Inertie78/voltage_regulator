@@ -1,3 +1,0 @@
-Flask==3.1.0 --pre
-Flask-SocketIO==5.5.1 --pre
-eventlet==0.39.1 --pre

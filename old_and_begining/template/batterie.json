@@ -1,8 +1,0 @@
-{ "plomb":{"tensionMin":?, "tensionMax":?},
-  "nicd":{"tensionMin":?, "tensionMax":?},
-  "nimh":{"tensionMin":?, "tensionMax":?},
-  "lipo":{"tensionMin":?, "tensionMax":?},
-  "life":{"tensionMin":?, "tensionMax":?},
-  "liion":{"tensionMin":?, "tensionMax":?},
-  "lilo":{"tensionMin":?, "tensionMax":?}
-}

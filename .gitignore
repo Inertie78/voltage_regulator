@@ -9,3 +9,4 @@ program/raspberry/__pycache__/
 program/dataBase/__pycache__/
 
 prometheus/prometheus_data/
+.env
