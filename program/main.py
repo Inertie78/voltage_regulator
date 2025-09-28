@@ -47,6 +47,7 @@ class Main:
     def update_temperature(self, current_time):
         if current_time - self.last_update_temp > data.TIME_CHECK_TEMP:
             result = data.dht_capteur.read_dht22()
+            result = 30, 60
             if result:
                 temp, hum = result
                 data.temp_dict['temperature'] = temp
