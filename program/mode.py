@@ -66,23 +66,49 @@ class Mode:
             return "✅ Batterie pleine", False, True
 
     def overheat(self):
+         """
+        Vérifie la température du système.
+        Si elle dépasse la limite de sécurité, retourne un tuple
+        (message, rs_01, rs_02, rs_03) avec tous les relais désactivés.
+        Sinon, retourne None.
+        """
         if data.temp_dict['temperature'] is not None and data.temp_dict['temperature'] >= data.MAX_SECURITY_TEMPERATURE:
             self.update_relays(False, False, False)
             return "🔥 Température trop élevée"
         return None
 
     def protect(self, current_time):
+         """
+        Mode PROTECTION :
+        - Vérifie la batterie (checkBattery)
+        - Inverse volontairement les relais (rs_02, rs_01)
+        - Vérifie la température (overheat)
+        Retourne toujours (message, rs_01, rs_02, rs_03).
+        """
         message, rs_01, rs_02 = self.checkBattery(current_time)
         self.update_relays(rs_02, rs_01)
         temp_message = self.overheat()
         return temp_message if temp_message else message
 
     def conso(self, current_time):
+         """
+        Mode CONSOMMATION :
+        - Vérifie la batterie (checkBattery)
+        - Applique les relais tels quels (rs_01, rs_02)
+        - Vérifie la température (overheat)
+        Retourne toujours (message, rs_01, rs_02, rs_03).
+        """
         message, rs_01, rs_02 = self.checkBattery(current_time)
         self.update_relays(rs_01, rs_02)
         temp_message = self.overheat()
         return temp_message if temp_message else message
 
     def observ(self):
+         """
+        Mode OBSERVATION :
+        - Active en permanence rs_01 et rs_02
+        - Vérifie la température (overheat)
+        Retourne toujours (message, rs_01, rs_02, rs_03).
+        """
         self.update_relays(True, True)
         return self.overheat()
