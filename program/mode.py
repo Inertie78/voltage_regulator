@@ -2,25 +2,43 @@ import data
 
 class Mode:
     def __init__(self, current_time):
+        """
+        Initialise l'état de la batterie et enregistre le temps de la dernière charge.
+        """
         self.etatBattery = False
         self.last_charge_bat = current_time
 
     def get_voltage(self):
+        """
+        Récupère la tension actuelle mesurée par le multimètre.
+        """
         return data.multi_dict[0]['psu_voltage']
 
     def update_relays(self, rs_01, rs_02, rs_03=None):
+        """
+        Met à jour l'état des relais.
+        - rs_01, rs_02, rs_03 : booléens (True = activé, False = désactivé)
+        """
         data.dict_relay["rs_01"] = rs_01
         data.dict_relay["rs_02"] = rs_02
         if rs_03 is not None:
             data.dict_relay["rs_03"] = rs_03
 
     def checkBattery(self, current_time):
+        """
+        Vérifie l'état de la batterie en fonction de la tension mesurée et du temps écoulé depuis la dernière charge.
+        Retourne un tuple (message, rs_01, rs_02) :
+        - message : état de la batterie (texte)
+        - rs_01, rs_02 : état des relais associés à la batterie
+        """
         voltage = self.get_voltage()
 
+        # Si la tension est faible ou si on est déjà en mode "batterie en contrôle"
         if voltage <= data.MIN_CONSO_TENSION or self.etatBattery:
             self.etatBattery = True
             temps_depuis_charge = current_time - self.last_charge_bat
 
+            # Phase de contrôle batterie
             if temps_depuis_charge < data.TIME_CHECK_BAT:
                 data.bool_mode = True
                 data.multimetre_count = 0
